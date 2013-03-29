@@ -27,12 +27,6 @@ namespace gbc
 				
 				Header _header;
 				
-				int _romBanks;
-				int _ramBanks;
-				
-				int _romBankSize;
-				int _ramBankSize;
-				
 				int _selectedRomBank;
 				int _selectedRamBank;
 			};

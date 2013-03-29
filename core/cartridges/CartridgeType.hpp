@@ -7,10 +7,10 @@ namespace gbc
 	{
 		namespace cartridges
 		{
-			enum CartrdigeType
+			enum CartridgeType
 			{
 				romOnly = 0x00,
-				mbc1 = 0x01
+				mbc1 = 0x01,
 				mbc1Ram = 0x02,
 				mbc1RamBattery = 0x03,
 				mbc2 = 0x05,
@@ -34,10 +34,10 @@ namespace gbc
 				mbc5Rumble = 0x1C,
 				mbc5RumbleRam = 0x1D,
 				mbc5RumbleRamBattery = 0x1E,
-				PocketCamera = 0xFC,
-				BandaiTamas = 0xFD,
-				HuC3 = 0xFE,
-				HuC1RamBattery = 0xFF
+				pocketCamera = 0xFC,
+				bandaiTamas = 0xFD,
+				huC3 = 0xFE,
+				huC1RamBattery = 0xFF
 			};
 		}
 	}

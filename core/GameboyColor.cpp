@@ -706,6 +706,8 @@ void gbc::core::GameboyColor::UpdateTiles()
 			}
 		}
 		
+		delete[] _changedTiles.back();
+		
 		_changedTiles.pop_back();
 	}
 }

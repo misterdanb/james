@@ -18,12 +18,14 @@ int main(int argc, char *argv[])
 	milliseconds ms = std::chrono::duration_cast<milliseconds>(t1 - t0);
 	std::cout << ms.count() << "ms\n";*/
 	
-	gbc::ui::GameWindow window(640, 480);
+	gbc::ui::GameWindow *window = new gbc::ui::GameWindow(160, 144);
 	
-	while (window.isOpen())
+	while (window->isOpen())
 	{
-		window.Render();
+		window->Render();
 	}
+	
+	delete window;
 	
 	return 0;
 }

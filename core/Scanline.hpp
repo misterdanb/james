@@ -10,8 +10,11 @@ namespace gbc
 		class Scanline
 		{
 		public:
-			Scanline(Color[]);
+			Scanline();
+			Scanline(int, Color[]);
 			~Scanline();
+			
+			int GetLineIndex();
 			
 			Color *GetGameboyColors();
 			Color *GetRealColors();
@@ -19,6 +22,7 @@ namespace gbc
 			int GetLength();
 			
 		private:
+			int _lineIndex;
 			Color *_gameboyColors;
 			Color *_realColors;
 		};

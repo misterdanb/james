@@ -11,8 +11,8 @@ namespace gbc
 		{
 		public:
 			virtual ~ILCD(); 
-			virtual void DrawScanline(Scanline);
-			virtual void FinishFrame();
+			virtual void DrawScanline(Scanline) = 0;
+			virtual void FinishFrame() = 0;
 		};
 	}
 }
