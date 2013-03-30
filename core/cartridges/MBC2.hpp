@@ -21,6 +21,9 @@ namespace gbc
 				
 				int ReadByte(int);
 				void WriteByte(int, int);
+			
+			private:
+				int _ramEnabled;
 			};
 		}
 	}

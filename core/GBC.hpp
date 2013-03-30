@@ -11,6 +11,14 @@ const int GBC_TRUE = 1;
 
 //#define DEBUG
 
+#ifdef DEBUG
+	#define LOG(str) gbc::Log(str)
+	#define ERROR(str) gbc::Log(str)
+#else
+	#define LOG(str)
+	#define ERROR(str)
+#endif
+
 namespace gbc
 {
 	void Log(std::string);

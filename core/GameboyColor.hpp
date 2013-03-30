@@ -7,6 +7,7 @@
 
 #include "GBC.hpp"
 #include "LCD.hpp"
+#include "cartridges/Cartridge.hpp"
 #include "cpu/Processor.hpp"
 #include "MemoryBus.hpp"
 #include "LCDMode.hpp"
@@ -38,6 +39,7 @@ namespace gbc
 			
 			void Initialize();
 			void SetLCD(ILCD *);
+			void SetRom(int[]);
 			
 			void RenderScanline();
 			void RenderFrame();
@@ -59,6 +61,9 @@ namespace gbc
 			
 			// lcd
 			ILCD *_lcd;
+			
+			// cartridge
+			cartridges::Cartridge *_cartridge;
 			
 			// processor
 			cpu::Processor _wtf80;

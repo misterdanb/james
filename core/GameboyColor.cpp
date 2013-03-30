@@ -1,12 +1,13 @@
 #include "GameboyColor.hpp"
 
 gbc::core::GameboyColor::GameboyColor()
-	: _lcd(NULL), _wtf80()
+	: _lcd(NULL), _cartridge(NULL), _wtf80()
 {
 }
 
 gbc::core::GameboyColor::~GameboyColor()
 {
+	delete _cartridge;
 }
 
 void gbc::core::GameboyColor::Initialize()
@@ -18,6 +19,11 @@ void gbc::core::GameboyColor::Initialize()
 void gbc::core::GameboyColor::SetLCD(ILCD *lcd)
 {
 	_lcd = lcd;
+}
+
+void gbc::core::GameboyColor::SetRom(int rom[])
+{
+	_cartridge = cartridges::Cartridge::Create(rom);
 }
 
 void gbc::core::GameboyColor::RenderScanline()
@@ -89,12 +95,12 @@ void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
 
 int gbc::core::GameboyColor::ReadByte(int address)
 {
+	// das geht eleganter...
+	address &= 0xFFFF;
+	
 	if (address >= 0x0000 && address <= 0x7FFF)
 	{
-#ifdef DEBUG
-		Log("Not implemented");
-#endif
-		return 0;
+		return _cartridge->ReadByte(address);
 	}
 	else if (address >= 0x8000 && address <= 0x9FFF)
 	{
@@ -102,10 +108,7 @@ int gbc::core::GameboyColor::ReadByte(int address)
 	}
 	else if (address >= 0xA000 && address <= 0xBFFF)
 	{
-#ifdef DEBUG
-		Log("Not implemented");
-#endif
-		return 0;
+		return _cartridge->ReadByte(address);
 	}
 	else if (address >= 0xC000 && address <= 0xFDFF)
 	{
@@ -141,21 +144,21 @@ int gbc::core::GameboyColor::ReadByte(int address)
 		// interrupt enable
 		return _interruptEnableRegister;
 	}
-
-#ifdef DEBUG
-	Log("Out of range.");
-#endif
-		
+	
+	LOG("MemoryMap: Address out of range.");
+	
 	return 0;
 }
 
 void gbc::core::GameboyColor::WriteByte(int address, int value)
 {
+	// das geht eleganter...
+	address &= 0xFFFF;
+	value &= 0xFF;
+	
 	if (address >= 0x0000 && address <= 0x7FFF)
 	{
-#ifdef DEBUG
-		Log("Not implemented");
-#endif
+		_cartridge->WriteByte(address, value);
 	}
 	else if (address >= 0x8000 && address <= 0x9FFF)
 	{
@@ -189,9 +192,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 	}
 	else if (address >= 0xA000 && address <= 0xBFFF)
 	{
-#ifdef DEBUG
-		Log("Not implemented");
-#endif
+		_cartridge->WriteByte(address, value);
 	}
 	else if (address >= 0xC000 && address <= 0xFDFF)
 	{
@@ -579,9 +580,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 	}
 	else
 	{
-#ifdef DEBUG
-		Log("Out of range.");
-#endif
+		LOG("MemoryMap: Address out of range.");
 	}
 }
 

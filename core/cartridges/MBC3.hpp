@@ -21,6 +21,11 @@ namespace gbc
 				
 				int ReadByte(int);
 				void WriteByte(int, int);
+			
+			private:
+				int _ramRtcEnabled;
+				int _ramRtcMode;
+				int _rtc[5];
 			};
 		}
 	}

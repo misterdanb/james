@@ -13,9 +13,9 @@ namespace gbc
 				RomDimensions(int);
 				~RomDimensions();
 				
-				int romSize;
-				int romBanks;
-				int romBankSize;
+				int size;
+				int banks;
+				int bankSize;
 			};
 		}
 	}

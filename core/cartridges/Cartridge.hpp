@@ -1,6 +1,7 @@
 #ifndef _Cartridge_hpp_
 #define _Cartridge_hpp_
 
+#include "../GBC.hpp"
 #include "../MemoryBus.hpp"
 #include "Header.hpp"
 
@@ -21,7 +22,7 @@ namespace gbc
 				
 				static Cartridge *Create(int[]);
 				
-			private:
+			protected:
 				int *_rom;
 				int *_ram;
 				

@@ -7,9 +7,10 @@
 #include "MBC4.hpp"
 #include "MBC5.hpp"
 #include "RomRam.hpp"
+#include "MMM01.hpp"
 
 gbc::core::cartridges::Cartridge::Cartridge(int rom[])
-	: _rom(rom), _header(rom)
+	: _rom(rom), _header(rom), _selectedRomBank(0), _selectedRamBank(0)
 {
 }
 
@@ -24,12 +25,12 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 	switch (cartridgeType)
 	{
 		case romOnly:
-			return (Cartridge *) (new RomOnly(rom));
+			return new RomOnly(rom);
 		
 		case mbc1:
 		case mbc1Ram:
 		case mbc1RamBattery:
-			return (Cartridge *) (new MBC1(rom));
+			return new MBC1(rom);
 		
 		case mbc2:
 		case mbc2Battery:
@@ -39,10 +40,10 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 		case romRamBattery:
 			return new RomRam(rom);
 		
-		/*case mmm01:
+		case mmm01:
 		case mmm01Ram:
 		case mmm01RamBattery:
-			return new MMM01(rom);*/
+			return new MMM01(rom);
 		
 		case mbc3TimerBattery:
 		case mbc3TimerRamBattery:
@@ -64,6 +65,7 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 		case mbc5RumbleRamBattery:
 			return new MBC5(rom);
 		
+		// ahahahahahaha... no.jpg
 		/*case pocketCamera:
 			return new PocketCamera(rom);
 		

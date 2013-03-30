@@ -13,9 +13,9 @@ namespace gbc
 				RamDimensions(int);
 				~RamDimensions();
 				
-				int ramSize;
-				int ramBanks;
-				int ramBankSize;
+				int size;
+				int banks;
+				int bankSize;
 			};
 		}
 	}
