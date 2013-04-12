@@ -5,15 +5,15 @@
 
 struct SpriteAttribute
 {
-	int y;
-	int x;
-	int tileNumber;
-	int spriteColorPaletteNumber;
-	int tileVideoRamBankNumber;
-	int spriteMonochromePaletteNumber;
-	HorizontalFlip horizontalFlip;
-	VerticalFlip verticalFlip;
-	SpriteToBackgroundPriority spriteToBackgroundPriority;
+	int y = 0;
+	int x = 0;
+	int tileNumber = 0;
+	int spriteColorPaletteNumber = 0;
+	int tileVideoRamBankNumber = 0;
+	int spriteMonochromePaletteNumber = 0;
+	HorizontalFlip horizontalFlip = HorizontalFlip(0);
+	VerticalFlip verticalFlip = VerticalFlip(0);
+	SpriteToBackgroundPriority spriteToBackgroundPriority = SpriteToBackgroundPriority(0);
 };
 
 #endif

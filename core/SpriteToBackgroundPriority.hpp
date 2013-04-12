@@ -3,8 +3,8 @@
 
 enum SpriteToBackgroundPriority
 {
-	SpriteAboveBackground = 0,
-	SpriteBehindBackground = 1
+	spriteAboveBackground = 0,
+	spriteBehindBackground = 1
 };
 
 #endif

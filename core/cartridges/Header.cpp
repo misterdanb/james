@@ -1,5 +1,5 @@
 #include "Header.hpp"
-
+#include <iostream>
 gbc::core::cartridges::Header::Header(int rom[])
 	: platformSupport(PlatformSupport(rom[0x0143])),
 	  superGameboyFlag(rom[0x0146]),
@@ -15,7 +15,7 @@ gbc::core::cartridges::Header::Header(int rom[])
 	memcpy(nintendoLogo, &rom[0x0104], 48 * sizeof(int));
 	memcpy(oldTitle, &rom[0x0134], 16 * sizeof(int));
 	memcpy(newTitle, &rom[0x0134], 11 * sizeof(int));
-	memcpy(manufacturerCode, &rom[0x013F], 16 * sizeof(int));
+	memcpy(manufacturerCode, &rom[0x013F], 4 * sizeof(int));
 	memcpy(newLicenseeCode, &rom[0x0144], 2 * sizeof(int));
 	memcpy(globalChecksum, &rom[0x014E], 2 * sizeof(int));
 }

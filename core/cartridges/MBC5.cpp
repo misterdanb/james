@@ -1,7 +1,7 @@
 #include "MBC5.hpp"
 
-gbc::core::cartridges::MBC5::MBC5(int rom[])
-	: Cartridge(rom)
+gbc::core::cartridges::MBC5::MBC5(int rom[], int size)
+	: Cartridge(rom, size)
 {
 }
 

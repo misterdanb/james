@@ -10,8 +10,14 @@
 #define STATE (_state)
 #define BUS (*_bus)
 
-#define READ(addr) (BUS.ReadByte((addr)))
-#define WRITE(addr, val) (BUS.WriteByte((addr), (val)))
+#define READ(addr) BUS.ReadByte((addr))
+#define WRITE(addr, val) BUS.WriteByte((addr), (val))/*; \
+	CPU_LOG(std::string("WRITE ") + \
+	ToDec(_counter) + \
+	std::string(" - ") + \
+	ToHex((addr)) + \
+	std::string(",") + \
+	ToHex((val)))*/
 
 #define S_A STATE.a
 #define S_F STATE.f
@@ -56,12 +62,12 @@
 #define FETCH_INSTRUCTION() \
 	FETCH_OP_CODE(); \
 	FETCH_OP_LOW(); \
-	FETCH_OP_HIGH();
+	FETCH_OP_HIGH()
 	
 #define CB_FETCH_INSTRUCTION() \
 	CB_FETCH_OP_CODE(); \
 	CB_FETCH_OP_LOW(); \
-	CB_FETCH_OP_HIGH();
+	CB_FETCH_OP_HIGH()
 
 #define GET_OP_CODE() opCode
 #define GET_OP_LOW() opLow
@@ -81,7 +87,7 @@
 
 #define UPDATE_PC() S_PC += LENGTH
 #define UPDATE_TICKS() S_TICKS += CYCLES
-#define UPDATE_ADDITIONAL_TICKS() S_TICKS += CYCLES
+#define UPDATE_ADDITIONAL_TICKS() S_TICKS += ADDITIONAL_CYCLES
 
 #define CB_UPDATE_PC() S_PC += CB_LENGTH
 #define CB_UPDATE_TICKS() S_TICKS += CB_CYCLES
@@ -100,14 +106,18 @@ namespace gbc
 				~Processor();
 				
 				void SetMemoryBus(IMemoryBus *);
-		
+				
 				void Step();
-		
+				
 				void ExecuteInstruction();
 				void ExecuteInterrupt();
-		
+				
+				void PowerUp();
+				
 				void SetState(State state);
 				State GetState();
+				
+				int GetCounter();
 				
 			private:
 				/* BEGIN INSTRUCTIONS */
@@ -171,7 +181,9 @@ namespace gbc
 				void JP_NN_IF(int);
 				void JP_RR(int *, int *);
 				void POP_RR(int *, int *);
+				void POP_AF();
 				void PUSH_RR(int *, int *);
+				void PUSH_AF();
 				void ADD_R_N(int *);
 				void ADC_R_N(int *);
 				void SUB_R_N(int *);
@@ -215,6 +227,8 @@ namespace gbc
 				void SET_X_R(int, int *);
 				void SET_X_AA(int, int *, int *);
 				/* END INSTRUCTIONS */
+				
+				int _counter;
 				
 				State _state;
 				IMemoryBus *_bus;

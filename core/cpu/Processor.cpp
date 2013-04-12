@@ -1,7 +1,7 @@
 #include "Processor.hpp"
 
 gbc::core::cpu::Processor::Processor()
-	: _state(), _bus(NULL)
+	: _counter(0), _state(), _bus(NULL)
 {
 }
 
@@ -16,8 +16,10 @@ void gbc::core::cpu::Processor::SetMemoryBus(IMemoryBus *bus)
 
 void gbc::core::cpu::Processor::Step()
 {
-	for (int i = 0; i < 1000000000; i++) ExecuteInstruction();
-	if (S_TICKS > 0) S_TICKS--;
+	if (S_TICKS > 0)
+	{
+		S_TICKS--;
+	}
 	else
 	{
 		ExecuteInterrupt();
@@ -31,6 +33,35 @@ void gbc::core::cpu::Processor::ExecuteInstruction()
 	{
 		FETCH_INSTRUCTION();
 		CB_FETCH_INSTRUCTION();
+		
+		/*std::cout << ToHex(GET_OP_CODE());
+		std::cout << ToHex(GET_OP_LOW());
+		std::cout << ToHex(GET_OP_HIGH());
+		std::cin.get();*/
+		
+		std::ostringstream oss;
+		
+		oss << "COUNTER=" << ToDec(_counter) << ", "
+		    << "OP_CODE=" << ToHex(GET_OP_CODE()) << ", "
+		    << "OP_LOW=" << ToHex(GET_OP_LOW()) << ", "
+		    << "OP_HIGH=" << ToHex(GET_OP_HIGH()) << ", "
+		    << "A=" << ToHex(S_A) << ", "
+		    << "F=" << ToHex(S_F) << ", "
+		    << "B=" << ToHex(S_B) << ", "
+		    << "C=" << ToHex(S_C) << ", "
+		    << "D=" << ToHex(S_D) << ", "
+		    << "E=" << ToHex(S_E) << ", "
+		    << "H=" << ToHex(S_H) << ", "
+		    << "L=" << ToHex(S_L) << ", "
+		    << "(HL)=" << ToHex(READ(JOIN_BYTES(S_H, S_L))) << ", "
+		    << "PC=" << ToHex(S_PC) << ", "
+		    << "SP=" << ToHex(S_SP) << ", "
+		    << "POP_LOW=" << ToHex(READ(S_SP)) << ", "
+		    << "POP_HIGH=" << ToHex(READ(S_SP + 1));
+		
+		CPU_LOG(oss.str());
+		
+		_counter++;
 		
 		switch (GET_OP_CODE())
 		{
@@ -538,11 +569,11 @@ void gbc::core::cpu::Processor::ExecuteInstruction()
 			case 0xEE: XOR_R_N(&S_A); break;
 			case 0xEF: RST(0x28); break;
 			case 0xF0: LDH_R_A(&S_A, &GET_OP_LOW()); break;
-			case 0xF1: POP_RR(&S_A, &S_F); break;
+			case 0xF1: POP_AF(); break;
 			case 0xF2: LD_R_A(&S_A, &S_C); break;
 			case 0xF3: DI(); break;
 			case 0xF4: NOP(); /* NOT USED */ break;
-			case 0xF5: PUSH_RR(&S_A, &S_F); break;
+			case 0xF5: PUSH_AF(); break;
 			case 0xF6: OR_R_N(&S_A); break;
 			case 0xF7: RST(0x30); break;
 			case 0xF8: LD_HL_SP_N(); break;
@@ -560,15 +591,16 @@ void gbc::core::cpu::Processor::ExecuteInstruction()
 
 void gbc::core::cpu::Processor::ExecuteInterrupt()
 {
-	if (S_INTERRUPTS_ENABLED)
+	if (S_INTERRUPTS_ENABLED || S_HALTED)
 	{
 		if ((GET_BIT(READ(0xFFFF), 0) && GET_BIT(READ(0xFF0F), 0)) ||
 		    (GET_BIT(READ(0xFFFF), 1) && GET_BIT(READ(0xFF0F), 1)) ||
 		    (GET_BIT(READ(0xFFFF), 2) && GET_BIT(READ(0xFF0F), 2)) ||
 		    (GET_BIT(READ(0xFFFF), 3) && GET_BIT(READ(0xFF0F), 3)) ||
 		    (GET_BIT(READ(0xFFFF), 4) && GET_BIT(READ(0xFF0F), 4)))
-		{
+		{int washalted = S_HALTED;
 			S_INTERRUPTS_ENABLED = GBC_FALSE;
+			S_STOPPED = GBC_FALSE;
 			S_HALTED = GBC_FALSE;
 			
 			S_SP -= 2;
@@ -576,11 +608,26 @@ void gbc::core::cpu::Processor::ExecuteInterrupt()
 			WRITE(S_SP, S_PC & 0xFF);
 			WRITE(S_SP + 1, (S_PC >> 8) & 0xFF);
 			
-			if (GET_BIT(READ(0xFFFF), 0) && GET_BIT(READ(0xFF0F), 0)) S_PC = 0x0040;
-			else if (GET_BIT(READ(0xFFFF), 1) && GET_BIT(READ(0xFF0F), 1)) S_PC = 0x0048;
-			else if (GET_BIT(READ(0xFFFF), 2) && GET_BIT(READ(0xFF0F), 2)) S_PC = 0x0050;
-			else if (GET_BIT(READ(0xFFFF), 3) && GET_BIT(READ(0xFF0F), 3)) S_PC = 0x0058;
-			else if (GET_BIT(READ(0xFFFF), 4) && GET_BIT(READ(0xFF0F), 4)) S_PC = 0x0060;
+			if (GET_BIT(READ(0xFFFF), 0) && GET_BIT(READ(0xFF0F), 0))
+			{
+				S_PC = 0x0040;
+			}
+			else if (GET_BIT(READ(0xFFFF), 1) && GET_BIT(READ(0xFF0F), 1))
+			{
+				S_PC = 0x0048;
+			}
+			else if (GET_BIT(READ(0xFFFF), 2) && GET_BIT(READ(0xFF0F), 2))
+			{
+				S_PC = 0x0050;
+			}
+			else if (GET_BIT(READ(0xFFFF), 3) && GET_BIT(READ(0xFF0F), 3))
+			{
+				S_PC = 0x0058;
+			}
+			else if (GET_BIT(READ(0xFFFF), 4) && GET_BIT(READ(0xFF0F), 4))
+			{
+				S_PC = 0x0060;
+			}
 			
 			if (GET_BIT(READ(0xFFFF), 0) && GET_BIT(READ(0xFF0F), 0))
 			{
@@ -616,6 +663,72 @@ void gbc::core::cpu::Processor::ExecuteInterrupt()
 			S_TICKS += 16;
 		}
 	}
+}
+
+void gbc::core::cpu::Processor::PowerUp()
+{
+	S_A = 0x01;
+	//S_A = 0x11; //test
+	S_F = 0xB0;
+	S_B = 0x00;
+	S_C = 0x13;
+	S_D = 0x00;
+	S_E = 0xD8;
+	S_H = 0x01;
+	S_L = 0x4D;
+	S_PC = 0x0100;
+	S_SP = 0xFFFE;
+	
+	S_INTERRUPTS_ENABLED = GBC_TRUE;
+	S_HALTED = GBC_FALSE;
+	S_STOPPED = GBC_FALSE;
+	
+	WRITE(0xFF05, 0x00); // TIMA
+	WRITE(0xFF06, 0x00); // TMA
+	WRITE(0xFF07, 0x00); // TAC
+	WRITE(0xFF10, 0x80); // NR10
+	WRITE(0xFF11, 0xBF); // NR11
+	WRITE(0xFF12, 0xF3); // NR12
+	WRITE(0xFF14, 0xBF); // NR14
+	WRITE(0xFF16, 0x3F); // NR21
+	WRITE(0xFF17, 0x00); // NR22
+	WRITE(0xFF19, 0xBF); // NR24
+	WRITE(0xFF1A, 0x7F); // NR30
+	WRITE(0xFF1B, 0xFF); // NR31
+	WRITE(0xFF1C, 0x9F); // NR32
+	WRITE(0xFF1E, 0xBF); // NR33
+	WRITE(0xFF20, 0xFF); // NR41
+	WRITE(0xFF21, 0x00); // NR42
+	WRITE(0xFF22, 0x00); // NR43
+	WRITE(0xFF23, 0xBF); // NR30
+	WRITE(0xFF24, 0x77); // NR50
+	WRITE(0xFF25, 0xF3); // NR51
+	WRITE(0xFF26, 0xF1); // NR52
+	WRITE(0xFF40, 0x91); // LCDC
+	WRITE(0xFF42, 0x00); // SCY
+	WRITE(0xFF43, 0x00); // SCX
+	WRITE(0xFF45, 0x00); // LYC
+	WRITE(0xFF47, 0xFC); // BGP
+	WRITE(0xFF48, 0xFF); // OBP0
+	WRITE(0xFF49, 0xFF); // OBP1
+	WRITE(0xFF4A, 0x00); // WY
+	WRITE(0xFF4B, 0x00); // WX
+	WRITE(0xFFFF, 0x00); // IE
+}
+
+void gbc::core::cpu::Processor::SetState(gbc::core::cpu::State state)
+{
+	_state = state;
+}
+
+gbc::core::cpu::State gbc::core::cpu::Processor::GetState()
+{
+	return _state;
+}
+
+int gbc::core::cpu::Processor::GetCounter()
+{
+	return _counter;
 }
 
 // default instruction set
@@ -672,7 +785,7 @@ void gbc::core::cpu::Processor::INC_SP()
 {
 	FETCH_OP_CODE();
 	S_SP++;
-	S_SP &= 0xFF;
+	S_SP &= 0xFFFF;
 	UPDATE_PC();
 	UPDATE_TICKS();
 }
@@ -763,7 +876,8 @@ void gbc::core::cpu::Processor::RLCA()
 void gbc::core::cpu::Processor::LD_AA_SP(int *a1, int *a2)
 {
 	FETCH_OP_CODE();
-	WRITE(JOIN_BYTES(*a1, *a2), S_SP);
+	WRITE(JOIN_BYTES(*a1, *a2), GET_LOW(S_SP));
+	WRITE((JOIN_BYTES(*a1, *a2) + 1) & 0xFFFF, GET_HIGH(S_SP));
 	UPDATE_PC();
 	UPDATE_TICKS();
 }
@@ -773,9 +887,10 @@ void gbc::core::cpu::Processor::ADD_RR_RR(int *r11, int *r12, int *r21, int *r22
 	FETCH_OP_CODE();
 	int r1Full = JOIN_BYTES(*r11, *r12);
 	int r2Full = JOIN_BYTES(*r21, *r22);
-	SET_HFLAG((r1Full & 0x0FFF) + (r2Full & 0x0FFF)) > 0x0F00;
-	SET_CFLAG((r1Full & 0xFFFF) + (r2Full & 0xFFFF)) > 0xFFFF;
+	SET_NFLAG(GBC_FALSE);
+	SET_HFLAG(((r1Full & 0x0FFF) + (r2Full & 0x0FFF)) > 0x0FFF);
 	int result = (r1Full & 0xFFFF) + (r2Full & 0xFFFF);
+	SET_CFLAG(result > 0xFFFF);
 	(*r11) = GET_HIGH(result);
 	(*r12) = GET_LOW(result);
 	UPDATE_PC();
@@ -786,9 +901,10 @@ void gbc::core::cpu::Processor::ADD_RR_SP(int *r1, int *r2)
 {
 	FETCH_OP_CODE();
 	int rFull = JOIN_BYTES(*r1, *r2);
-	SET_HFLAG((rFull & 0x0FFF) + (S_SP & 0x0FFF)) > 0x0F00;
-	SET_CFLAG((rFull & 0xFFFF) + (S_SP & 0xFFFF)) > 0xFFFF;
+	SET_NFLAG(GBC_FALSE);
+	SET_HFLAG((rFull & 0x0FFF) + (S_SP & 0x0FFF)) > 0x0FFF;
 	int result = (rFull + S_SP) & 0xFFFF;
+	SET_CFLAG(result > 0xFFFF);
 	(*r1) = GET_HIGH(result);
 	(*r2) = GET_LOW(result);
 	UPDATE_PC();
@@ -867,7 +983,8 @@ void gbc::core::cpu::Processor::RRA()
 {
 	FETCH_OP_CODE();
 	int old_cflag = GET_CFLAG();
-	SET_CFLAG(((S_A >> 1) & 0xFF) | (old_cflag ? 0x80 : 0x00));
+	SET_CFLAG((S_A & 0x01) != 0);
+	S_A = ((S_A >> 1) & 0x7F) | (old_cflag ? 0x80 : 0x00);
 	SET_ZFLAG(GBC_FALSE);
 	SET_NFLAG(GBC_FALSE);
 	SET_HFLAG(GBC_FALSE);
@@ -951,7 +1068,88 @@ void gbc::core::cpu::Processor::LD_R_AA_DEC(int *r, int *a1, int *a2)
 void gbc::core::cpu::Processor::DAA()
 {
 	FETCH_OP_CODE();
-	// lalala
+	
+	int highNibble = S_A >> 4;
+    int lowNibble = S_A & 0x0F;
+    
+    bool newCarry = GBC_TRUE;
+    
+	if (GET_NFLAG())
+    {
+		if (GET_CFLAG())
+		{
+			if (GET_HFLAG())
+			{
+				S_A += 0x9A;
+			}
+			else
+			{
+				S_A += 0xA0;
+			}
+		}
+		else
+		{
+			newCarry = GBC_FALSE;
+			
+			if (GET_HFLAG())
+			{
+				S_A += 0xFA;
+			}
+			else
+			{
+				S_A += 0x00;
+			}
+		}
+	}
+	else if (GET_CFLAG())
+	{
+		if (GET_HFLAG() || lowNibble > 9)
+		{
+			S_A += 0x66;
+		}
+		else
+		{
+			S_A += 0x60;
+		}
+	}
+	else if (GET_HFLAG())
+	{
+		if (highNibble > 9)
+		{
+			S_A += 0x66;
+		}
+		else
+		{
+			S_A += 0x06;
+			newCarry = GBC_FALSE;
+		}
+	}
+	else if (lowNibble > 9)
+	{
+		if (highNibble < 9)
+		{
+			newCarry = GBC_FALSE;
+			S_A += 0x06;
+		}
+		else
+		{
+			S_A += 0x66;
+		}
+	}
+	else if (highNibble > 9)
+	{
+		S_A += 0x60;
+	}
+	else
+	{
+		newCarry = GBC_FALSE;
+	}
+	
+	S_A &= 0xFF;
+	
+	SET_CFLAG(newCarry);
+	SET_ZFLAG(S_A == 0);
+	
 	UPDATE_PC();
 	UPDATE_TICKS();
 }
@@ -1009,8 +1207,8 @@ void gbc::core::cpu::Processor::ADD_R_R(int *r1, int *r2)
 	FETCH_OP_CODE();
 	SET_NFLAG(GBC_FALSE);
 	SET_HFLAG((((*r1) & 0x0F) + ((*r2) & 0x0F)) > 0x0F);
-	SET_CFLAG((((*r2) & 0xFF) + ((*r2) & 0xFF)) > 0xFF);
 	(*r1) += (*r2);
+	SET_CFLAG((*r1) > 0xFF);
 	(*r1) &= 0xFF;
 	SET_ZFLAG((*r1) == 0x00);
 	UPDATE_PC();
@@ -1023,8 +1221,8 @@ void gbc::core::cpu::Processor::ADD_R_AA(int *r, int *a1, int *a2)
 	int memory = READ(JOIN_BYTES(*a1, *a2));
 	SET_NFLAG(GBC_FALSE);
 	SET_HFLAG((((*r) & 0x0F) + (memory & 0x0F)) > 0x0F);
-	SET_CFLAG((((*r) & 0xFF) + (memory & 0xFF)) > 0xFF);
 	(*r) += memory;
+	SET_CFLAG((*r) > 0xFF);
 	(*r) &= 0xFF;
 	SET_ZFLAG((*r) == 0x00);
 	UPDATE_PC();
@@ -1037,8 +1235,8 @@ void gbc::core::cpu::Processor::ADC_R_R(int *r1, int *r2)
 	int old_cflag = GET_CFLAG();
 	SET_NFLAG(GBC_FALSE);
 	SET_HFLAG((((*r1) & 0x0F) + ((*r2) & 0x0F) + (old_cflag ? 0x01 : 0x00)) > 0x0F);
-	SET_CFLAG((((*r2) & 0xFF) + ((*r2) & 0xFF) + (old_cflag ? 0x01 : 0x00)) > 0xFF);
 	(*r1) += (*r2) + (old_cflag ? 0x01 : 0x00);
+	SET_CFLAG((*r1) > 0xFF);
 	(*r1) &= 0xFF;
 	SET_ZFLAG((*r1) == 0x00);
 	UPDATE_PC();
@@ -1052,8 +1250,8 @@ void gbc::core::cpu::Processor::ADC_R_AA(int *r, int *a1, int *a2)
 	int old_cflag = GET_CFLAG();
 	SET_NFLAG(GBC_FALSE);
 	SET_HFLAG((((*r) & 0x0F) + (memory & 0x0F) + (old_cflag ? 0x01 : 0x00)) > 0x0F);
-	SET_CFLAG((((*r) & 0xFF) + (memory & 0xFF) + (old_cflag ? 0x01 : 0x00)) > 0xFF);
 	(*r) += memory + (old_cflag ? 0x01 : 0x00);
+	SET_CFLAG((*r) > 0xFF);
 	(*r) &= 0xFF;
 	SET_ZFLAG((*r) == 0x00);
 	UPDATE_PC();
@@ -1065,8 +1263,8 @@ void gbc::core::cpu::Processor::SUB_R_R(int *r1, int *r2)
 	FETCH_OP_CODE();
 	SET_NFLAG(GBC_TRUE);
 	SET_HFLAG((((*r1) & 0x0F) - ((*r2) & 0x0F)) < 0x00);
-	SET_CFLAG((((*r2) & 0xFF) - ((*r2) & 0xFF)) < 0x00);
 	(*r1) -= (*r2);
+	SET_CFLAG((*r1) < 0x00);
 	(*r1) &= 0xFF;
 	SET_ZFLAG((*r1) == 0x00);
 	UPDATE_PC();
@@ -1079,8 +1277,8 @@ void gbc::core::cpu::Processor::SUB_R_AA(int *r, int *a1, int *a2)
 	int memory = READ(JOIN_BYTES(*a1, *a2));
 	SET_NFLAG(GBC_TRUE);
 	SET_HFLAG((((*r) & 0x0F) - (memory & 0x0F)) < 0x00);
-	SET_CFLAG((((*r) & 0xFF) - (memory & 0xFF)) < 0x00);
 	(*r) -= memory;
+	SET_CFLAG((*r) < 0x00);
 	(*r) &= 0xFF;
 	SET_ZFLAG((*r) == 0x00);
 	UPDATE_PC();
@@ -1093,8 +1291,8 @@ void gbc::core::cpu::Processor::SBC_R_R(int *r1, int *r2)
 	int old_cflag = GET_CFLAG();
 	SET_NFLAG(GBC_TRUE);
 	SET_HFLAG((((*r1) & 0x0F) - (((*r2) & 0x0F) + (old_cflag ? 0x01 : 0x00))) < 0x00);
-	SET_CFLAG((((*r2) & 0xFF) - (((*r2) & 0xFF) + (old_cflag ? 0x01 : 0x00))) < 0x00);
 	(*r1) -= ((*r2) + (old_cflag ? 0x01 : 0x00));
+	SET_CFLAG((*r1) < 0x00);
 	(*r1) &= 0xFF;
 	SET_ZFLAG((*r1) == 0x00);
 	UPDATE_PC();
@@ -1108,8 +1306,8 @@ void gbc::core::cpu::Processor::SBC_R_AA(int *r, int *a1, int *a2)
 	int old_cflag = GET_CFLAG();
 	SET_NFLAG(GBC_TRUE);
 	SET_HFLAG((((*r) & 0x0F) - ((memory & 0x0F) + (old_cflag ? 0x01 : 0x00))) < 0x00);
-	SET_CFLAG((((*r) & 0xFF) - ((memory & 0xFF) + (old_cflag ? 0x01 : 0x00))) < 0x00);
 	(*r) -= (memory + (old_cflag ? 0x01 : 0x00));
+	SET_CFLAG((*r) < 0x00);
 	(*r) &= 0xFF;
 	SET_ZFLAG((*r) == 0x00);
 	UPDATE_PC();
@@ -1251,7 +1449,6 @@ void gbc::core::cpu::Processor::RET()
 	FETCH_OP_CODE();
 	S_PC = JOIN_BYTES(READ(S_SP + 1), READ(S_SP));
 	S_SP += 2;
-	UPDATE_PC();
 	UPDATE_TICKS();
 }
 
@@ -1277,6 +1474,7 @@ void gbc::core::cpu::Processor::RETI()
 	S_INTERRUPTS_ENABLED = GBC_TRUE;
 	S_HALTED = GBC_FALSE;
 	S_PC = (READ(S_SP + 1) << 8) | READ(S_SP);
+	S_SP += 2;
 	UPDATE_TICKS();
 }
 
@@ -1323,12 +1521,32 @@ void gbc::core::cpu::Processor::POP_RR(int *r1, int *r2)
 	UPDATE_TICKS();
 }
 
+void gbc::core::cpu::Processor::POP_AF()
+{
+	FETCH_OP_CODE();
+	S_A = READ(S_SP + 1);
+	S_F = READ(S_SP) & 0xF0;
+	S_SP += 2;
+	UPDATE_PC();
+	UPDATE_TICKS();
+}
+
 void gbc::core::cpu::Processor::PUSH_RR(int *r1, int *r2)
 {
 	FETCH_OP_CODE();
 	S_SP -= 2;
 	WRITE(S_SP + 1, *r1);
 	WRITE(S_SP, *r2);
+	UPDATE_PC();
+	UPDATE_TICKS();
+}
+
+void gbc::core::cpu::Processor::PUSH_AF()
+{
+	FETCH_OP_CODE();
+	S_SP -= 2;
+	WRITE(S_SP + 1, S_A);
+	WRITE(S_SP, S_F & 0xF0);
 	UPDATE_PC();
 	UPDATE_TICKS();
 }
@@ -1440,7 +1658,7 @@ void gbc::core::cpu::Processor::LD_HL_SP_N()
 {
 	FETCH_OP_CODE();
 	FETCH_OP_LOW();
-	int result = (S_SP + GET_SIGNED_VALUE(GET_OP_LOW())) & 0xFF;
+	int result = (S_SP + GET_SIGNED_VALUE(GET_OP_LOW())) & 0xFFFF;
 	S_H = GET_HIGH(result);
 	S_L = GET_LOW(result);
 	SET_NFLAG(GBC_FALSE);

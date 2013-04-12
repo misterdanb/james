@@ -16,7 +16,7 @@ namespace gbc
 			class MBC5 : public Cartridge
 			{
 			public:
-				MBC5(int[]);
+				MBC5(int[], int);
 				~MBC5();
 				
 				int ReadByte(int);

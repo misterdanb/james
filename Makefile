@@ -1,13 +1,56 @@
-CC=clang++
+CC=g++
 
 CFLAGS=-c -std=c++11 -O2
 CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O2
-
+	
 LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system
 LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -pg
 
-OBJECTS=core/GBC.o core/MemoryBus.o core/cpu/LookUpTables.o core/cpu/Processor.o core/cartridges/RomDimensions.o core/cartridges/RamDimensions.o core/cartridges/Header.o core/cartridges/Cartridge.o core/cartridges/RomOnly.o core/cartridges/MBC1.o core/cartridges/MBC2.o core/cartridges/MBC3.o core/cartridges/MBC4.o core/cartridges/MBC5.o core/cartridges/RomRam.o core/cartridges/MMM01.o core/Scanline.o core/LCD.o core/GameboyColor.o ui/GameWindow.o main.o
-OBJECTSDEBUG=core/GBC-debug.o core/MemoryBus-debug.o core/cpu/LookUpTables-debug.o core/cpu/Processor-debug.o core/cartridges/RomDimensions-debug.o core/cartridges/RamDimensions-debug.o core/cartridges/Header-debug.o core/cartridges/Cartridge-debug.o core/cartridges/RomOnly-debug.o core/cartridges/MBC1-debug.o core/cartridges/MBC2-debug.o core/cartridges/MBC3-debug.o core/cartridges/MBC4-debug.o core/cartridges/MBC5-debug.o core/cartridges/RomRam-debug.o core/cartridges/MMM01-debug.o core/Scanline-debug.o core/LCD-debug.o core/GameboyColor-debug.o ui/GameWindow-debug.o main-debug.o
+OBJECTS=core/GBC.o \
+	core/MemoryBus.o \
+	core/cpu/LookUpTables.o \
+	core/cpu/Processor.o \
+	core/cartridges/RomDimensions.o \
+	core/cartridges/RamDimensions.o \
+	core/cartridges/Header.o \
+	core/cartridges/Cartridge.o \
+	core/cartridges/RomOnly.o \
+	core/cartridges/MBC1.o \
+	core/cartridges/MBC2.o \
+	core/cartridges/MBC3.o \
+	core/cartridges/MBC4.o \
+	core/cartridges/MBC5.o \
+	core/cartridges/RomRam.o \
+	core/cartridges/MMM01.o \
+	core/Scanline.o \
+	core/LCD.o \
+	core/Joypad.o \
+	core/GameboyColor.o \
+	ui/GameWindow.o \
+	main.o
+
+OBJECTSDEBUG=core/GBC-debug.o \
+	core/MemoryBus-debug.o \
+	core/cpu/LookUpTables-debug.o \
+	core/cpu/Processor-debug.o \
+	core/cartridges/RomDimensions-debug.o \
+	core/cartridges/RamDimensions-debug.o \
+	core/cartridges/Header-debug.o \
+	core/cartridges/Cartridge-debug.o \
+	core/cartridges/RomOnly-debug.o \
+	core/cartridges/MBC1-debug.o \
+	core/cartridges/MBC2-debug.o \
+	core/cartridges/MBC3-debug.o \
+	core/cartridges/MBC4-debug.o \
+	core/cartridges/MBC5-debug.o \
+	core/cartridges/RomRam-debug.o \
+	core/cartridges/MMM01-debug.o \
+	core/Scanline-debug.o \
+	core/LCD-debug.o \
+	core/Joypad-debug.o \
+	core/GameboyColor-debug.o \
+	ui/GameWindow-debug.o \
+	main-debug.o
 
 EXECUTABLE=gbc
 
@@ -25,6 +68,9 @@ ui/GameWindow.o: ui/GameWindow.cpp
 
 core/GameboyColor.o: core/GameboyColor.cpp
 	$(CC) $(CFLAGS) core/GameboyColor.cpp -o core/GameboyColor.o
+
+core/Joypad.o: core/Joypad.cpp
+	$(CC) $(CFLAGS) core/Joypad.cpp -o core/Joypad.o
 
 core/LCD.o: core/LCD.cpp
 	$(CC) $(CFLAGS) core/LCD.cpp -o core/LCD.o
@@ -93,6 +139,9 @@ ui/GameWindow-debug.o: ui/GameWindow.cpp
 
 core/GameboyColor-debug.o: core/GameboyColor.cpp
 	$(CC) $(CFLAGSDEBUG) core/GameboyColor.cpp -o core/GameboyColor-debug.o
+
+core/Joypad-debug.o: core/Joypad.cpp
+	$(CC) $(CFLAGS) core/Joypad.cpp -o core/Joypad-debug.o
 
 core/LCD-debug.o: core/LCD.cpp
 	$(CC) $(CFLAGSDEBUG) core/LCD.cpp -o core/LCD-debug.o

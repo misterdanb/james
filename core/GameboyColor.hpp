@@ -4,16 +4,20 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cstring>
 
 #include "GBC.hpp"
 #include "LCD.hpp"
+#include "Joypad.hpp"
 #include "cartridges/Cartridge.hpp"
 #include "cpu/Processor.hpp"
 #include "MemoryBus.hpp"
 #include "LCDMode.hpp"
 #include "BackgroundMapAttribute.hpp"
 #include "SpriteAttribute.hpp"
+#include "Tile.hpp"
 #include "Color.hpp"
+#include "ColorPalette.hpp"
 
 #define VRAM_BANKS 2
 #define VRAM_BANK_SIZE 0x2000
@@ -27,6 +31,11 @@
 
 #define HRAM_SIZE 0x80
 
+#define COLOR_0 0b00000001
+#define COLOR_1 0b00000010
+#define COLOR_2 0b00000100
+#define COLOR_3 0b00001000
+
 namespace gbc
 {
 	namespace core
@@ -39,7 +48,8 @@ namespace gbc
 			
 			void Initialize();
 			void SetLCD(ILCD *);
-			void SetRom(int[]);
+			void SetJoypad(IJoypad *);
+			void SetRom(int[], int);
 			
 			void RenderScanline();
 			void RenderFrame();
@@ -56,17 +66,37 @@ namespace gbc
 			void DoVBlank();
 			
 			void UpdateTiles();
+			void UpdateBackgroundMapElements();
 			void UpdateBackgroundMapAttributes();
 			void UpdateSpriteAttributes();
+			
+			void DrawSprites(int, SpriteToBackgroundPriority);
+			void DrawSprites(int);
+			void DrawBackgroundMap(int, BackgroundToOAMPriority);
+			void DrawBackgroundMap(int);
+			void DrawWindowMap(int, BackgroundToOAMPriority);
+			void DrawWindowMap(int);
+			void DrawMapTile(int, int, int, int, int, cartridges::PlatformSupport);
+			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
+			
+			// current scanline
+			Color _currentScanline[160];
 			
 			// lcd
 			ILCD *_lcd;
 			
+			// joypad
+			IJoypad *_joypad;
+			
+			int _directionKeysSelected;
+			int _buttonKeysSelected;
+			
 			// cartridge
 			cartridges::Cartridge *_cartridge;
+			int _forceClassicGameboy;
 			
 			// processor
-			cpu::Processor _wtf80;
+			cpu::Processor _hybr1s80;
 			int _speedFactor;
 			
 			// ram
@@ -133,21 +163,25 @@ namespace gbc
 			int _monochromeBackgroundPaletteData[4];
 			int _monochromeSpritePalette0Data[4];
 			int _monochromeSpritePalette1Data[4];
-			int _monochromePalette[4];
+			ColorPalette _monochromePalette;
 			
 			// lcd color phunalettes
 			int _colorBackgroundPaletteIndexAutoIncrement;
-			Color _colorBackgroundPalettes[8][4];
+			ColorPalette _colorBackgroundPalettes[8];
 			int _colorSpritePaletteIndexAutoIncrement;
-			Color _colorSpritePalettes[8][4];
+			ColorPalette _colorSpritePalettes[8];
 			
 			// tile data
-			int _tiles[2][384][8][8];
+			Tile _tiles[2][384];
 			std::vector<int *> _changedTiles; // (tile vram bank, tile number)
 			
-			// bg map attributes
-			BackgroundMapAttribute _backgroundMapAttributes[0x0800];
-			std::vector<int> _changedBackgroundMapAttributes;
+			// background map elements
+			int _backgroundMapElements[2][32 * 32];
+			std::vector<int *> _changedBackgroundMapElements;
+			
+			// background map attributes
+			BackgroundMapAttribute _backgroundMapAttributes[2][32 * 32];
+			std::vector<int *> _changedBackgroundMapAttributes;
 			
 			// sprite attributes
 			SpriteAttribute _spriteAttributes[40];

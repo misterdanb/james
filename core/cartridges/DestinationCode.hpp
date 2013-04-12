@@ -9,8 +9,8 @@ namespace gbc
 		{
 			enum DestinationCode
 			{
-				Japanese = 0x00,
-				NonJapanese = 0x01
+				japanese = 0x00,
+				nonJapanese = 0x01
 			};
 		}
 	}

@@ -1,9 +1,12 @@
 #include "GameWindow.hpp"
 
-gbc::ui::GameWindow::GameWindow(int width, int height)
+gbc::ui::GameWindow::GameWindow(int width, int height, int rom[], int size)
 	: sf::RenderWindow(sf::VideoMode(width, height), "GBC")
 {
-	FinishFrame();
+	_gbc.Initialize();
+	_gbc.SetRom(rom, size);
+	_gbc.SetLCD(this);
+	_gbc.SetJoypad(this);
 }
 
 gbc::ui::GameWindow::~GameWindow()
@@ -11,7 +14,9 @@ gbc::ui::GameWindow::~GameWindow()
 }
 
 void gbc::ui::GameWindow::Render()
-{FinishFrame();
+{
+	_gbc.RenderFrame();
+	
 	sf::Event event;
 	sf::Texture texture;
 	
@@ -36,31 +41,69 @@ void gbc::ui::GameWindow::DrawScanline(core::Scanline scanline)
 {
 	if (scanline.GetLineIndex() < 144)
 	{
-		_frameBuffer[scanline.GetLineIndex()] = scanline;
+		core::Color *realColors = scanline.GetRealColors();
+		
+		for (int i = 0; i < 160; i++)
+		{
+			int lineIndex = scanline.GetLineIndex();
+			int lineOffset = lineIndex * 160;
+			
+			_rawFrame[(lineOffset + i) * 4] = (sf::Uint8) (realColors[i].red);
+			_rawFrame[(lineOffset + i) * 4 + 1] = (sf::Uint8) (realColors[i].green);
+			_rawFrame[(lineOffset + i) * 4 + 2] = (sf::Uint8) (realColors[i].blue);
+			_rawFrame[(lineOffset + i) * 4 + 3] = (sf::Uint8) (0x59); // test
+		}
 	}
 }
 
 void gbc::ui::GameWindow::FinishFrame()
 {
-	sf::Uint8 rawData[144 * 160 * 4];
-	
-	for (int i = 0; i < 144; i++)
-	{
-		for (int j = 0; j < 160; j++)
-		{
-			int offset = (i * 160 + j) * 4;
-			
-			rawData[offset] = (sf::Uint8) (_frameBuffer[i].GetRealColors()[j].red);
-			rawData[offset + 1] = (sf::Uint8) (_frameBuffer[i].GetRealColors()[j].green);
-			rawData[offset + 2] = (sf::Uint8) (_frameBuffer[i].GetRealColors()[j].blue);
-			rawData[offset + 3] = (sf::Uint8) (0x59); // test
-		}
-	}
-	
-	_frame.create(160, 144, rawData);
-	
+	_frame.create(160, 144, _rawFrame);
+	static int i = 0;
+	printf("%d\n", i);
+	i++;
 	/*for (int i = 0; i < 144 * 160 * 4; i++)
 	{
 		delete &rawData[i];
 	}*/
+}
+
+int gbc::ui::GameWindow::GetRight()
+{
+	return 0;
+}
+
+int gbc::ui::GameWindow::GetLeft()
+{
+	return 0;
+}
+
+int gbc::ui::GameWindow::GetUp()
+{
+	return 0;
+}
+
+int gbc::ui::GameWindow::GetDown()
+{
+	return 0;
+}
+
+int gbc::ui::GameWindow::GetButtonA()
+{
+	return 0;
+}
+
+int gbc::ui::GameWindow::GetButtonB()
+{
+	return 0;
+}
+
+int gbc::ui::GameWindow::GetSelect()
+{
+	return 0;
+}
+
+int gbc::ui::GameWindow::GetStart()
+{
+	return 0;
 }

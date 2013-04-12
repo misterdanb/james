@@ -7,11 +7,11 @@
 
 struct BackgroundMapAttribute
 {
-	int backgroundColorPaletteNumber;
-	int tileVideoRamBankNumber;
-	HorizontalFlip horizontalFlip;
-	VerticalFlip verticalFlip;
-	BackgroundToOAMPriority backgroundToOAMPriority;
+	int backgroundColorPaletteNumber = 0;
+	int tileVideoRamBankNumber = 0;
+	HorizontalFlip horizontalFlip = HorizontalFlip(0);
+	VerticalFlip verticalFlip = VerticalFlip(0);
+	BackgroundToOAMPriority backgroundToOAMPriority = BackgroundToOAMPriority(0);
 };
 
 #endif

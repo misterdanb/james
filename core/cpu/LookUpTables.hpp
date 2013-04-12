@@ -760,6 +760,7 @@
 
 /* INSTRUCTIONS END */
 
+// replace this with consts
 #define DEFAULT_TABLE 0
 #define CB_TABLE 1
 

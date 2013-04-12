@@ -1,5 +1,5 @@
-#ifndef _RomOnly_hpp_
-#define _RomOnly_hpp_
+#ifndef _MMM01_hpp_
+#define _MMM01_hpp_
 
 #include "Cartridge.hpp"
 
@@ -13,11 +13,11 @@ namespace gbc
 	{
 		namespace cartridges
 		{
-			class RomOnly : public Cartridge
+			class MMM01 : public Cartridge
 			{
 			public:
-				RomOnly(int[], int);
-				~RomOnly();
+				MMM01(int[], int);
+				~MMM01();
 				
 				int ReadByte(int);
 				void WriteByte(int, int);

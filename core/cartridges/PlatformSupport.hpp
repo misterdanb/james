@@ -5,11 +5,14 @@ namespace gbc
 {
 	namespace core
 	{
-		enum PlatformSupport
+		namespace cartridges
 		{
-			gameboyColorSupport = 0x80,
-			gameboyColorOnly = 0xC0
-		};
+			enum PlatformSupport
+			{
+				gameboyColorSupport = 0x80,
+				gameboyColorOnly = 0xC0
+			};
+		}
 	}
 }
 

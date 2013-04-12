@@ -1,7 +1,7 @@
 #include "MBC3.hpp"
 
-gbc::core::cartridges::MBC3::MBC3(int rom[])
-	: Cartridge(rom), _ramRtcEnabled(GBC_FALSE), _ramRtcMode(0x00)
+gbc::core::cartridges::MBC3::MBC3(int rom[], int size)
+	: Cartridge(rom, size), _ramRtcEnabled(GBC_FALSE), _ramRtcMode(0x00)
 {
 }
 
@@ -19,7 +19,7 @@ int gbc::core::cartridges::MBC3::ReadByte(int address)
 	{
 		return _rom[_selectedRomBank * _header.romDimensions.bankSize + address];
 	}
-	else if (address >= 0xA000 && address <= 0xBFFFF)
+	else if (address >= 0xA000 && address <= 0xBFFF)
 	{
 		if (_ramRtcEnabled)
 		{
@@ -84,6 +84,8 @@ void gbc::core::cartridges::MBC3::WriteByte(int address, int value)
 			_ram[_selectedRamBank * _header.ramDimensions.bankSize + address] = value;
 		}
 	}
-	
-	ERROR("MBC3: Address out of range!");
+	else
+	{
+		ERROR("MBC3: Address out of range!");
+	}
 }

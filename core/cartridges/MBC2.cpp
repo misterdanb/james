@@ -1,7 +1,7 @@
 #include "MBC2.hpp"
 
-gbc::core::cartridges::MBC2::MBC2(int rom[])
-	: Cartridge(rom), _ramEnabled(GBC_FALSE)
+gbc::core::cartridges::MBC2::MBC2(int rom[], int size)
+	: Cartridge(rom, size), _ramEnabled(GBC_FALSE)
 {
 }
 
@@ -62,6 +62,8 @@ void gbc::core::cartridges::MBC2::WriteByte(int address, int value)
 			_ram[_selectedRamBank * _header.ramDimensions.bankSize + address] |= (value & 0x0F) << ((address % 2) * 4);
 		}
 	}
-	
-	ERROR("MBC2: Address out of range!");
+	else
+	{
+		ERROR("MBC2: Address out of range!");
+	}
 }

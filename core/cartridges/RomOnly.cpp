@@ -1,7 +1,7 @@
 #include "RomOnly.hpp"
 
-gbc::core::cartridges::RomOnly::RomOnly(int rom[])
-	: Cartridge(rom)
+gbc::core::cartridges::RomOnly::RomOnly(int rom[], int size)
+	: Cartridge(rom, size)
 {
 }
 
@@ -35,6 +35,8 @@ void gbc::core::cartridges::RomOnly::WriteByte(int address, int value)
 	{
 		_ram[address - 0xA000] = value & 0xFF;
 	}
-	
-	ERROR("RomOnly: Address out of range!");
+	else
+	{
+		ERROR("RomOnly: Address out of range!");
+	}
 }
