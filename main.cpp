@@ -1,5 +1,5 @@
 #include <iostream>
-#include <fstream>
+#include <fstream>	
 #include <chrono>
 #include <unistd.h>
 #include "core/GameboyColor.hpp"
@@ -20,10 +20,17 @@ int main(int argc, char *argv[])
 	milliseconds ms = std::chrono::duration_cast<milliseconds>(t1 - t0);
 	std::cout << ms.count() << "ms\n";*/
 	
+	if (argc != 2) return -1;
+	
+	std::string path(argv[1]);
+	
+	std::cout << path << std::endl << std::endl;
+	
 	std::vector<int> rom;
 	//std::ifstream file("/home/daniel/Downloads/instr_timing/instr_timing.gb", std::ios::in | std::ios::binary);
-	//std::ifstream file("/home/daniel/Downloads/cpu_instrs/individual/02-interrupts.gb", std::ios::in | std::ios::binary);
-	std::ifstream file("/home/daniel/tet.gb", std::ios::in | std::ios::binary);
+	//std::ifstream file("/home/daniel/Downloads/cpu_instrs/individual/01-special.gb", std::ios::in | std::ios::binary);
+	std::ifstream file(path, std::ios::in | std::ios::binary);
+	//std::ifstream file("/home/daniel/tet.gb", std::ios::in | std::ios::binary);
 	
 	if (file.is_open())
 	{
@@ -57,7 +64,7 @@ int main(int argc, char *argv[])
 			gbc.RenderFrame();
 		}*/
 	
-		gbc::ui::GameWindow window(160, 144, arrayRom, rom.size());
+		gbc::ui::GameWindow window(320, 288, arrayRom, rom.size());
 	
 		while (window.isOpen())
 		{

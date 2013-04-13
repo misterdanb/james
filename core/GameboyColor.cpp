@@ -529,6 +529,10 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				_windowTileMapDisplaySelect = GET_BIT(value, 6);
 				_lcdDisplayEnabled = GET_BIT(value, 7);
 				
+				std::cout << (_backgroundDisplayEnabled ?
+				              "background turned on" :
+				              "background turned off") << std::endl;
+				
 				break;
 			
 			case 0xFF41:
@@ -898,7 +902,7 @@ void gbc::core::GameboyColor::DoTransferData()
 		}
 		else
 		{
-			if (_backgroundDisplayEnabled)
+			//if (_backgroundDisplayEnabled)
 			{
 				DrawBackgroundMap(COLOR_0);
 			}
@@ -910,7 +914,7 @@ void gbc::core::GameboyColor::DoTransferData()
 			
 			DrawSprites(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3, spriteBehindBackground);
 			
-			if (_backgroundDisplayEnabled)
+			//if (_backgroundDisplayEnabled)
 			{
 				DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3);
 			}
@@ -1053,9 +1057,9 @@ void gbc::core::GameboyColor::UpdateTiles()
 		if (lastTile == tileNumber)
 		{
 			std::cout << "that should not be..." << std::endl;
-		}*/
+		}
 		
-		lastTile = tileNumber;
+		lastTile = tileNumber;*/
 		
 		delete[] _changedTiles.back();
 		
