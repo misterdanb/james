@@ -5,6 +5,7 @@
 #include "../Tools.hpp"
 #include "../MemoryBus.hpp"
 #include "State.hpp"
+#include "../InterruptHandler.hpp"
 #include "LookUpTables.hpp"
 
 #define STATE (_state)
@@ -99,7 +100,7 @@ namespace gbc
 	{
 		namespace cpu
 		{
-			class Processor
+			class Processor : public IInterruptHandler
 			{
 			public:
 				Processor();
@@ -113,6 +114,12 @@ namespace gbc
 				void ExecuteInterrupt();
 				
 				void PowerUp();
+				
+				void SignalVBlankInterrupt();
+				void SignalLCDStatusInterrupt();
+				void SignalTimerInterrupt();
+				void SignalSerialInterrupt();
+				void SignalJoypadInterrupt();
 				
 				void SetState(State state);
 				State GetState();
@@ -229,6 +236,12 @@ namespace gbc
 				/* END INSTRUCTIONS */
 				
 				int _counter;
+				
+				int _vBlankInterruptSignalled;
+				int _lcdStatusInterruptSignalled;
+				int _timerInterruptSignalled;
+				int _serialInterruptSignalled;
+				int _joypadInterruptSignalled;
 				
 				State _state;
 				IMemoryBus *_bus;

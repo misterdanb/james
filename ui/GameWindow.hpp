@@ -35,6 +35,15 @@ namespace gbc
 			
 			sf::Uint8 _rawFrame[160 * 144 * 4];
 			sf::Image _frame;
+			
+			int _rightPressed;
+			int _leftPressed;
+			int _upPressed;
+			int _downPressed;
+			int _buttonAPressed;
+			int _buttonBPressed;
+			int _selectPressed;
+			int _startPressed;
 		};
 	}
 }

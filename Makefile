@@ -8,6 +8,7 @@ LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -pg
 
 OBJECTS=core/GBC.o \
 	core/MemoryBus.o \
+	core/InterruptHandler.o \
 	core/cpu/LookUpTables.o \
 	core/cpu/Processor.o \
 	core/cartridges/RomDimensions.o \
@@ -31,6 +32,7 @@ OBJECTS=core/GBC.o \
 
 OBJECTSDEBUG=core/GBC-debug.o \
 	core/MemoryBus-debug.o \
+	core/InterruptHandler-debug.o \
 	core/cpu/LookUpTables-debug.o \
 	core/cpu/Processor-debug.o \
 	core/cartridges/RomDimensions-debug.o \
@@ -120,6 +122,9 @@ core/cpu/Processor.o: core/cpu/Processor.cpp
 core/cpu/LookUpTables.o: core/cpu/LookUpTables.cpp
 	$(CC) $(CFLAGS) core/cpu/LookUpTables.cpp -o core/cpu/LookUpTables.o
 
+core/InterruptHandler.o: core/InterruptHandler.cpp
+	$(CC) $(CFLAGS) core/InterruptHandler.cpp -o core/InterruptHandler.o
+
 core/MemoryBus.o: core/MemoryBus.cpp
 	$(CC) $(CFLAGS) core/MemoryBus.cpp -o core/MemoryBus.o
 
@@ -190,6 +195,9 @@ core/cpu/Processor-debug.o: core/cpu/Processor.cpp
 
 core/cpu/LookUpTables-debug.o: core/cpu/LookUpTables.cpp
 	$(CC) $(CFLAGSDEBUG) core/cpu/LookUpTables.cpp -o core/cpu/LookUpTables-debug.o
+
+core/InterruptHandler-debug.o: core/InterruptHandler.cpp
+	$(CC) $(CFLAGS) core/InterruptHandler.cpp -o core/InterruptHandler-debug.o
 
 core/MemoryBus-debug.o: core/MemoryBus.cpp
 	$(CC) $(CFLAGSDEBUG) core/MemoryBus.cpp -o core/MemoryBus-debug.o

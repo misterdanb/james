@@ -21,11 +21,7 @@ gbc::core::GameboyColor::GameboyColor()
 	  _timerStopped(GBC_TRUE),
 	  _deviderCounter(0),
 	  _timerCounter(0),
-	  _vBlankInterruptRequested(GBC_FALSE),
-	  _lcdStatusInterruptRequested(GBC_FALSE),
-	  _timerInterruptRequested(GBC_FALSE),
-	  _serialInterruptRequested(GBC_FALSE),
-	  _joypadInterruptRequested(GBC_FALSE),
+	  _vBlankInterruptAlreadyRequested(GBC_FALSE),
 	  _lcdDisplayEnabled(GBC_FALSE),
 	  _windowTileMapDisplaySelect(0),
 	  _windowDisplayEnabled(GBC_FALSE),
@@ -64,6 +60,28 @@ gbc::core::GameboyColor::~GameboyColor()
 	delete _cartridge;
 }
 
+void gbc::core::GameboyColor::SetLCD(ILCD *lcd)
+{
+	_lcd = lcd;
+}
+
+void gbc::core::GameboyColor::SetJoypad(IJoypad *joypad)
+{
+	_joypad = joypad;
+}
+
+void gbc::core::GameboyColor::SetRom(int rom[], int size)
+{
+	LOG_L2("Loading cartridge");
+	
+	_cartridge = cartridges::Cartridge::Create(rom, size);
+}
+
+gbc::core::IInterruptHandler *gbc::core::GameboyColor::GetInterruptHandler()
+{
+	return &_hybr1s80;
+}
+
 void gbc::core::GameboyColor::Initialize()
 {
 	LOG_L2("Initializing Gameboy Color emulation");
@@ -83,23 +101,6 @@ void gbc::core::GameboyColor::Initialize()
 	_monochromePalette.colors[0].red = 0x1F;
 	_monochromePalette.colors[0].green = 0x1F;
 	_monochromePalette.colors[0].blue = 0x1F;
-}
-
-void gbc::core::GameboyColor::SetLCD(ILCD *lcd)
-{
-	_lcd = lcd;
-}
-
-void gbc::core::GameboyColor::SetJoypad(IJoypad *joypad)
-{
-	_joypad = joypad;
-}
-
-void gbc::core::GameboyColor::SetRom(int rom[], int size)
-{
-	LOG_L2("Loading cartridge");
-	
-	_cartridge = cartridges::Cartridge::Create(rom, size);
 }
 
 void gbc::core::GameboyColor::RenderScanline()
@@ -124,12 +125,10 @@ void gbc::core::GameboyColor::RenderScanline()
 
 void gbc::core::GameboyColor::RenderFrame()
 {
-	for (int i = 0; i < 153; i++)
+	for (int i = 0; i < 154; i++)
 	{	
 		RenderScanline();
 	}
-	
-	//std::cin.get();
 }
 
 void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
@@ -158,7 +157,7 @@ void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
 				{
 					_ioPorts[0xFF05 - 0xFF00] = _ioPorts[0xFF06  - 0xFF00];
 					_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 2, GBC_TRUE);
-					_timerInterruptRequested = GBC_TRUE;
+					_hybr1s80.SignalTimerInterrupt();
 				}
 				else
 				{
@@ -270,10 +269,10 @@ int gbc::core::GameboyColor::ReadByte(int address)
 		{
 			case 0xFF00:
 				// joypad
-				return ((!(_directionKeysSelected) ? _joypad->GetRight() : _joypad->GetButtonA()) ? 0b00000001 : 0b00000000) |
-				       ((!(_directionKeysSelected) ? _joypad->GetLeft() : _joypad->GetButtonB()) ? 0b00000010 : 0b00000000) |
-				       ((!(_directionKeysSelected) ? _joypad->GetUp() : _joypad->GetSelect()) ? 0b00000100 : 0b00000000) |
-				       ((!(_directionKeysSelected) ? _joypad->GetDown() : _joypad->GetStart()) ? 0b00001000 : 0b00000000) |
+				return ((!(_directionKeysSelected ? _joypad->GetRight() : _joypad->GetButtonA())) ? 0b00000001 : 0b00000000) |
+				       ((!(_directionKeysSelected ? _joypad->GetLeft() : _joypad->GetButtonB())) ? 0b00000010 : 0b00000000) |
+				       ((!(_directionKeysSelected ? _joypad->GetUp() : _joypad->GetSelect())) ? 0b00000100 : 0b00000000) |
+				       ((!(_directionKeysSelected ? _joypad->GetDown() : _joypad->GetStart())) ? 0b00001000 : 0b00000000) |
 				       ((!_directionKeysSelected) ? 0b00010000 : 0b00000000) |
 				       ((!_buttonKeysSelected) ? 0b00100000 : 0b00000000);
 			
@@ -432,10 +431,19 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 	else if (address >= 0xFE00 && address <= 0xFE9F)
 	{
 		int changedSpriteAttribute = (address - 0xFE00) / 4;
-			
-		if (std::find(_changedSpriteAttributes.begin(),
-		              _changedSpriteAttributes.end(),
-		              changedSpriteAttribute) == _changedSpriteAttributes.end())
+		
+		int isAlreadyInList = GBC_FALSE;
+		
+		for (int i = 0; i < _changedSpriteAttributes.size(); i++)
+		{
+			if (changedSpriteAttribute == _changedSpriteAttributes[i])
+			{
+				isAlreadyInList = GBC_TRUE;
+				break;
+			}
+		}
+		
+		if (!isAlreadyInList)
 		{
 			_changedSpriteAttributes.push_back(changedSpriteAttribute);
 		}
@@ -505,14 +513,33 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				break;
 			
 			case 0xFF0F:
-				// interrupt flag
+				// interrupt flags
 				_ioPorts[address - 0xFF00] = value;
 				
-				_vBlankInterruptRequested = GET_BIT(value, 0);
-				_lcdStatusInterruptRequested = GET_BIT(value, 1);
-				_timerInterruptRequested = GET_BIT(value, 2);
-				_serialInterruptRequested = GET_BIT(value, 3);
-				_joypadInterruptRequested = GET_BIT(value, 4);
+				if (GET_BIT(value, 0))
+				{
+					_hybr1s80.SignalVBlankInterrupt();
+				}
+				
+				if (GET_BIT(value, 1))
+				{
+					_hybr1s80.SignalLCDStatusInterrupt();
+				}
+				
+				if (GET_BIT(value, 2))
+				{
+					_hybr1s80.SignalTimerInterrupt();
+				}
+				
+				if (GET_BIT(value, 3))
+				{
+					_hybr1s80.SignalSerialInterrupt();
+				}
+				
+				if (GET_BIT(value, 4))
+				{
+					_hybr1s80.SignalJoypadInterrupt();
+				}
 				
 				break;
 			
@@ -841,13 +868,13 @@ void gbc::core::GameboyColor::DoOAMSearch()
 	if (_oamInterruptEnabled)
 	{
 		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
-		_lcdStatusInterruptRequested = GBC_TRUE;
+		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
 	if (_coincidenceInterruptEnabled && _coincidenceFlag)
 	{
 		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
-		_lcdStatusInterruptRequested = GBC_TRUE;
+		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
 	UpdateSpriteAttributes();
@@ -883,7 +910,7 @@ void gbc::core::GameboyColor::DoTransferData()
 					DrawWindowMap(COLOR_0, UseOAMPriorityBit);
 				}
 				
-				DrawSprites(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3, spriteBehindBackground);
+				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteBehindBackground);
 				DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, UseOAMPriorityBit);
 				
 				if (_windowDisplayEnabled)
@@ -891,7 +918,7 @@ void gbc::core::GameboyColor::DoTransferData()
 					DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, UseOAMPriorityBit);
 				}
 				
-				DrawSprites(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3, spriteAboveBackground);
+				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteAboveBackground);
 				DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundPriority);
 				
 				if (_windowDisplayEnabled)
@@ -902,7 +929,7 @@ void gbc::core::GameboyColor::DoTransferData()
 		}
 		else
 		{
-			//if (_backgroundDisplayEnabled)
+			if (_backgroundDisplayEnabled)
 			{
 				DrawBackgroundMap(COLOR_0);
 			}
@@ -912,9 +939,9 @@ void gbc::core::GameboyColor::DoTransferData()
 				DrawWindowMap(COLOR_0);
 			}
 			
-			DrawSprites(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3, spriteBehindBackground);
+			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteBehindBackground);
 			
-			//if (_backgroundDisplayEnabled)
+			if (_backgroundDisplayEnabled)
 			{
 				DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3);
 			}
@@ -924,7 +951,7 @@ void gbc::core::GameboyColor::DoTransferData()
 				DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3);
 			}
 			
-			DrawSprites(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3, spriteAboveBackground);
+			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteAboveBackground);
 		}
 	}
 	
@@ -945,7 +972,7 @@ void gbc::core::GameboyColor::DoHBlank()
 	if (_hBlankInterruptEnabled)
 	{
 		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
-		_lcdStatusInterruptRequested = GBC_TRUE;	
+		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
 	if (_hBlankDMATransferActive)
@@ -997,7 +1024,7 @@ void gbc::core::GameboyColor::DoVBlank()
 	if (_vBlankInterruptEnabled && !_vBlankInterruptAlreadyRequested)
 	{
 		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 0, GBC_TRUE);
-		_vBlankInterruptRequested = GBC_TRUE;
+		_hybr1s80.SignalVBlankInterrupt();
 		_vBlankInterruptAlreadyRequested = GBC_TRUE;
 	}
 	
@@ -1006,7 +1033,7 @@ void gbc::core::GameboyColor::DoVBlank()
 		_lcdY++;
 	}
 	
-	if (_lcdY >= 153)
+	if (_lcdY > 153)
 	{
 		if (_lcd)
 		{
@@ -1220,8 +1247,8 @@ void gbc::core::GameboyColor::UpdateSpriteAttributes()
 		
 		int spriteAttributeFlags = _oam[oamAddress + 3];
 		
-		_spriteAttributes[spriteAttributeNumber].y = _oam[oamAddress];
-		_spriteAttributes[spriteAttributeNumber].x = _oam[oamAddress + 1];
+		_spriteAttributes[spriteAttributeNumber].y = _oam[oamAddress] - 16;
+		_spriteAttributes[spriteAttributeNumber].x = _oam[oamAddress + 1] - 8;
 		_spriteAttributes[spriteAttributeNumber].tileNumber = _oam[oamAddress + 2];
 		
 		_spriteAttributes[spriteAttributeNumber].spriteColorPaletteNumber = spriteAttributeFlags & 0x07;

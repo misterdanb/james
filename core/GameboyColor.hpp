@@ -46,10 +46,13 @@ namespace gbc
 			GameboyColor();
 			~GameboyColor();
 			
-			void Initialize();
 			void SetLCD(ILCD *);
 			void SetJoypad(IJoypad *);
 			void SetRom(int[], int);
+			
+			IInterruptHandler *GetInterruptHandler();
+			
+			void Initialize();
 			
 			void RenderScanline();
 			void RenderFrame();
@@ -118,12 +121,6 @@ namespace gbc
 			int _timerCounter;
 			
 			// interrupt requests
-			int _vBlankInterruptRequested;
-			int _lcdStatusInterruptRequested;
-			int _timerInterruptRequested;
-			int _serialInterruptRequested;
-			int _joypadInterruptRequested;
-			
 			int _vBlankInterruptAlreadyRequested;
 			
 			// interrupt enablers

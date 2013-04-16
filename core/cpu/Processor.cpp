@@ -593,69 +593,72 @@ void gbc::core::cpu::Processor::ExecuteInterrupt()
 {
 	if (S_INTERRUPTS_ENABLED || S_HALTED)
 	{
-		if ((GET_BIT(READ(0xFFFF), 0) && GET_BIT(READ(0xFF0F), 0)) ||
-		    (GET_BIT(READ(0xFFFF), 1) && GET_BIT(READ(0xFF0F), 1)) ||
-		    (GET_BIT(READ(0xFFFF), 2) && GET_BIT(READ(0xFF0F), 2)) ||
-		    (GET_BIT(READ(0xFFFF), 3) && GET_BIT(READ(0xFF0F), 3)) ||
-		    (GET_BIT(READ(0xFFFF), 4) && GET_BIT(READ(0xFF0F), 4)))
+		if ((GET_BIT(READ(0xFFFF), 0) && _vBlankInterruptSignalled) ||
+		    (GET_BIT(READ(0xFFFF), 1) && _lcdStatusInterruptSignalled) ||
+		    (GET_BIT(READ(0xFFFF), 2) && _timerInterruptSignalled) ||
+		    (GET_BIT(READ(0xFFFF), 3) && _serialInterruptSignalled) ||
+		    (GET_BIT(READ(0xFFFF), 4) && _joypadInterruptSignalled))
 		{
-			
-			
 			S_SP -= 2;
 			
 			WRITE(S_SP, S_PC & 0xFF);
 			WRITE(S_SP + 1, (S_PC >> 8) & 0xFF);
 			
-			if (GET_BIT(READ(0xFFFF), 0) && GET_BIT(READ(0xFF0F), 0))
+			if (GET_BIT(READ(0xFFFF), 0) && _vBlankInterruptSignalled)
 			{
 				S_PC = 0x0040;
 				
-				if (!S_HALTED)
+				//if (!S_HALTED)
 				{
+					_vBlankInterruptSignalled = GBC_FALSE;
 					int result = READ(0xFF0F);
 					result = SET_BIT(result, 0, GBC_FALSE);
 					WRITE(0xFF0F, result);
 				}
 			}
-			else if (GET_BIT(READ(0xFFFF), 1) && GET_BIT(READ(0xFF0F), 1))
+			else if (GET_BIT(READ(0xFFFF), 1) && _lcdStatusInterruptSignalled)
 			{
 				S_PC = 0x0048;
 				
-				if (!S_HALTED)
+				//if (!S_HALTED)
 				{
+					_lcdStatusInterruptSignalled = GBC_FALSE;
 					int result = READ(0xFF0F);
 					result = SET_BIT(result, 1, GBC_FALSE);
 					WRITE(0xFF0F, result);
 				}
 			}
-			else if (GET_BIT(READ(0xFFFF), 2) && GET_BIT(READ(0xFF0F), 2))
+			else if (GET_BIT(READ(0xFFFF), 2) && _timerInterruptSignalled)
 			{
 				S_PC = 0x0050;
 				
-				if (!S_HALTED)
+				//if (!S_HALTED)
 				{
+					_timerInterruptSignalled = GBC_FALSE;
 					int result = READ(0xFF0F);
 					result = SET_BIT(result, 2, GBC_FALSE);
 					WRITE(0xFF0F, result);
 				}
 			}
-			else if (GET_BIT(READ(0xFFFF), 3) && GET_BIT(READ(0xFF0F), 3))
+			else if (GET_BIT(READ(0xFFFF), 3) && _serialInterruptSignalled)
 			{
 				S_PC = 0x0058;
 				
-				if (!S_HALTED)
+				//if (!S_HALTED)
 				{
+					_serialInterruptSignalled = GBC_FALSE;
 					int result = READ(0xFF0F);
 					result = SET_BIT(result, 3, GBC_FALSE);
 					WRITE(0xFF0F, result);
 				}
 			}
-			else if (GET_BIT(READ(0xFFFF), 4) && GET_BIT(READ(0xFF0F), 4))
+			else if (GET_BIT(READ(0xFFFF), 4) && _joypadInterruptSignalled)
 			{
 				S_PC = 0x0060;
 				
-				if (!S_HALTED)
+				//if (!S_HALTED)
 				{
+					_joypadInterruptSignalled = GBC_FALSE;
 					int result = READ(0xFF0F);
 					result = SET_BIT(result, 4, GBC_FALSE);
 					WRITE(0xFF0F, result);
@@ -720,6 +723,31 @@ void gbc::core::cpu::Processor::PowerUp()
 	WRITE(0xFF4A, 0x00); // WY
 	WRITE(0xFF4B, 0x00); // WX
 	WRITE(0xFFFF, 0x00); // IE
+}
+
+void gbc::core::cpu::Processor::SignalVBlankInterrupt()
+{
+	_vBlankInterruptSignalled = GBC_TRUE;
+}
+
+void gbc::core::cpu::Processor::SignalLCDStatusInterrupt()
+{
+	_lcdStatusInterruptSignalled = GBC_TRUE;
+}
+
+void gbc::core::cpu::Processor::SignalTimerInterrupt()
+{
+	_timerInterruptSignalled = GBC_TRUE;
+}
+
+void gbc::core::cpu::Processor::SignalSerialInterrupt()
+{
+	_serialInterruptSignalled = GBC_TRUE;
+}
+
+void gbc::core::cpu::Processor::SignalJoypadInterrupt()
+{
+	_joypadInterruptSignalled = GBC_TRUE;
 }
 
 void gbc::core::cpu::Processor::SetState(gbc::core::cpu::State state)
@@ -874,6 +902,7 @@ void gbc::core::cpu::Processor::RLCA()
 	S_A = ((S_A << 1) & 0xFE) | (GET_BIT(S_A, 7) ? 0x01 : 0x00);
 	SET_ZFLAG(GBC_FALSE);
 	SET_HFLAG(GBC_FALSE);
+	SET_NFLAG(GBC_FALSE);
 	UPDATE_PC();
 	UPDATE_TICKS();
 }
@@ -947,9 +976,10 @@ void gbc::core::cpu::Processor::RRCA()
 {
 	FETCH_OP_CODE();
 	SET_CFLAG(GET_BIT(S_A, 0));
-	S_A = ((S_A >> 1) & 0x7F) | (GET_BIT(S_A, 7) ? 0x80 : 0x00));
+	S_A = ((S_A >> 1) & 0x7F) | (GET_BIT(S_A, 0) ? 0x80 : 0x00);
 	SET_ZFLAG(GBC_FALSE);
 	SET_HFLAG(GBC_FALSE);
+	SET_NFLAG(GBC_FALSE);
 	UPDATE_PC();
 	UPDATE_TICKS();
 }
@@ -1074,76 +1104,44 @@ void gbc::core::cpu::Processor::DAA()
 {
 	FETCH_OP_CODE();
 	
-	/*int a = S_A;
-
-    if (!GET_NFLAG())
-    {
-        if (GET_HFLAG() || (a & 0xF) > 9)
-            a += 0x06;
-
-        if (GET_CFLAG() || a > 0x9F)
-            a += 0x60;
-    }
-    else
-    {
-        if (GET_NFLAG())
-            a = (a - 6) & 0xFF;
-
-        if (GET_CFLAG())
-            a -= 0x60;
-    }
-    
-    SET_HFLAG(GBC_FALSE);
-    SET_ZFLAG(GBC_FALSE);
-
-    if ((a & 0x100) == 0x100)
-        SET_CFLAG(GBC_TRUE);
-
-    a &= 0xFF;
-
-    if (a == 0)
-        SET_ZFLAG(GBC_TRUE);
-
-    S_A = a & 0xFF;*/
-    
-    if (!GET_NFLAG())
-    {
-        if (GET_HFLAG() || (S_A & 0x0F) > 0x09)
-        {
-            S_A += 0x06;
+	if (!GET_NFLAG())
+	{
+		if (GET_HFLAG() || (S_A & 0x0F) > 0x09)
+		{
+			S_A += 0x06;
 		}
-
-        if (GET_CFLAG() || S_A > 0x9F)
-        {
-            S_A += 0x60;
+		
+		if (GET_CFLAG() || S_A > 0x9F)
+		{
+			S_A += 0x60;
 		}
-    }
-    else
-    {
-        if (GET_NFLAG())
-        {
+	}
+	else
+	{
+		if (GET_NFLAG())
+		{
 			S_A -= 0x06;
 			S_A &= 0xFF;
 		}
-
-        if (GET_CFLAG())
-        {
-            S_A -= 0x60;
+		
+		if (GET_CFLAG())
+		{
+			S_A -= 0x60;
 		}
-    }
-    
-    SET_HFLAG(GBC_FALSE);
-    SET_ZFLAG(GBC_FALSE);
-
-    if ((S_A & 0x100) == 0x100)
-    {
-        SET_CFLAG(GBC_TRUE);
-    }
-
-    S_A &= 0xFF;
-
-    if (S_A == 0x00)
-    {
+	}
+	
+	SET_HFLAG(GBC_FALSE);
+	SET_ZFLAG(GBC_FALSE);
+	
+	if (S_A > 0xFF)
+	{
+		SET_CFLAG(GBC_TRUE);
+	}
+	
+	S_A &= 0xFF;
+	
+	if (S_A == 0x00)
+	{
 		SET_ZFLAG(GBC_TRUE);
 	}
 	
@@ -1643,9 +1641,12 @@ void gbc::core::cpu::Processor::ADD_SP_N()
 {
 	FETCH_OP_CODE();
 	FETCH_OP_LOW();
-	S_SP += GET_SIGNED_VALUE(GET_OP_LOW());
+	SET_CFLAG(0xFF - (S_SP & 0xFF) < GET_OP_LOW());          // to be understood
+	SET_HFLAG(0x0F - (S_SP & 0x0F) < (GET_OP_LOW() & 0x0F)); // to be understood
 	SET_NFLAG(GBC_FALSE);
 	SET_ZFLAG(GBC_FALSE);
+	S_SP += GET_SIGNED_VALUE(GET_OP_LOW());
+	S_SP &= 0xFFFF;
 	UPDATE_PC();
 	UPDATE_TICKS();
 }
@@ -1654,11 +1655,13 @@ void gbc::core::cpu::Processor::LD_HL_SP_N()
 {
 	FETCH_OP_CODE();
 	FETCH_OP_LOW();
-	int result = (S_SP + GET_SIGNED_VALUE(GET_OP_LOW())) & 0xFFFF;
-	S_H = GET_HIGH(result);
-	S_L = GET_LOW(result);
+	SET_CFLAG(0xFF - (S_SP & 0xFF) < GET_OP_LOW());          // to be understood
+	SET_HFLAG(0x0F - (S_SP & 0x0F) < (GET_OP_LOW() & 0x0F)); // to be understood
 	SET_NFLAG(GBC_FALSE);
 	SET_ZFLAG(GBC_FALSE);
+	int result = S_SP + GET_SIGNED_VALUE(GET_OP_LOW());
+	S_H = GET_HIGH(result);
+	S_L = GET_LOW(result);
 	UPDATE_PC();
 	UPDATE_TICKS();
 }

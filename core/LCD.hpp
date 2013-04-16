@@ -10,7 +10,8 @@ namespace gbc
 		class ILCD
 		{
 		public:
-			virtual ~ILCD(); 
+			virtual ~ILCD();
+			
 			virtual void DrawScanline(Scanline) = 0;
 			virtual void FinishFrame() = 0;
 		};

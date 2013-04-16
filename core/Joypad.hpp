@@ -9,6 +9,7 @@ namespace gbc
 		{
 		public:
 			virtual ~IJoypad();
+			
 			virtual int GetRight() = 0;
 			virtual int GetLeft() = 0;
 			virtual int GetUp() = 0;

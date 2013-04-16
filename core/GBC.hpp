@@ -11,7 +11,7 @@
 const int GBC_FALSE = 0;
 const int GBC_TRUE = 1;
 
-#define DEBUG
+//#define DEBUG
 
 #define LOG_LEVEL_2
 
