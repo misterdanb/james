@@ -51,20 +51,7 @@ int main(int argc, char *argv[])
 			arrayRom[i] = rom[i] & 0xFF;
 		}
 		
-		gbc::core::cartridges::Cartridge *test = gbc::core::cartridges::Cartridge::Create(arrayRom, rom.size());
-		
-		//std::copy(rom.begin(), rom.end(), arrayRom);
-		
-		/*gbc::core::GameboyColor gbc;
-		gbc.SetRom(arrayRom);
-		gbc.Initialize();
-	
-		for (int i = 0; i < 10000; i++)
-		{
-			gbc.RenderFrame();
-		}*/
-	
-		gbc::ui::GameWindow window(320, 288, arrayRom, rom.size());
+		gbc::ui::GameWindow window(160, 144, arrayRom, rom.size());
 	
 		while (window.isOpen())
 		{

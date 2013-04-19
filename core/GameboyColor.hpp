@@ -157,9 +157,9 @@ namespace gbc
 			int _windowX;
 			
 			// lcd monochrome palettes
-			int _monochromeBackgroundPaletteData[4];
-			int _monochromeSpritePalette0Data[4];
-			int _monochromeSpritePalette1Data[4];
+			ColorPalette _monochromeBackgroundPalette;
+			ColorPalette _monochromeSpritePalette0;
+			ColorPalette _monochromeSpritePalette1;
 			ColorPalette _monochromePalette;
 			
 			// lcd color phunalettes

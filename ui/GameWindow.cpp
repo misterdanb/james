@@ -31,7 +31,7 @@ void gbc::ui::GameWindow::Render()
 	texture.loadFromImage(_frame, sf::IntRect(0, 0, 160, 144));
 	
 	sf::Sprite sprite(texture);
-	sprite.setScale(2, 2);
+	//sprite.setScale(2, 2);
 	
 	while (pollEvent(event))
 	{

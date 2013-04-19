@@ -608,61 +608,36 @@ void gbc::core::cpu::Processor::ExecuteInterrupt()
 			{
 				S_PC = 0x0040;
 				
-				//if (!S_HALTED)
-				{
-					_vBlankInterruptSignalled = GBC_FALSE;
-					int result = READ(0xFF0F);
-					result = SET_BIT(result, 0, GBC_FALSE);
-					WRITE(0xFF0F, result);
-				}
+				_vBlankInterruptSignalled = GBC_FALSE;
+				WRITE(0xFF0F, SET_BIT(READ(0xFF0F), 0, GBC_FALSE));
 			}
 			else if (GET_BIT(READ(0xFFFF), 1) && _lcdStatusInterruptSignalled)
 			{
 				S_PC = 0x0048;
 				
-				//if (!S_HALTED)
-				{
-					_lcdStatusInterruptSignalled = GBC_FALSE;
-					int result = READ(0xFF0F);
-					result = SET_BIT(result, 1, GBC_FALSE);
-					WRITE(0xFF0F, result);
-				}
+				_lcdStatusInterruptSignalled = GBC_FALSE;
+				WRITE(0xFF0F, SET_BIT(READ(0xFF0F), 1, GBC_FALSE));
 			}
 			else if (GET_BIT(READ(0xFFFF), 2) && _timerInterruptSignalled)
 			{
 				S_PC = 0x0050;
 				
-				//if (!S_HALTED)
-				{
-					_timerInterruptSignalled = GBC_FALSE;
-					int result = READ(0xFF0F);
-					result = SET_BIT(result, 2, GBC_FALSE);
-					WRITE(0xFF0F, result);
-				}
+				_timerInterruptSignalled = GBC_FALSE;
+				WRITE(0xFF0F, SET_BIT(READ(0xFF0F), 2, GBC_FALSE));
 			}
 			else if (GET_BIT(READ(0xFFFF), 3) && _serialInterruptSignalled)
 			{
 				S_PC = 0x0058;
 				
-				//if (!S_HALTED)
-				{
-					_serialInterruptSignalled = GBC_FALSE;
-					int result = READ(0xFF0F);
-					result = SET_BIT(result, 3, GBC_FALSE);
-					WRITE(0xFF0F, result);
-				}
+				_serialInterruptSignalled = GBC_FALSE;
+				WRITE(0xFF0F, SET_BIT(READ(0xFF0F), 3, GBC_FALSE));
 			}
 			else if (GET_BIT(READ(0xFFFF), 4) && _joypadInterruptSignalled)
 			{
 				S_PC = 0x0060;
 				
-				//if (!S_HALTED)
-				{
-					_joypadInterruptSignalled = GBC_FALSE;
-					int result = READ(0xFF0F);
-					result = SET_BIT(result, 4, GBC_FALSE);
-					WRITE(0xFF0F, result);
-				}
+				_joypadInterruptSignalled = GBC_FALSE;
+				WRITE(0xFF0F, SET_BIT(READ(0xFF0F), 4, GBC_FALSE));
 			}
 			
 			S_INTERRUPTS_ENABLED = GBC_FALSE;

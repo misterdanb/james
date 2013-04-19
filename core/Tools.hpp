@@ -11,4 +11,6 @@
 
 #define GET_SIGNED_VALUE(x) (((x) & 0x7F) - ((x) & 0x80))
 
+#define GET_ABSOLUTE_VALUE(x) ((x) < 0 ? ((x) * (-1)) : (x))
+
 #endif
