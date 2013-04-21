@@ -181,14 +181,14 @@ void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
 			_deviderCounter++;
 		}
 		
-		if (GET_BIT(_ioPorts[0xFF07 - 0xFF00], 2))
+		if (GetBit(_ioPorts[0xFF07 - 0xFF00], 2))
 		{
 			if (_timerCounter >= _timerClockFrequency)
 			{
 				if (_ioPorts[0xFF05 - 0xFF00] + 1 >= 0xFF)
 				{
 					_ioPorts[0xFF05 - 0xFF00] = _ioPorts[0xFF06  - 0xFF00];
-					_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 2, GBC_TRUE);
+					_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 2, GBC_TRUE);
 					_hybr1s80.SignalTimerInterrupt();
 				}
 				else
@@ -493,8 +493,8 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// joypad input
 				_ioPorts[address - 0xFF00] = value;
 				
-				_directionKeysSelected = !GET_BIT(value, 4);
-				_buttonKeysSelected = !GET_BIT(value, 5);
+				_directionKeysSelected = !GetBit(value, 4);
+				_buttonKeysSelected = !GetBit(value, 5);
 				
 				break;
 			
@@ -540,7 +540,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 					case 0x03: _timerClockFrequency = 256; break;
 				}
 				
-				_timerStopped = GET_BIT(value, 2);
+				_timerStopped = GetBit(value, 2);
 				
 				break;
 			
@@ -548,27 +548,27 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// interrupt flags
 				_ioPorts[address - 0xFF00] = value;
 				
-				if (GET_BIT(value, 0))
+				if (GetBit(value, 0))
 				{
 					_hybr1s80.SignalVBlankInterrupt();
 				}
 				
-				if (GET_BIT(value, 1))
+				if (GetBit(value, 1))
 				{
 					_hybr1s80.SignalLCDStatusInterrupt();
 				}
 				
-				if (GET_BIT(value, 2))
+				if (GetBit(value, 2))
 				{
 					_hybr1s80.SignalTimerInterrupt();
 				}
 				
-				if (GET_BIT(value, 3))
+				if (GetBit(value, 3))
 				{
 					_hybr1s80.SignalSerialInterrupt();
 				}
 				
-				if (GET_BIT(value, 4))
+				if (GetBit(value, 4))
 				{
 					_hybr1s80.SignalJoypadInterrupt();
 				}
@@ -579,14 +579,14 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// lcd control
 				_ioPorts[address - 0xFF00] = value;
 				
-				_backgroundDisplayEnabled = GET_BIT(value, 0);
-				_spriteDisplayEnabled = GET_BIT(value, 1);
-				_spriteSize = GET_BIT(value, 2);
-				_backgroundTileMapDisplaySelect = GET_BIT(value, 3);
-				_backgroundAndWindowTileDataSelect = GET_BIT(value, 4);
-				_windowDisplayEnabled = GET_BIT(value, 5);
-				_windowTileMapDisplaySelect = GET_BIT(value, 6);
-				_lcdDisplayEnabled = GET_BIT(value, 7);
+				_backgroundDisplayEnabled = GetBit(value, 0);
+				_spriteDisplayEnabled = GetBit(value, 1);
+				_spriteSize = GetBit(value, 2);
+				_backgroundTileMapDisplaySelect = GetBit(value, 3);
+				_backgroundAndWindowTileDataSelect = GetBit(value, 4);
+				_windowDisplayEnabled = GetBit(value, 5);
+				_windowTileMapDisplaySelect = GetBit(value, 6);
+				_lcdDisplayEnabled = GetBit(value, 7);
 				
 				break;
 			
@@ -596,11 +596,11 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				_ioPorts[address - 0xFF00] = value;
 				
 				//_lcdMode = LCDMode(value & 0x03);
-				//_coincidenceFlag = GET_BIT(value, 2);
-				_hBlankInterruptEnabled = GET_BIT(value, 3);
-				_vBlankInterruptEnabledInLCD = GET_BIT(value, 4);
-				_oamInterruptEnabled = GET_BIT(value, 5);
-				_coincidenceInterruptEnabled = GET_BIT(value, 6);
+				//_coincidenceFlag = GetBit(value, 2);
+				_hBlankInterruptEnabled = GetBit(value, 3);
+				_vBlankInterruptEnabledInLCD = GetBit(value, 4);
+				_oamInterruptEnabled = GetBit(value, 5);
+				_coincidenceInterruptEnabled = GetBit(value, 6);
 				
 				break;
 			
@@ -734,10 +734,10 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// new dma length/mode/start
 				_ioPorts[address - 0xFF00] = value;
 				
-				if (GET_BIT(value, 7) && !_hBlankDMATransferActive)
+				if (GetBit(value, 7) && !_hBlankDMATransferActive)
 				{
-					int source = JOIN_BYTES(_ioPorts[0xFF51 - 0xFF00], _ioPorts[0xFF52 - 0xFF00]) & 0x000F;
-					int destination = JOIN_BYTES(_ioPorts[0xFF53 - 0xFF00], _ioPorts[0xFF54 - 0xFF00]) & 0xE00F;
+					int source = JoinBytes(_ioPorts[0xFF51 - 0xFF00], _ioPorts[0xFF52 - 0xFF00]) & 0x000F;
+					int destination = JoinBytes(_ioPorts[0xFF53 - 0xFF00], _ioPorts[0xFF54 - 0xFF00]) & 0xE00F;
 					int length = ((value & 0x7F) + 1) * 0x10;
 				
 					_hBlankDMATransferActive = GBC_TRUE;
@@ -746,17 +746,17 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 					_hBlankDMATransferLength = length;
 					_currentHBlankDMATransferAddressOffset = 0x0000;
 					
-					_ioPorts[address - 0xFF00] = SET_BIT(_ioPorts[address - 0xFF00], 7, GBC_FALSE);
+					_ioPorts[address - 0xFF00] = SetBit(_ioPorts[address - 0xFF00], 7, GBC_FALSE);
 				}
-				else if (!GET_BIT(value, 7) && _hBlankDMATransferActive)
+				else if (!GetBit(value, 7) && _hBlankDMATransferActive)
 				{
 					_hBlankDMATransferActive = GBC_FALSE;
-					_ioPorts[address - 0xFF00] = SET_BIT(_ioPorts[address - 0xFF00], 7, GBC_TRUE);
+					_ioPorts[address - 0xFF00] = SetBit(_ioPorts[address - 0xFF00], 7, GBC_TRUE);
 				}
 				else
 				{
-					int source = JOIN_BYTES(_ioPorts[0xFF51 - 0xFF00], _ioPorts[0xFF52 - 0xFF00]) & 0x000F;
-					int destination = JOIN_BYTES(_ioPorts[0xFF53 - 0xFF00], _ioPorts[0xFF54 - 0xFF00]) & 0xE00F;
+					int source = JoinBytes(_ioPorts[0xFF51 - 0xFF00], _ioPorts[0xFF52 - 0xFF00]) & 0x000F;
+					int destination = JoinBytes(_ioPorts[0xFF53 - 0xFF00], _ioPorts[0xFF54 - 0xFF00]) & 0xE00F;
 					int length = ((value & 0x7F) + 1) * 0x10;
 					
 					for (int i = 0; i < length; i++)
@@ -765,7 +765,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 					}
 					
 					// emulate bit 7 for reading, so the dma transfer "takes some time"
-					// _ioPorts[0xFF55 - 0xFF00] = SET_BIT(_ioPorts[0xFF55 - 0xFF00], 7, GBC_TRUE);
+					// _ioPorts[0xFF55 - 0xFF00] = SetBit(_ioPorts[0xFF55 - 0xFF00], 7, GBC_TRUE);
 					_ioPorts[address - 0xFF00] = 0xFF;
 				}
 				
@@ -781,7 +781,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// background palette index
 				_ioPorts[address - 0xFF00] = value;
 				
-				if (GET_BIT(value, 7)) _colorBackgroundPaletteIndexAutoIncrement = GBC_TRUE;
+				if (GetBit(value, 7)) _colorBackgroundPaletteIndexAutoIncrement = GBC_TRUE;
 				else _colorBackgroundPaletteIndexAutoIncrement = GBC_FALSE;
 				
 				break;
@@ -818,7 +818,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// sprite palette index
 				_ioPorts[address - 0xFF00] = value;
 				
-				if (GET_BIT(value, 7)) _colorSpritePaletteIndexAutoIncrement = GBC_TRUE;
+				if (GetBit(value, 7)) _colorSpritePaletteIndexAutoIncrement = GBC_TRUE;
 				else _colorSpritePaletteIndexAutoIncrement = GBC_FALSE;
 				
 				break;
@@ -875,11 +875,11 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 		// interrupt enable
 		_interruptEnableRegister = value;
 		
-		_vBlankInterruptEnabled = GET_BIT(value, 0);
-		_lcdStatusInterruptEnabled = GET_BIT(value, 1);
-		_timerInterruptEnabled = GET_BIT(value, 2);
-		_serialInterruptEnabled = GET_BIT(value, 3);
-		_joypadInterruptEnabled = GET_BIT(value, 4);
+		_vBlankInterruptEnabled = GetBit(value, 0);
+		_lcdStatusInterruptEnabled = GetBit(value, 1);
+		_timerInterruptEnabled = GetBit(value, 2);
+		_serialInterruptEnabled = GetBit(value, 3);
+		_joypadInterruptEnabled = GetBit(value, 4);
 	}
 	else
 	{
@@ -895,13 +895,13 @@ void gbc::core::GameboyColor::DoOAMSearch()
 	
 	if (_oamInterruptEnabled)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
+		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
 	if (_coincidenceInterruptEnabled && _coincidenceFlag)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
+		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
@@ -1010,7 +1010,7 @@ void gbc::core::GameboyColor::DoHBlank()
 	
 	if (_hBlankInterruptEnabled)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
+		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
@@ -1057,12 +1057,12 @@ void gbc::core::GameboyColor::DoVBlank()
 	
 	if (_coincidenceInterruptEnabled && _coincidenceFlag)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
+		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
 	}
 	
 	if (_vBlankInterruptEnabled && !_vBlankInterruptAlreadyRequested)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SET_BIT(_ioPorts[0xFF0F - 0xFF00], 0, GBC_TRUE);
+		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 0, GBC_TRUE);
 		_hybr1s80.SignalVBlankInterrupt();
 		_vBlankInterruptAlreadyRequested = GBC_TRUE;
 	}
@@ -1409,7 +1409,7 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 	}
 	
 	int tileNumber = (!_backgroundAndWindowTileDataSelect) ?
-		             (((0x9000 - 0x8000) / 16) + GET_SIGNED_VALUE(backgroundMapElement)) :
+		             (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
 		             (((0x8000 - 0x8000) / 16) + backgroundMapElement);
 	
 	Tile tile = _tiles[tileVideoRamBankNumber][tileNumber];

@@ -21,8 +21,8 @@ namespace gbc
 				
 				Header GetHeader();
 				
-				virtual int ReadByte(int) = 0;
-				virtual void WriteByte(int, int) = 0;
+				virtual int ReadByte(int) = GBC_NULL;
+				virtual void WriteByte(int, int) = GBC_NULL;
 				
 				static Cartridge *Create(int[], int);
 				

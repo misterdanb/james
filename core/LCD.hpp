@@ -1,6 +1,7 @@
 #ifndef _LCD_hpp_
 #define _LCD_hpp_
 
+#include "GBC.hpp"
 #include "Scanline.hpp"
 
 namespace gbc
@@ -16,8 +17,8 @@ namespace gbc
 		public:
 			virtual ~ILCD();
 			
-			virtual void DrawScanline(Scanline) = 0;
-			virtual void FinishFrame() = 0;
+			virtual void DrawScanline(Scanline) = GBC_NULL;
+			virtual void FinishFrame() = GBC_NULL;
 		};
 	}
 }

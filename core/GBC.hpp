@@ -45,6 +45,8 @@
 	#define ERROR_L3(str)
 #endif
 
+#define GBC_NULL 0
+
 namespace gbc
 {
 	// consts
@@ -52,6 +54,41 @@ namespace gbc
 	const int GBC_TRUE = 1;
 	
 	// const expressions
+	constexpr int GetBit(int x, int n)
+	{
+		return (x >> n) & 0x01;
+	}
+	
+	constexpr int SetBit(int x, int n, int value)
+	{
+		return (x & (~(0x01 << n))) | (value ? (0x01 << n) : 0x00);
+	}
+	
+	constexpr int GetHigh(int x)
+	{
+		return (x >> 8) & 0xFF;
+	}
+	
+	constexpr int GetLow(int x)
+	{
+		return x & 0xFF;
+	}
+	
+	constexpr int JoinBytes(int high, int low)
+	{
+		return ((high & 0xFF) << 8) | (low & 0xFF);
+	}
+	
+	constexpr int GetSignedValue(int x)
+	{
+		return (x & 0x7F) - (x & 0x80);
+	}
+	
+	constexpr int GetAbsoluteValue(int x)
+	{
+		return (x < 0) ? (x * (-1)) : x;
+	}
+	
 	template<typename T>
 	constexpr typename std::underlying_type<T>::type GetEnumValue(T value)
 	{
