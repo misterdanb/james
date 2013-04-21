@@ -47,59 +47,59 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 	
 	switch (cartridgeType)
 	{
-		case romOnly:
+		case CartridgeType::ROM_ONLY:
 			createdCartridge = new RomOnly(rom, size);
 			createdCartridgeName = "Rom only";
 			break;
 		
-		case mbc1:
-		case mbc1Ram:
-		case mbc1RamBattery:
+		case CartridgeType::MBC1:
+		case CartridgeType::MBC1_RAM:
+		case CartridgeType::MBC1_RAM_BATTERY:
 			createdCartridge = new MBC1(rom, size);
 			createdCartridgeName = "MBC1";
 			break;
 		
-		case mbc2:
-		case mbc2Battery:
+		case CartridgeType::MBC2:
+		case CartridgeType::MBC2_BATTERY:
 			createdCartridge = new MBC2(rom, size);
 			createdCartridgeName = "MBC2";
 			break;
 		
-		case romRam:
-		case romRamBattery:
+		case CartridgeType::ROM_RAM:
+		case CartridgeType::ROM_RAM_BATTERY:
 			createdCartridge = new RomRam(rom, size);
 			createdCartridgeName = "Rom and ram";
 			break;
 		
-		case mmm01:
-		case mmm01Ram:
-		case mmm01RamBattery:
+		case CartridgeType::MMM01:
+		case CartridgeType::MMM01_RAM:
+		case CartridgeType::MMM01_RAM_BATTERY:
 			createdCartridge = new MMM01(rom, size);
 			createdCartridgeName = "MMM01";
 			break;
 		
-		case mbc3TimerBattery:
-		case mbc3TimerRamBattery:
-		case mbc3:
-		case mbc3Ram:
-		case mbc3RamBattery:
+		case CartridgeType::MBC3_TIMER_BATTERY:
+		case CartridgeType::MBC3_TIMER_RAM_BATTERY:
+		case CartridgeType::MBC3:
+		case CartridgeType::MBC3_RAM:
+		case CartridgeType::MBC3_RAM_BATTERY:
 			createdCartridge = new MBC3(rom, size);
 			createdCartridgeName = "MBC3";
 			break;
 		
-		case mbc4:
-		case mbc4Ram:
-		case mbc4RamBattery:
+		case CartridgeType::MBC4:
+		case CartridgeType::MBC4_RAM:
+		case CartridgeType::MBC4_RAM_BATTERY:
 			createdCartridge = new MBC4(rom, size);
 			createdCartridgeName = "MBC4";
 			break;
 		
-		case mbc5:
-		case mbc5Ram:
-		case mbc5RamBattery:
-		case mbc5Rumble:
-		case mbc5RumbleRam:
-		case mbc5RumbleRamBattery:
+		case CartridgeType::MBC5:
+		case CartridgeType::MBC5_RAM:
+		case CartridgeType::MBC5_RAM_BATTERY:
+		case CartridgeType::MBC5_RUMBLE:
+		case CartridgeType::MBC5_RUMBLE_RAM:
+		case CartridgeType::MBC5_RUMBLE_RAM_BATTERY:
 			createdCartridge = new MBC5(rom, size);
 			createdCartridgeName = "MBC5";
 			break;
@@ -119,7 +119,8 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 		
 		default: break;
 	}
-	
+
+#ifdef DEBUG
 	Header createdHeader = createdCartridge->GetHeader();
 	
 	std::ostringstream oss;
@@ -139,7 +140,7 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 	oss <<                   ToDec(createdHeader.romDimensions.banks) << " banks" << std::endl;
 	oss << "\tRam size: " << ToDec(createdHeader.ramDimensions.size) << " bytes splitted into ";
 	oss <<                   ToDec(createdHeader.ramDimensions.banks) << " banks" << std::endl;
-	oss << "\tDestination code: " << ((createdHeader.destinationCode == japanese) ? "Japanese" : "non Japanese") << std::endl;
+	oss << "\tDestination code: " << ((createdHeader.destinationCode == DestinationCode::JAPANESE) ? "Japanese" : "non Japanese") << std::endl;
 	oss << "\tOld licensee code: " << ToHex(createdHeader.oldLicenseeCode)  << std::endl;
 	oss << "\tRom version Number: " << ToDec(createdHeader.romVersionNumber) << std::endl;
 	oss << "\tHeader checksum: " << ToHex(createdHeader.headerChecksum) << std::endl;
@@ -147,6 +148,7 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 	oss <<                          ToHex(createdHeader.globalChecksum[1]) << std::endl;
 	
 	LOG_L2(oss.str());
+#endif
 	
 	return createdCartridge;
 }

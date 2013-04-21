@@ -760,21 +760,24 @@
 
 /* INSTRUCTIONS END */
 
-// replace this with consts
-#define DEFAULT_TABLE 0
-#define CB_TABLE 1
-
 namespace gbc
 {
 	namespace core
 	{
 		namespace cpu
 		{
-			struct LookUpTables
+			class LookUpTables
 			{
-				static const int INSTRUCTION_CYCLES[2][0x0100];
-				static const int ADDITIONAL_INSTRUCTION_CYCLES[2][0x0100];
-				static const int INSTRUCTION_LENGTHS[2][0x0100];
+			public:
+				static const int AMOUNT_OF_INSTUCTION_TABLES = 2;
+				static const int INSTRUCTION_TABLE_SIZE = 0x0100;
+				static const int DEFAULT_TABLE = 0;
+				static const int CB_TABLE = 1;
+			
+			public:
+				static const int INSTRUCTION_CYCLES[AMOUNT_OF_INSTUCTION_TABLES][INSTRUCTION_TABLE_SIZE];
+				static const int ADDITIONAL_INSTRUCTION_CYCLES[AMOUNT_OF_INSTUCTION_TABLES][INSTRUCTION_TABLE_SIZE];
+				static const int INSTRUCTION_LENGTHS[AMOUNT_OF_INSTUCTION_TABLES][INSTRUCTION_TABLE_SIZE];
 			};
 		}
 	}

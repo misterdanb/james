@@ -1,6 +1,6 @@
 #include "LookUpTables.hpp"
 
-const int gbc::core::cpu::LookUpTables::INSTRUCTION_CYCLES[2][0x0100] =
+const int gbc::core::cpu::LookUpTables::INSTRUCTION_CYCLES[AMOUNT_OF_INSTUCTION_TABLES][INSTRUCTION_TABLE_SIZE] =
 {
 	{ // DEFAULT
 	/*  X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  XA  XB  XC  XD  XE  XF        XX */
@@ -42,7 +42,7 @@ const int gbc::core::cpu::LookUpTables::INSTRUCTION_CYCLES[2][0x0100] =
 	}
 };
 
-const int gbc::core::cpu::LookUpTables::ADDITIONAL_INSTRUCTION_CYCLES[2][0x0100] =
+const int gbc::core::cpu::LookUpTables::ADDITIONAL_INSTRUCTION_CYCLES[AMOUNT_OF_INSTUCTION_TABLES][INSTRUCTION_TABLE_SIZE] =
 {
 	{ // DEFAULT
 	/*  X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  XA  XB  XC  XD  XE  XF        XX */
@@ -84,7 +84,7 @@ const int gbc::core::cpu::LookUpTables::ADDITIONAL_INSTRUCTION_CYCLES[2][0x0100]
 	}
 };
 
-const int gbc::core::cpu::LookUpTables::INSTRUCTION_LENGTHS[2][0x0100] =
+const int gbc::core::cpu::LookUpTables::INSTRUCTION_LENGTHS[AMOUNT_OF_INSTUCTION_TABLES][INSTRUCTION_TABLE_SIZE] =
 {
 	{ // DEFAULT
 	/*  X0  X1  X2  X3  X4  X5  X6  X7  X8  X9  XA  XB  XC  XD  XE  XF        XX */

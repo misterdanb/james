@@ -1,12 +1,18 @@
 #ifndef _LCDMode_hpp_
 #define _LCDMode_hpp_
 
-enum LCDMode
+namespace gbc
 {
-	hBlank = 0,
-	vBlank = 1,
-	searchingOAM = 2,
-	transferringData = 3
-};
+	namespace core
+	{
+		enum class LCDMode : int
+		{
+			HORIZONTAL_BLANK = 0,
+			VERTICAL_BLANK = 1,
+			SEARCHING_OAM = 2,
+			TRANSFERRING_DATA = 3
+		};
+	}
+}
 
 #endif

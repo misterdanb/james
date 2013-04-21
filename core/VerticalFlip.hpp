@@ -1,10 +1,16 @@
 #ifndef _VerticalFlip_hpp_
 #define _VerticalFlip_hpp_
 
-enum VerticalFlip
+namespace gbc
 {
-	notVerticallyFlipped = 0,
-	verticallyFlipped = 1
-};
+	namespace core
+	{
+		enum class VerticalFlip : int
+		{
+			NOT_FLIPPED = 0,
+			FLIPPED = 1
+		};
+	}
+}
 
 #endif

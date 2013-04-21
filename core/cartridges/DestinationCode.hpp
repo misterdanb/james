@@ -7,10 +7,10 @@ namespace gbc
 	{
 		namespace cartridges
 		{
-			enum DestinationCode
+			enum class DestinationCode : int
 			{
-				japanese = 0x00,
-				nonJapanese = 0x01
+				JAPANESE = 0x00,
+				NON_JAPANESE = 0x01
 			};
 		}
 	}

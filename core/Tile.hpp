@@ -8,7 +8,11 @@ namespace gbc
 		class Tile
 		{
 		public:
-			int data[8][8] =
+			static const int WIDTH = 8;
+			static const int HEIGHT = 8;
+		
+		public:
+			int data[WIDTH][HEIGHT] =
 			{
 				{ 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0 },

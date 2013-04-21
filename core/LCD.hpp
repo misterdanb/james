@@ -10,6 +10,10 @@ namespace gbc
 		class ILCD
 		{
 		public:
+			static const int LCD_WIDTH = Scanline::WIDTH;
+			static const int LCD_HEIGHT = 144;
+		
+		public:
 			virtual ~ILCD();
 			
 			virtual void DrawScanline(Scanline) = 0;

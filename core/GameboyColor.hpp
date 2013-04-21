@@ -13,28 +13,12 @@
 #include "cpu/Processor.hpp"
 #include "MemoryBus.hpp"
 #include "LCDMode.hpp"
-#include "BackgroundMapAttribute.hpp"
+#include "TileMapAttribute.hpp"
 #include "SpriteAttribute.hpp"
 #include "Tile.hpp"
+#include "TileMap.hpp"
 #include "Color.hpp"
 #include "ColorPalette.hpp"
-
-#define VRAM_BANKS 2
-#define VRAM_BANK_SIZE 0x2000
-
-#define WRAM_BANKS 8
-#define WRAM_BANK_SIZE 0x1000
-
-#define OAM_SIZE 0x80
-
-#define IOPORTS_SIZE 0x80
-
-#define HRAM_SIZE 0x80
-
-#define COLOR_0 0b00000001
-#define COLOR_1 0b00000010
-#define COLOR_2 0b00000100
-#define COLOR_3 0b00001000
 
 namespace gbc
 {
@@ -42,6 +26,24 @@ namespace gbc
 	{
 		class GameboyColor : public IMemoryBus
 		{
+		public:
+			static const int VIDEO_RAM_BANKS = 2;
+			static const int VIDEO_RAM_BANK_SIZE = 0x2000;
+			
+			static const int WORK_RAM_BANKS = 8;
+			static const int WORK_RAM_BANK_SIZE = 0x1000;
+			
+			static const int OAM_SIZE = 0x80;
+			
+			static const int IO_PORTS_SIZE = 0x80;
+			
+			static const int HIGH_RAM_SIZE = 0x80;
+			
+			static const int COLOR_0 = 0b00000001;
+			static const int COLOR_1 = 0b00000010;
+			static const int COLOR_2 = 0b00000100;
+			static const int COLOR_3 = 0b00001000;
+		
 		public:
 			GameboyColor();
 			~GameboyColor();
@@ -70,7 +72,7 @@ namespace gbc
 			
 			void UpdateTiles();
 			void UpdateBackgroundMapElements();
-			void UpdateBackgroundMapAttributes();
+			void UpdateTileMapAttributes();
 			void UpdateSpriteAttributes();
 			
 			void DrawSprites(int, SpriteToBackgroundPriority);
@@ -103,11 +105,11 @@ namespace gbc
 			int _speedFactor;
 			
 			// ram
-			int _videoRam[VRAM_BANKS][VRAM_BANK_SIZE];
-			int _workRam[WRAM_BANKS][WRAM_BANK_SIZE];
+			int _videoRam[VIDEO_RAM_BANKS][VIDEO_RAM_BANK_SIZE];
+			int _workRam[WORK_RAM_BANKS][WORK_RAM_BANK_SIZE];
 			int _oam[OAM_SIZE];
-			int _ioPorts[IOPORTS_SIZE];
-			int _highRam[HRAM_SIZE];
+			int _ioPorts[IO_PORTS_SIZE];
+			int _highRam[HIGH_RAM_SIZE];
 			int _interruptEnableRegister;
 			
 			// ram banks
@@ -173,12 +175,12 @@ namespace gbc
 			std::vector<int *> _changedTiles; // (tile vram bank, tile number)
 			
 			// background map elements
-			int _backgroundMapElements[2][32 * 32];
+			TileMap _tileMaps[2];
 			std::vector<int *> _changedBackgroundMapElements;
 			
 			// background map attributes
-			BackgroundMapAttribute _backgroundMapAttributes[2][32 * 32];
-			std::vector<int *> _changedBackgroundMapAttributes;
+			TileMapAttribute _backgroundMapAttributes[2][32 * 32];
+			std::vector<int *> _changedTileMapAttributes;
 			
 			// sprite attributes
 			SpriteAttribute _spriteAttributes[40];

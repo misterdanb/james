@@ -1,14 +1,14 @@
 #include "Scanline.hpp"
 
 gbc::core::Scanline::Scanline()
-	: _lineIndex(0), _gameboyColors(new Color[160]), _realColors(new Color[160])
+	: _lineIndex(0), _gameboyColors(new Color[SCANLINE_WIDTH]), _realColors(new Color[SCANLINE_WIDTH])
 {
 }
 
 gbc::core::Scanline::Scanline(int lineIndex, Color gameboyColors[])
-	: _lineIndex(lineIndex), _gameboyColors(new Color[160]), _realColors(new Color[160])
+	: _lineIndex(lineIndex), _gameboyColors(new Color[SCANLINE_WIDTH]), _realColors(new Color[SCANLINE_WIDTH])
 {
-	for (int i = 0; i < 160; i++)
+	for (int i = 0; i < SCANLINE_WIDTH; i++)
 	{
 		_gameboyColors[i].red = gameboyColors[i].red;
 		_gameboyColors[i].green = gameboyColors[i].green;

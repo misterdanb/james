@@ -9,11 +9,6 @@ gbc::core::GameboyColor::GameboyColor()
 	  _forceClassicGameboy(GBC_TRUE),
 	  _hybr1s80(),
 	  _speedFactor(1),
-	  _videoRam({ { 0, }, { 0, } }),
-	  _workRam({ { 0, }, { 0, }, { 0, }, { 0, }, { 0, }, { 0, }, { 0, }, { 0, } }),
-	  _oam({ 0, }),
-	  _ioPorts({ 0, }),
-	  _highRam({ 0, }),
 	  _interruptEnableRegister(0x00),
 	  _selectedWorkRamBank(1), // 0xD000 is 1-7
 	  _selectedVideoRamBank(0),
@@ -30,7 +25,7 @@ gbc::core::GameboyColor::GameboyColor()
 	  _spriteSize(0), // missing enum for sprite size (and implementation of this)
 	  _spriteDisplayEnabled(GBC_FALSE),
 	  _backgroundDisplayEnabled(GBC_FALSE),
-	  _lcdMode(vBlank),
+	  _lcdMode(LCDMode::VERTICAL_BLANK),
 	  _coincidenceFlag(GBC_FALSE),
 	  _hBlankInterruptEnabled(GBC_FALSE),
 	  _vBlankInterruptEnabledInLCD(GBC_FALSE),
@@ -50,6 +45,11 @@ gbc::core::GameboyColor::GameboyColor()
 	  _hBlankDMATransferLength(0),
 	  _currentHBlankDMATransferAddressOffset(0x0000)
 {
+	std::memset(_videoRam, 0x00, VIDEO_RAM_BANKS * VIDEO_RAM_BANK_SIZE);
+	std::memset(_workRam, 0x00, WORK_RAM_BANKS * WORK_RAM_BANK_SIZE);
+	std::memset(_oam, 0x00, OAM_SIZE);
+	std::memset(_ioPorts, 0x00, IO_PORTS_SIZE);
+	std::memset(_highRam, 0x00, HIGH_RAM_SIZE);
 }
 
 gbc::core::GameboyColor::~GameboyColor()
@@ -131,14 +131,14 @@ void gbc::core::GameboyColor::RenderFrame()
 		RenderScanline();
 	}
 	
-	// test output background maps
+	/*// test output background maps
 	std::cout << "Background map 0: " << std::endl;
 	
 	for (int y = 0; y < 32; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			std::cout << ToHex(_backgroundMapElements[0][y * 32 + x]) << " ";
+			std::cout << ToHex(_tileMaps[0][y * 32 + x]) << " ";
 		}
 		
 		std::cout << std::endl;
@@ -152,7 +152,7 @@ void gbc::core::GameboyColor::RenderFrame()
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			std::cout << ToHex(_backgroundMapElements[1][y * 32 + x]) << " ";
+			std::cout << ToHex(_tileMaps[1][y * 32 + x]) << " ";
 		}
 		
 		std::cout << std::endl;
@@ -160,7 +160,7 @@ void gbc::core::GameboyColor::RenderFrame()
 	
 	std::cout << std::endl;
 	
-	std::cin.get();
+	std::cin.get();*/
 }
 
 void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
@@ -311,7 +311,7 @@ int gbc::core::GameboyColor::ReadByte(int address)
 			case 0xFF41:
 				// lcd status
 				return (_ioPorts[0xFF41 - 0xFF00] & 0xF8) |
-				       (_lcdMode & 0x03) |
+				       (GetEnumValue(_lcdMode) & 0x03) |
 				       (_coincidenceFlag ? 0x04 : 0x00);
 			
 			case 0xFF44:
@@ -414,17 +414,17 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 			}
 			else
 			{
-				int *changedBackgroundMapAttribute = new int[2];
+				int *changedTileMapAttribute = new int[2];
 				
-				changedBackgroundMapAttribute[0] = (address <= 0x9BFF) ? 0 : 1;
-				changedBackgroundMapAttribute[1] = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
+				changedTileMapAttribute[0] = (address <= 0x9BFF) ? 0 : 1;
+				changedTileMapAttribute[1] = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
 				
 				int isAlreadyInList = GBC_FALSE;
 				
-				for (int i = 0; i < _changedBackgroundMapAttributes.size(); i++)
+				for (int i = 0; i < _changedTileMapAttributes.size(); i++)
 				{
-					if (changedBackgroundMapAttribute[0] == _changedBackgroundMapAttributes[i][0] &&
-					    changedBackgroundMapAttribute[1] == _changedBackgroundMapAttributes[i][1])
+					if (changedTileMapAttribute[0] == _changedTileMapAttributes[i][0] &&
+					    changedTileMapAttribute[1] == _changedTileMapAttributes[i][1])
 					{
 						isAlreadyInList = GBC_TRUE;
 						break;
@@ -433,7 +433,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				
 				if (!isAlreadyInList)
 				{
-					_changedBackgroundMapAttributes.push_back(changedBackgroundMapAttribute);
+					_changedTileMapAttributes.push_back(changedTileMapAttribute);
 				}
 			}
 		}
@@ -889,7 +889,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 
 void gbc::core::GameboyColor::DoOAMSearch()
 {
-	_lcdMode = searchingOAM;
+	_lcdMode = LCDMode::SEARCHING_OAM;
 	
 	_coincidenceFlag = (_lcdY == _lcdYCompare);
 	
@@ -910,11 +910,11 @@ void gbc::core::GameboyColor::DoOAMSearch()
 
 void gbc::core::GameboyColor::DoTransferData()
 {
-	_lcdMode = transferringData;
+	_lcdMode = LCDMode::TRANSFERRING_DATA;
 	
 	UpdateTiles();
 	UpdateBackgroundMapElements();
-	UpdateBackgroundMapAttributes();
+	UpdateTileMapAttributes();
 	UpdateSpriteAttributes();
 	
 	if (_lcdDisplayEnabled)
@@ -931,27 +931,38 @@ void gbc::core::GameboyColor::DoTransferData()
 			}
 			else
 			{
-				DrawBackgroundMap(COLOR_0, UseOAMPriorityBit);
-				
-				if (_windowDisplayEnabled)
+				if (_backgroundDisplayEnabled)
 				{
-					DrawWindowMap(COLOR_0, UseOAMPriorityBit);
+					DrawBackgroundMap(COLOR_0, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
 				}
 				
-				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteBehindBackground);
-				DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, UseOAMPriorityBit);
-				
 				if (_windowDisplayEnabled)
 				{
-					DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, UseOAMPriorityBit);
+					DrawWindowMap(COLOR_0, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
 				}
 				
-				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteAboveBackground);
-				DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundPriority);
+				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND);
+				
+				if (_backgroundDisplayEnabled)
+				{
+					DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
+				}
 				
 				if (_windowDisplayEnabled)
 				{
-					DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundPriority);
+					DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
+				}
+				
+				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND);
+				
+				if (_backgroundDisplayEnabled)
+				{
+					DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::BACKGROUND_PRIORITY);
+				}
+				
+				if (_windowDisplayEnabled)
+				{
+					DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::BACKGROUND_PRIORITY);
 				}
 			}
 		}
@@ -964,10 +975,10 @@ void gbc::core::GameboyColor::DoTransferData()
 			
 			if (_windowDisplayEnabled)
 			{
-				//DrawWindowMap(COLOR_0);
+				DrawWindowMap(COLOR_0);
 			}
 			
-			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteBehindBackground);
+			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND);
 			
 			if (_backgroundDisplayEnabled)
 			{
@@ -976,10 +987,10 @@ void gbc::core::GameboyColor::DoTransferData()
 			
 			if (_windowDisplayEnabled)
 			{
-				//DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3);
+				DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3);
 			}
 			
-			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, spriteAboveBackground);
+			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND);
 		}
 	}
 	
@@ -995,7 +1006,7 @@ void gbc::core::GameboyColor::DoTransferData()
 
 void gbc::core::GameboyColor::DoHBlank()
 {
-	_lcdMode = hBlank;
+	_lcdMode = LCDMode::HORIZONTAL_BLANK;
 	
 	if (_hBlankInterruptEnabled)
 	{
@@ -1040,7 +1051,7 @@ void gbc::core::GameboyColor::DoHBlank()
 
 void gbc::core::GameboyColor::DoVBlank()
 {
-	_lcdMode = vBlank;
+	_lcdMode = LCDMode::VERTICAL_BLANK;
 	
 	_coincidenceFlag = (_lcdY == _lcdYCompare);
 	
@@ -1083,12 +1094,12 @@ void gbc::core::GameboyColor::UpdateTiles()
 		int tileNumber = _changedTiles.back()[1];
 		int videoRamAddress = tileNumber << 4; // * 0x10
 		
-		for (int y = 0; y < 8; y++)
+		for (int y = 0; y < Tile::HEIGHT; y++)
 		{
 			int colorNumbersLow = _videoRam[videoRamBank][videoRamAddress + y * 2];
 			int colorNumbersHigh = _videoRam[videoRamBank][videoRamAddress + y * 2 + 1];
 			
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < Tile::WIDTH; x++)
 			{
 				_tiles[videoRamBank][tileNumber].data[x][y] = (((colorNumbersHigh << 1) >> (7 - x)) & 0b10) |
 				                                              ((colorNumbersLow >> (7 - x)) & 0b01);
@@ -1108,9 +1119,11 @@ void gbc::core::GameboyColor::UpdateBackgroundMapElements()
 		int mapNumber = _changedBackgroundMapElements.back()[0];
 		int mapElementNumber = _changedBackgroundMapElements.back()[1];
 		
-		_backgroundMapElements[mapNumber][mapElementNumber] = _videoRam[0][(mapNumber == 0) ?
-		                                                      (0x9800 - 0x8000 + mapElementNumber) :
-		                                                      (0x9C00 - 0x8000 + mapElementNumber)];
+		_tileMaps[mapNumber].data
+		[mapElementNumber % TileMap::WIDTH]
+		[mapElementNumber / TileMap::WIDTH] = _videoRam[0][(mapNumber == 0) ?
+		                                                   (0x9800 - 0x8000 + mapElementNumber) :
+		                                                   (0x9C00 - 0x8000 + mapElementNumber)];
 		
 		delete[] _changedBackgroundMapElements.back();
 		
@@ -1118,12 +1131,12 @@ void gbc::core::GameboyColor::UpdateBackgroundMapElements()
 	}
 }
 
-void gbc::core::GameboyColor::UpdateBackgroundMapAttributes()
+void gbc::core::GameboyColor::UpdateTileMapAttributes()
 {
-	while (_changedBackgroundMapAttributes.size() > 0)
+	while (_changedTileMapAttributes.size() > 0)
 	{
-		int mapNumber = _changedBackgroundMapAttributes.back()[0];
-		int mapElementNumber = _changedBackgroundMapAttributes.back()[1];
+		int mapNumber = _changedTileMapAttributes.back()[0];
+		int mapElementNumber = _changedTileMapAttributes.back()[1];
 		
 		int backgroundMapAttribute = _videoRam[1][(mapNumber == 0) ?
 		                             (0x9800 + mapElementNumber) :
@@ -1135,9 +1148,9 @@ void gbc::core::GameboyColor::UpdateBackgroundMapAttributes()
 		_backgroundMapAttributes[mapNumber][mapElementNumber].verticalFlip = VerticalFlip((backgroundMapAttribute >> 6) & 0x01);
 		_backgroundMapAttributes[mapNumber][mapElementNumber].backgroundToOAMPriority = BackgroundToOAMPriority((backgroundMapAttribute >> 7) & 0x01);
 		
-		delete[] _changedBackgroundMapAttributes.back();
+		delete[] _changedTileMapAttributes.back();
 		
-		_changedBackgroundMapAttributes.pop_back();
+		_changedTileMapAttributes.pop_back();
 	}
 }
 
@@ -1256,27 +1269,27 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors)
 void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors,
                                                 BackgroundToOAMPriority backgroundToOAMPriority)
 {
-	for (int mapX = 0; mapX < 32; mapX++)
+	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		int mapElementX = (mapX << 2 + _scrollX) >> 3;
-		int mapElementY = (_lcdY + _scrollY) >> 3;
+		int mapElementX = ((mapX * Tile::WIDTH) + _scrollX) / Tile::WIDTH;
+		int mapElementY = (_lcdY + _scrollY) / Tile::HEIGHT;
 		
 		if (mapElementX < 0)
 		{
-			mapElementX += 32;
+			mapElementX += TileMap::WIDTH;
 		}
 		
 		if (mapElementY < 0)
 		{
-			mapElementY += 32;
+			mapElementY += TileMap::HEIGHT;
 		}
 	
 		mapElementX &= 0x1F; // % 32
 		mapElementY &= 0x1F; // % 32
 		
-		int mapElementNumber = (mapElementY << 5) + mapElementX;
+		int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 		
-		BackgroundMapAttribute backgroundMapAttribute = _backgroundMapAttributes
+		TileMapAttribute backgroundMapAttribute = _backgroundMapAttributes
 			                                            [_backgroundTileMapDisplaySelect]
 			                                            [mapElementNumber];
 		
@@ -1292,7 +1305,7 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors,
 
 void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors)
 {
-	for (int mapX = 0; mapX < 32; mapX++)
+	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
 		DrawMapTile(mapX, -_scrollX, -_scrollY, 
 		            _backgroundTileMapDisplaySelect,
@@ -1304,27 +1317,27 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors)
 void gbc::core::GameboyColor::DrawWindowMap(int enabledColors,
                                             BackgroundToOAMPriority backgroundToOAMPriority)
 {
-	for (int mapX = 0; mapX < 21; mapX++)
+	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		int mapElementX = (mapX << 3 - _windowX) >> 3;
-		int mapElementY = (_lcdY - _windowY) >> 3;
+		int mapElementX = ((mapX * Tile::WIDTH) - _windowX) / Tile::WIDTH;
+		int mapElementY = (_lcdY - _windowY) / Tile::HEIGHT;
 		
 		if (mapElementX < 0)
 		{
-			mapElementX += 32;
+			mapElementX += TileMap::WIDTH;
 		}
 		
 		if (mapElementY < 0)
 		{
-			mapElementY += 32;
+			mapElementY += TileMap::HEIGHT;
 		}
-	
-		mapElementX &= 0x1F; // % 32
-		mapElementY &= 0x1F; // % 32
 		
-		int mapElementNumber = (mapElementY << 5) + mapElementX;
+		mapElementX %= TileMap::WIDTH;
+		mapElementY %= TileMap::HEIGHT;
 		
-		BackgroundMapAttribute backgroundMapAttribute = _backgroundMapAttributes
+		int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
+		
+		TileMapAttribute backgroundMapAttribute = _backgroundMapAttributes
 			                                            [_windowTileMapDisplaySelect]
 			                                            [mapElementNumber];
 		
@@ -1340,7 +1353,7 @@ void gbc::core::GameboyColor::DrawWindowMap(int enabledColors,
 
 void gbc::core::GameboyColor::DrawWindowMap(int enabledColors)
 {
-	for (int mapX = 0; mapX < 32; mapX++)
+	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
 		DrawMapTile(mapX, _windowX, _windowY,
 		            _windowTileMapDisplaySelect,
@@ -1357,34 +1370,34 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
                                           cartridges::PlatformSupport platformSupport)
 {
 	//if (tileMapDisplaySelect == 0) return; ////////////////////
-	int x = (mapX << 3) + xOffset; // x tile beginning
-	int y = (_lcdY - yOffset) - ((_lcdY - yOffset) & 0x07) + yOffset; // y tile beginning // % 8
+	int x = (mapX * Tile::WIDTH) + xOffset;
+	int y = (_lcdY - yOffset) - ((_lcdY - yOffset) % Tile::HEIGHT) + yOffset;
 	
-	int mapElementX = ((mapX << 3) - xOffset) >> 3; // / 8
-	int mapElementY = (_lcdY - yOffset) >> 3;       // / 8
+	int mapElementX = ((mapX * Tile::WIDTH) - xOffset) / Tile::WIDTH;
+	int mapElementY = (_lcdY - yOffset) / Tile::HEIGHT;
 	
 	if (mapElementX < 0)
 	{
-		mapElementX += 32;
+		mapElementX += TileMap::WIDTH;
 	}
 	
 	if (mapElementY < 0)
 	{
-		mapElementY += 32;
+		mapElementY += TileMap::HEIGHT;
 	}
 	
-	mapElementX &= 0x1F; // % 32
-	mapElementY &= 0x1F; // % 32
+	mapElementX %= TileMap::WIDTH;
+	mapElementY %= TileMap::HEIGHT;
 	
-	int mapElementNumber = (mapElementY << 5) + mapElementX;
+	int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 	
-	BackgroundMapAttribute backgroundMapAttribute = _backgroundMapAttributes
-		                                            [tileMapDisplaySelect]
-		                                            [mapElementNumber];
+	TileMapAttribute backgroundMapAttribute = _backgroundMapAttributes
+		                                      [tileMapDisplaySelect]
+		                                      [mapElementNumber];
 	
-	int backgroundMapElement = _backgroundMapElements
-		                       [tileMapDisplaySelect]
-		                       [mapElementNumber];
+	int backgroundMapElement = _tileMaps
+		                       [tileMapDisplaySelect].data
+		                       [mapElementX][mapElementY];
 	
 	int tileVideoRamBankNumber = 0;
 	
@@ -1425,8 +1438,8 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 	{
 		DrawTile(x, y,
 			     tile,
-			     notHorizontallyFlipped,
-			     notVerticallyFlipped,
+			     HorizontalFlip::NOT_FLIPPED,
+			     VerticalFlip::NOT_FLIPPED,
 			     colorPalette,
 			     enabledColors);
 	}
@@ -1441,23 +1454,23 @@ void gbc::core::GameboyColor::DrawTile(int x, int y,
 {
 	int tileY = _lcdY - y;
 	
-	if (tileY >= 0 && tileY < 8)
+	if (tileY >= 0 && tileY < Tile::HEIGHT)
 	{
-		for (int tileX = 0; tileX < 8; tileX++)
+		for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
 		{
 			int scanlinePosition = x + tileX;
 			
-			if (scanlinePosition >= 0 && scanlinePosition < 160)
+			if (scanlinePosition >= 0 && scanlinePosition < Scanline::WIDTH)
 			{
 				int realTileX = tileX;
 				int realTileY = tileY;
 				
-				if (horizontalFlip == horizontallyFlipped)
+				if (horizontalFlip == HorizontalFlip::FLIPPED)
 				{
 					realTileX = 7 - tileX;
 				}
 				
-				if (verticalFlip == verticallyFlipped)
+				if (verticalFlip == VerticalFlip::FLIPPED)
 				{
 					realTileY = 7 - tileY;
 				}

@@ -11,13 +11,13 @@ gbc::core::cartridges::Header::Header(int rom[])
 	  romVersionNumber(rom[0x014C]),
 	  headerChecksum(rom[0x014D])
 {
-	memcpy(entryPoint, &rom[0x0100], 4 * sizeof(int));
-	memcpy(nintendoLogo, &rom[0x0104], 48 * sizeof(int));
-	memcpy(oldTitle, &rom[0x0134], 16 * sizeof(int));
-	memcpy(newTitle, &rom[0x0134], 11 * sizeof(int));
-	memcpy(manufacturerCode, &rom[0x013F], 4 * sizeof(int));
-	memcpy(newLicenseeCode, &rom[0x0144], 2 * sizeof(int));
-	memcpy(globalChecksum, &rom[0x014E], 2 * sizeof(int));
+	std::memcpy(entryPoint, &rom[0x0100], 4 * sizeof(int));
+	std::memcpy(nintendoLogo, &rom[0x0104], 48 * sizeof(int));
+	std::memcpy(oldTitle, &rom[0x0134], 16 * sizeof(int));
+	std::memcpy(newTitle, &rom[0x0134], 11 * sizeof(int));
+	std::memcpy(manufacturerCode, &rom[0x013F], 4 * sizeof(int));
+	std::memcpy(newLicenseeCode, &rom[0x0144], 2 * sizeof(int));
+	std::memcpy(globalChecksum, &rom[0x014E], 2 * sizeof(int));
 }
 
 gbc::core::cartridges::Header::~Header()

@@ -10,7 +10,10 @@ namespace gbc
 		class ColorPalette
 		{
 		public:
-			Color colors[4];
+			static const int COLOR_PALETTE_SIZE = 4;
+		
+		public:
+			Color colors[COLOR_PALETTE_SIZE];
 		};
 	}
 }

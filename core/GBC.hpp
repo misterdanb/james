@@ -6,10 +6,8 @@
 #include <sstream>
 #include <fstream>
 #include <iomanip>
+#include <type_traits>
 #include <stdarg.h>
-
-const int GBC_FALSE = 0;
-const int GBC_TRUE = 1;
 
 //#define DEBUG
 
@@ -49,6 +47,18 @@ const int GBC_TRUE = 1;
 
 namespace gbc
 {
+	// consts
+	const int GBC_FALSE = 0;
+	const int GBC_TRUE = 1;
+	
+	// const expressions
+	template<typename T>
+	constexpr typename std::underlying_type<T>::type GetEnumValue(T value)
+	{
+		return static_cast<typename std::underlying_type<T>::type>(value);
+	}
+	
+	// helper methods
 	void Log(std::string);
 	void LogToFile(std::string, std::string);
 	
@@ -59,21 +69,5 @@ namespace gbc
 	
 	std::string ToString(int[], int);
 }
-
-/* constexpr const char *NotImplemented()
-{
-	return "Not implmenented.";
-}
-
-constexpr char *AddressOutOfRange(int address)
-{
-	std::stringstream ss;
-	
-	ss << "Address out of range (0x";
-	ss << std::hex << address;
-	ss << std::string(")");
-	
-	return std::const_cast<char *>(ss.str().c_str());
-}*/
 
 #endif

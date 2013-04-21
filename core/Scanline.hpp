@@ -7,8 +7,13 @@ namespace gbc
 {
 	namespace core
 	{
+		const int SCANLINE_WIDTH = 160;
+		
 		class Scanline
 		{
+		public:
+			static const int WIDTH = 160;
+		
 		public:
 			Scanline();
 			Scanline(int, Color[]);
