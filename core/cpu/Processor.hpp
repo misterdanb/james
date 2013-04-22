@@ -9,18 +9,6 @@
 #include "InstructionTable.hpp"
 #include "LookUpTables.hpp"
 
-#define STATE (_state)
-#define BUS (*_bus)
-
-#define READ(addr) BUS.ReadByte((addr))
-#define WRITE(addr, val) BUS.WriteByte((addr), (val))/*; \
-	CPU_LOG(std::string("WRITE ") + \
-	ToDec(_counter) + \
-	std::string(" - ") + \
-	ToHex((addr)) + \
-	std::string(",") + \
-	ToHex((val)))*/
-
 namespace gbc
 {
 	namespace core

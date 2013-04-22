@@ -33,11 +33,6 @@ void gbc::core::cpu::Processor::ExecuteInstruction()
 	{
 		FetchInstruction(InstructionTable::DEFAULT);
 		
-		/*std::cout << ToHex(GET_OP_CODE());
-		std::cout << ToHex(GET_OP_LOW());
-		std::cout << ToHex(GetOpHigh(InstructionTable::DEFAULT));
-		std::cin.get();*/
-		
 		/*std::ostringstream oss;
 		
 		oss << "COUNTER=" << ToDec(_counter) << ", "
@@ -52,11 +47,11 @@ void gbc::core::cpu::Processor::ExecuteInstruction()
 		    << "E=" << ToHex(_state.e) << ", "
 		    << "H=" << ToHex(_state.h) << ", "
 		    << "L=" << ToHex(_state.l) << ", "
-		    << "(HL)=" << ToHex(READ(JoinBytes(_state.h, _state.l))) << ", "
+		    << "(HL)=" << ToHex(_bus->ReadByte(JoinBytes(_state.h, _state.l))) << ", "
 		    << "PC=" << ToHex(_state.pc) << ", "
 		    << "SP=" << ToHex(_state.sp) << ", "
-		    << "POP_LOW=" << ToHex(READ(_state.sp)) << ", "
-		    << "POP_HIGH=" << ToHex(READ(_state.sp + 1));
+		    << "POP_LOW=" << ToHex(_bus->ReadByte(_state.sp)) << ", "
+		    << "POP_HIGH=" << ToHex(_bus->ReadByte(_state.sp + 1));
 		
 		CPU_LOG(oss.str());*/
 		
@@ -594,51 +589,51 @@ void gbc::core::cpu::Processor::ExecuteInterrupt()
 {
 	if (_state.interruptsEnabled || _state.halted)
 	{
-		if ((GetBit(READ(0xFFFF), 0) && _vBlankInterruptSignalled) ||
-		    (GetBit(READ(0xFFFF), 1) && _lcdStatusInterruptSignalled) ||
-		    (GetBit(READ(0xFFFF), 2) && _timerInterruptSignalled) ||
-		    (GetBit(READ(0xFFFF), 3) && _serialInterruptSignalled) ||
-		    (GetBit(READ(0xFFFF), 4) && _joypadInterruptSignalled))
+		if ((GetBit(_bus->ReadByte(0xFFFF), 0) && _vBlankInterruptSignalled) ||
+		    (GetBit(_bus->ReadByte(0xFFFF), 1) && _lcdStatusInterruptSignalled) ||
+		    (GetBit(_bus->ReadByte(0xFFFF), 2) && _timerInterruptSignalled) ||
+		    (GetBit(_bus->ReadByte(0xFFFF), 3) && _serialInterruptSignalled) ||
+		    (GetBit(_bus->ReadByte(0xFFFF), 4) && _joypadInterruptSignalled))
 		{
 			_state.sp -= 2;
 			
-			WRITE(_state.sp, _state.pc & 0xFF);
-			WRITE(_state.sp + 1, (_state.pc >> 8) & 0xFF);
+			_bus->WriteByte(_state.sp, _state.pc & 0xFF);
+			_bus->WriteByte(_state.sp + 1, (_state.pc >> 8) & 0xFF);
 			
-			if (GetBit(READ(0xFFFF), 0) && _vBlankInterruptSignalled)
+			if (GetBit(_bus->ReadByte(0xFFFF), 0) && _vBlankInterruptSignalled)
 			{
 				_state.pc = 0x0040;
 				
 				_vBlankInterruptSignalled = GBC_FALSE;
-				WRITE(0xFF0F, SetBit(READ(0xFF0F), 0, GBC_FALSE));
+				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 0, GBC_FALSE));
 			}
-			else if (GetBit(READ(0xFFFF), 1) && _lcdStatusInterruptSignalled)
+			else if (GetBit(_bus->ReadByte(0xFFFF), 1) && _lcdStatusInterruptSignalled)
 			{
 				_state.pc = 0x0048;
 				
 				_lcdStatusInterruptSignalled = GBC_FALSE;
-				WRITE(0xFF0F, SetBit(READ(0xFF0F), 1, GBC_FALSE));
+				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 1, GBC_FALSE));
 			}
-			else if (GetBit(READ(0xFFFF), 2) && _timerInterruptSignalled)
+			else if (GetBit(_bus->ReadByte(0xFFFF), 2) && _timerInterruptSignalled)
 			{
 				_state.pc = 0x0050;
 				
 				_timerInterruptSignalled = GBC_FALSE;
-				WRITE(0xFF0F, SetBit(READ(0xFF0F), 2, GBC_FALSE));
+				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 2, GBC_FALSE));
 			}
-			else if (GetBit(READ(0xFFFF), 3) && _serialInterruptSignalled)
+			else if (GetBit(_bus->ReadByte(0xFFFF), 3) && _serialInterruptSignalled)
 			{
 				_state.pc = 0x0058;
 				
 				_serialInterruptSignalled = GBC_FALSE;
-				WRITE(0xFF0F, SetBit(READ(0xFF0F), 3, GBC_FALSE));
+				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 3, GBC_FALSE));
 			}
-			else if (GetBit(READ(0xFFFF), 4) && _joypadInterruptSignalled)
+			else if (GetBit(_bus->ReadByte(0xFFFF), 4) && _joypadInterruptSignalled)
 			{
 				_state.pc = 0x0060;
 				
 				_joypadInterruptSignalled = GBC_FALSE;
-				WRITE(0xFF0F, SetBit(READ(0xFF0F), 4, GBC_FALSE));
+				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 4, GBC_FALSE));
 			}
 			
 			_state.interruptsEnabled = GBC_FALSE;
@@ -668,37 +663,37 @@ void gbc::core::cpu::Processor::PowerUp()
 	_state.halted = GBC_FALSE;
 	_state.stopped = GBC_FALSE;
 	
-	WRITE(0xFF05, 0x00); // TIMA
-	WRITE(0xFF06, 0x00); // TMA
-	WRITE(0xFF07, 0x00); // TAC
-	WRITE(0xFF10, 0x80); // NR10
-	WRITE(0xFF11, 0xBF); // NR11
-	WRITE(0xFF12, 0xF3); // NR12
-	WRITE(0xFF14, 0xBF); // NR14
-	WRITE(0xFF16, 0x3F); // NR21
-	WRITE(0xFF17, 0x00); // NR22
-	WRITE(0xFF19, 0xBF); // NR24
-	WRITE(0xFF1A, 0x7F); // NR30
-	WRITE(0xFF1B, 0xFF); // NR31
-	WRITE(0xFF1C, 0x9F); // NR32
-	WRITE(0xFF1E, 0xBF); // NR33
-	WRITE(0xFF20, 0xFF); // NR41
-	WRITE(0xFF21, 0x00); // NR42
-	WRITE(0xFF22, 0x00); // NR43
-	WRITE(0xFF23, 0xBF); // NR30
-	WRITE(0xFF24, 0x77); // NR50
-	WRITE(0xFF25, 0xF3); // NR51
-	WRITE(0xFF26, 0xF1); // NR52
-	WRITE(0xFF40, 0x91); // LCDC
-	WRITE(0xFF42, 0x00); // SCY
-	WRITE(0xFF43, 0x00); // SCX
-	WRITE(0xFF45, 0x00); // LYC
-	WRITE(0xFF47, 0xFC); // BGP
-	WRITE(0xFF48, 0xFF); // OBP0
-	WRITE(0xFF49, 0xFF); // OBP1
-	WRITE(0xFF4A, 0x00); // WY
-	WRITE(0xFF4B, 0x00); // WX
-	WRITE(0xFFFF, 0x00); // IE
+	_bus->WriteByte(0xFF05, 0x00); // TIMA
+	_bus->WriteByte(0xFF06, 0x00); // TMA
+	_bus->WriteByte(0xFF07, 0x00); // TAC
+	_bus->WriteByte(0xFF10, 0x80); // NR10
+	_bus->WriteByte(0xFF11, 0xBF); // NR11
+	_bus->WriteByte(0xFF12, 0xF3); // NR12
+	_bus->WriteByte(0xFF14, 0xBF); // NR14
+	_bus->WriteByte(0xFF16, 0x3F); // NR21
+	_bus->WriteByte(0xFF17, 0x00); // NR22
+	_bus->WriteByte(0xFF19, 0xBF); // NR24
+	_bus->WriteByte(0xFF1A, 0x7F); // NR30
+	_bus->WriteByte(0xFF1B, 0xFF); // NR31
+	_bus->WriteByte(0xFF1C, 0x9F); // NR32
+	_bus->WriteByte(0xFF1E, 0xBF); // NR33
+	_bus->WriteByte(0xFF20, 0xFF); // NR41
+	_bus->WriteByte(0xFF21, 0x00); // NR42
+	_bus->WriteByte(0xFF22, 0x00); // NR43
+	_bus->WriteByte(0xFF23, 0xBF); // NR30
+	_bus->WriteByte(0xFF24, 0x77); // NR50
+	_bus->WriteByte(0xFF25, 0xF3); // NR51
+	_bus->WriteByte(0xFF26, 0xF1); // NR52
+	_bus->WriteByte(0xFF40, 0x91); // LCDC
+	_bus->WriteByte(0xFF42, 0x00); // SCY
+	_bus->WriteByte(0xFF43, 0x00); // SCX
+	_bus->WriteByte(0xFF45, 0x00); // LYC
+	_bus->WriteByte(0xFF47, 0xFC); // BGP
+	_bus->WriteByte(0xFF48, 0xFF); // OBP0
+	_bus->WriteByte(0xFF49, 0xFF); // OBP1
+	_bus->WriteByte(0xFF4A, 0x00); // WY
+	_bus->WriteByte(0xFF4B, 0x00); // WX
+	_bus->WriteByte(0xFFFF, 0x00); // IE
 }
 
 void gbc::core::cpu::Processor::SignalVBlankInterrupt()
@@ -746,15 +741,15 @@ void gbc::core::cpu::Processor::FetchInstruction(InstructionTable instructionTab
 {
 	if (instructionTable == InstructionTable::DEFAULT)
 	{
-		_currentOpCodes[0] = READ(_state.pc);
-		_currentOpLows[0] = READ(_state.pc + 1);
-		_currentOpHighs[0] = READ(_state.pc + 2);
+		_currentOpCodes[0] = _bus->ReadByte(_state.pc);
+		_currentOpLows[0] = _bus->ReadByte(_state.pc + 1);
+		_currentOpHighs[0] = _bus->ReadByte(_state.pc + 2);
 	}
 	else
 	{
-		_currentOpCodes[1] = READ(_state.pc + 1);
-		_currentOpLows[1] = READ(_state.pc + 2);
-		_currentOpHighs[1] = READ(_state.pc + 3);
+		_currentOpCodes[1] = _bus->ReadByte(_state.pc + 1);
+		_currentOpLows[1] = _bus->ReadByte(_state.pc + 2);
+		_currentOpHighs[1] = _bus->ReadByte(_state.pc + 3);
 	}
 }
 
@@ -881,7 +876,7 @@ void gbc::core::cpu::Processor::INC_R(int &r)
 void gbc::core::cpu::Processor::INC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetHFlag((memory & 0x0F) == 0x0F);
 	
@@ -891,7 +886,7 @@ void gbc::core::cpu::Processor::INC_AA(int a1, int a2)
 	SetZFlag(memory == 0x00);
 	SetNFlag(GBC_FALSE);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -909,7 +904,7 @@ void gbc::core::cpu::Processor::INC_SP()
 void gbc::core::cpu::Processor::DEC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetHFlag((memory & 0x0F) == 0x00);
 	
@@ -919,7 +914,7 @@ void gbc::core::cpu::Processor::DEC_AA(int a1, int a2)
 	SetZFlag(memory == 0x00);
 	SetNFlag(GBC_TRUE);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -998,8 +993,8 @@ void gbc::core::cpu::Processor::LD_AA_SP(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	
-	WRITE(address, GetLow(_state.sp));
-	WRITE((address + 1) & 0xFFFF, GetHigh(_state.sp));
+	_bus->WriteByte(address, GetLow(_state.sp));
+	_bus->WriteByte((address + 1) & 0xFFFF, GetHigh(_state.sp));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1046,7 +1041,7 @@ void gbc::core::cpu::Processor::ADD_RR_SP(int &r1, int &r2)
 
 void gbc::core::cpu::Processor::LD_R_AA(int &r, int a1, int a2)
 {
-	r = READ(JoinBytes(a1, a2));
+	r = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1062,7 +1057,7 @@ void gbc::core::cpu::Processor::LD_R_N(int &r)
 
 void gbc::core::cpu::Processor::LD_AA_N(int a1, int a2)
 {
-	WRITE(JoinBytes(a1, a2), GetOpLow(InstructionTable::DEFAULT));
+	_bus->WriteByte(JoinBytes(a1, a2), GetOpLow(InstructionTable::DEFAULT));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1145,7 +1140,7 @@ void gbc::core::cpu::Processor::JR_N_IF(int c)
 
 void gbc::core::cpu::Processor::LD_AA_R_INC(int &a1, int &a2, int r)
 {
-	WRITE(JoinBytes(a1, a2), r);
+	_bus->WriteByte(JoinBytes(a1, a2), r);
 	
 	a2++;
 	
@@ -1162,7 +1157,7 @@ void gbc::core::cpu::Processor::LD_AA_R_INC(int &a1, int &a2, int r)
 
 void gbc::core::cpu::Processor::LD_AA_R_DEC(int &a1, int &a2, int r)
 {
-	WRITE(JoinBytes(a1, a2), r);
+	_bus->WriteByte(JoinBytes(a1, a2), r);
 	
 	a2--;
 	
@@ -1179,7 +1174,7 @@ void gbc::core::cpu::Processor::LD_AA_R_DEC(int &a1, int &a2, int r)
 
 void gbc::core::cpu::Processor::LD_R_AA_INC(int &r, int &a1, int &a2)
 {
-	r = READ(JoinBytes(a1, a2));
+	r = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	a2++;
 	
@@ -1196,7 +1191,7 @@ void gbc::core::cpu::Processor::LD_R_AA_INC(int &r, int &a1, int &a2)
 
 void gbc::core::cpu::Processor::LD_R_AA_DEC(int &r, int &a1, int &a2)
 {
-	r = READ(JoinBytes(a1, a2));
+	r = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	a2--;
 	
@@ -1325,7 +1320,7 @@ void gbc::core::cpu::Processor::ADD_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::ADD_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	SetNFlag(GBC_FALSE);
 	SetHFlag(((r & 0x0F) + (memory & 0x0F)) > 0x0F);
@@ -1363,7 +1358,7 @@ void gbc::core::cpu::Processor::ADC_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::ADC_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
 	
 	SetNFlag(GBC_FALSE);
@@ -1400,7 +1395,7 @@ void gbc::core::cpu::Processor::SUB_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::SUB_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	SetNFlag(GBC_TRUE);
 	SetHFlag(((r & 0x0F) - (memory & 0x0F)) < 0x00);
@@ -1438,7 +1433,7 @@ void gbc::core::cpu::Processor::SBC_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::SBC_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
 	
 	SetNFlag(GBC_TRUE);
@@ -1471,7 +1466,7 @@ void gbc::core::cpu::Processor::AND_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::AND_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	r &= memory;
 	
@@ -1499,7 +1494,7 @@ void gbc::core::cpu::Processor::XOR_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::XOR_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	r ^= memory;
 	
@@ -1527,7 +1522,7 @@ void gbc::core::cpu::Processor::OR_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::OR_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	r |= memory;
 	
@@ -1553,7 +1548,7 @@ void gbc::core::cpu::Processor::CP_R_R(int &r1, int r2)
 
 void gbc::core::cpu::Processor::CP_R_AA(int &r, int a1, int a2)
 {
-	int memory = READ(JoinBytes(a1, a2));
+	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
 	SetCFlag(memory > r);
 	SetHFlag((memory & 0x0F) > (r & 0x0F));
@@ -1568,8 +1563,8 @@ void gbc::core::cpu::Processor::CALL_NN()
 {
 	_state.sp -= 2;
 	
-	WRITE(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
-	WRITE(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	_bus->WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
 	
 	_state.pc = JoinBytes(GetOpHigh(InstructionTable::DEFAULT), GetOpLow(InstructionTable::DEFAULT));
 	
@@ -1582,8 +1577,8 @@ void gbc::core::cpu::Processor::CALL_NN_IF(int c)
 	{
 		_state.sp -= 2;
 		
-		WRITE(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
-		WRITE(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+		_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+		_bus->WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
 		
 		_state.pc = JoinBytes(GetOpHigh(InstructionTable::DEFAULT), GetOpLow(InstructionTable::DEFAULT));
 		
@@ -1599,7 +1594,7 @@ void gbc::core::cpu::Processor::CALL_NN_IF(int c)
 
 void gbc::core::cpu::Processor::RET()
 {
-	_state.pc = JoinBytes(READ(_state.sp + 1), READ(_state.sp));
+	_state.pc = JoinBytes(_bus->ReadByte(_state.sp + 1), _bus->ReadByte(_state.sp));
 	
 	_state.sp += 2;
 	
@@ -1610,7 +1605,7 @@ void gbc::core::cpu::Processor::RET_IF(int c)
 {
 	if (c)
 	{
-		_state.pc = JoinBytes(READ(_state.sp + 1), READ(_state.sp));
+		_state.pc = JoinBytes(_bus->ReadByte(_state.sp + 1), _bus->ReadByte(_state.sp));
 		
 		_state.sp += 2;
 		
@@ -1629,7 +1624,7 @@ void gbc::core::cpu::Processor::RETI()
 	_state.interruptsEnabled = GBC_TRUE;
 	_state.halted = GBC_FALSE;
 	
-	_state.pc = (READ(_state.sp + 1) << 8) | READ(_state.sp);
+	_state.pc = (_bus->ReadByte(_state.sp + 1) << 8) | _bus->ReadByte(_state.sp);
 	
 	_state.sp += 2;
 	
@@ -1668,8 +1663,8 @@ void gbc::core::cpu::Processor::JP_RR(int r1, int r2)
 
 void gbc::core::cpu::Processor::POP_RR(int &r1, int &r2)
 {
-	r1 = READ(_state.sp + 1);
-	r2 = READ(_state.sp);
+	r1 = _bus->ReadByte(_state.sp + 1);
+	r2 = _bus->ReadByte(_state.sp);
 	
 	_state.sp += 2;
 	
@@ -1679,8 +1674,8 @@ void gbc::core::cpu::Processor::POP_RR(int &r1, int &r2)
 
 void gbc::core::cpu::Processor::POP_AF()
 {
-	_state.a = READ(_state.sp + 1);
-	_state.f = READ(_state.sp) & 0xF0;
+	_state.a = _bus->ReadByte(_state.sp + 1);
+	_state.f = _bus->ReadByte(_state.sp) & 0xF0;
 	
 	_state.sp += 2;
 	
@@ -1692,8 +1687,8 @@ void gbc::core::cpu::Processor::PUSH_RR(int r1, int r2)
 {
 	_state.sp -= 2;
 	
-	WRITE(_state.sp + 1, r1);
-	WRITE(_state.sp, r2);
+	_bus->WriteByte(_state.sp + 1, r1);
+	_bus->WriteByte(_state.sp, r2);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1703,8 +1698,8 @@ void gbc::core::cpu::Processor::PUSH_AF()
 {
 	_state.sp -= 2;
 	
-	WRITE(_state.sp + 1, _state.a);
-	WRITE(_state.sp, _state.f & 0xF0);
+	_bus->WriteByte(_state.sp + 1, _state.a);
+	_bus->WriteByte(_state.sp, _state.f & 0xF0);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1754,8 +1749,8 @@ void gbc::core::cpu::Processor::RST(int a)
 {
 	_state.sp -= 2;
 	
-	WRITE(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
-	WRITE(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	_bus->WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
 	
 	_state.pc = a;
 	
@@ -1774,7 +1769,7 @@ void gbc::core::cpu::Processor::LDH_R_A(int &r, int a)
 
 void gbc::core::cpu::Processor::LD_A_R(int a, int r)
 {
-	WRITE(JoinBytes(0xFF, a), r);
+	_bus->WriteByte(JoinBytes(0xFF, a), r);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1782,7 +1777,7 @@ void gbc::core::cpu::Processor::LD_A_R(int a, int r)
 
 void gbc::core::cpu::Processor::LD_R_A(int &r, int a)
 {
-	r = READ(JoinBytes(0xFF, a));
+	r = _bus->ReadByte(JoinBytes(0xFF, a));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1790,7 +1785,7 @@ void gbc::core::cpu::Processor::LD_R_A(int &r, int a)
 
 void gbc::core::cpu::Processor::LD_AA_R(int a1, int a2, int r)
 {
-	WRITE(JoinBytes(a1, a2), r);
+	_bus->WriteByte(JoinBytes(a1, a2), r);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1869,7 +1864,7 @@ void gbc::core::cpu::Processor::RLC_R(int &r)
 void gbc::core::cpu::Processor::RLC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 7));
 	
@@ -1879,7 +1874,7 @@ void gbc::core::cpu::Processor::RLC_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -1902,7 +1897,7 @@ void gbc::core::cpu::Processor::RRC_R(int &r)
 void gbc::core::cpu::Processor::RRC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 0));
 	
@@ -1912,7 +1907,7 @@ void gbc::core::cpu::Processor::RRC_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -1937,7 +1932,7 @@ void gbc::core::cpu::Processor::RL_R(int &r)
 void gbc::core::cpu::Processor::RL_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	int oldCFlag = GetCFlag();
 	
@@ -1949,7 +1944,7 @@ void gbc::core::cpu::Processor::RL_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -1974,7 +1969,7 @@ void gbc::core::cpu::Processor::RR_R(int &r)
 void gbc::core::cpu::Processor::RR_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	int oldCFlag = GetCFlag();
 	
@@ -1986,7 +1981,7 @@ void gbc::core::cpu::Processor::RR_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2009,7 +2004,7 @@ void gbc::core::cpu::Processor::SLA_R(int &r)
 void gbc::core::cpu::Processor::SLA_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 7));
 	
@@ -2019,7 +2014,7 @@ void gbc::core::cpu::Processor::SLA_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2042,7 +2037,7 @@ void gbc::core::cpu::Processor::SRA_R(int &r)
 void gbc::core::cpu::Processor::SRA_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 0));
 	
@@ -2052,7 +2047,7 @@ void gbc::core::cpu::Processor::SRA_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2074,7 +2069,7 @@ void gbc::core::cpu::Processor::SWAP_R(int &r)
 void gbc::core::cpu::Processor::SWAP_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	memory = ((memory << 4) | (memory >> 4)) & 0xFF;
 	
@@ -2083,7 +2078,7 @@ void gbc::core::cpu::Processor::SWAP_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2106,7 +2101,7 @@ void gbc::core::cpu::Processor::SRL_R(int &r)
 void gbc::core::cpu::Processor::SRL_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 0));
 	
@@ -2116,7 +2111,7 @@ void gbc::core::cpu::Processor::SRL_AA(int a1, int a2)
 	SetNFlag(GBC_FALSE);
 	SetZFlag(memory == 0x00);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2135,13 +2130,13 @@ void gbc::core::cpu::Processor::BIT_X_R(int x, int &r)
 void gbc::core::cpu::Processor::BIT_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	SetHFlag(GBC_TRUE);
 	SetNFlag(GBC_FALSE);
 	SetZFlag(!GetBit(memory, x));
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2158,11 +2153,11 @@ void gbc::core::cpu::Processor::RES_X_R(int x, int &r)
 void gbc::core::cpu::Processor::RES_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	memory = SetBit(memory, x, GBC_FALSE);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2179,11 +2174,11 @@ void gbc::core::cpu::Processor::SET_X_R(int x, int &r)
 void gbc::core::cpu::Processor::SET_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = READ(address);
+	int memory = _bus->ReadByte(address);
 	
 	memory = SetBit(memory, x, GBC_TRUE);
 	
-	WRITE(address, memory);
+	_bus->WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);

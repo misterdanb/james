@@ -1,5 +1,5 @@
-#ifndef _gbc_h_
-#define _gbc_h_
+#ifndef _GBC_hpp_
+#define _GBC_hpp_
 
 #include <iostream>
 #include <string>
