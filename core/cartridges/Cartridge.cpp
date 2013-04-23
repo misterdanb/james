@@ -11,20 +11,14 @@
 
 gbc::core::cartridges::Cartridge::Cartridge(int rom[], int size)
 	: _header(rom),
-	  //_rom(new int[size]),
-	  //_ram(new int[_header.ramDimensions.size]),
 	  _selectedRomBank(1),
 	  _selectedRamBank(0)
 {
 	_rom = new int[size];
-	_ram = new int[_header.ramDimensions.size] { 0, };
+	_ram = new int[_header.ramDimensions.size];
 	
-	memcpy(_rom, rom, size * sizeof(int));
-	
-	LOG_L2(ToHex(_rom[0x0100]));
-	LOG_L2(ToHex(_rom[0x0101]));
-	LOG_L2(ToHex(_rom[0x0102]));
-	LOG_L2(ToHex(_rom[0x0103]));
+	std::memcpy(_rom, rom, size * sizeof(int));
+	std::memset(_ram, 0x00, _header.ramDimensions.size);
 }
 
 gbc::core::cartridges::Cartridge::~Cartridge()
@@ -40,7 +34,7 @@ gbc::core::cartridges::Header gbc::core::cartridges::Cartridge::GetHeader()
 
 gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int rom[], int size)
 {
-	CartridgeType cartridgeType = CartridgeType(rom[0x0147]);
+	CartridgeType cartridgeType = CartridgeType(rom[Header::CARTRIDGE_TYPE_ADDRESS]);
 	
 	Cartridge *createdCartridge = NULL;
 	std::string createdCartridgeName = "None";

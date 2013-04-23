@@ -17,16 +17,53 @@ namespace gbc
 			class Header
 			{
 			public:
+				static const int TOTAL_OFFSET = 0x0100;
+				
+				static const int ENTRY_POINT_LENGTH = 4;
+				static const int NINTENDO_LOGO_LENGTH = 48;
+				static const int OLD_TITLE_LENGTH = 16;
+				static const int NEW_TITLE_LENGTH = 11;
+				static const int MANUFACTURER_CODE_LENGTH = 4;
+				static const int PLATFORM_SUPPORT_LENGTH = 1;
+				static const int NEW_LICENSEE_CODE_LENGTH = 2;
+				static const int SUPER_GAMEBOY_FLAG_LENGTH = 1;
+				static const int CARTRIDGE_TYPE_LENGTH = 1;
+				static const int ROM_DIMENSIONS_LENGTH = 1;
+				static const int RAM_DIMENSIONS_LENGTH = 1;
+				static const int DESTINATION_CODE_LENGTH = 1;
+				static const int OLD_LICENSEE_CODE_LENGTH = 1;
+				static const int ROM_VERSION_NUMBER_LENGTH = 1;
+				static const int HEADER_CHECKSUM_LENGTH = 1;
+				static const int GLOBAL_CHECKSUM_LENGTH = 2;
+				
+				static const int ENTRY_POINT_ADDRESS = TOTAL_OFFSET;
+				static const int NINTENDO_LOGO_ADDRESS = TOTAL_OFFSET + 0x04;
+				static const int OLD_TITLE_ADDRESS = TOTAL_OFFSET + 0x34;
+				static const int NEW_TITLE_ADDRESS = TOTAL_OFFSET + 0x34;
+				static const int MANUFACTURER_CODE_ADDRESS = TOTAL_OFFSET + 0x3F;
+				static const int PLATFORM_SUPPORT_ADDRESS = TOTAL_OFFSET + 0x43;
+				static const int NEW_LICENSEE_CODE_ADDRESS = TOTAL_OFFSET + 0x44;
+				static const int SUPER_GAMEBOY_FLAG_ADDRESS = TOTAL_OFFSET + 0x46;
+				static const int CARTRIDGE_TYPE_ADDRESS = TOTAL_OFFSET + 0x47;
+				static const int ROM_DIMENSIONS_ADDRESS = TOTAL_OFFSET + 0x48;
+				static const int RAM_DIMENSIONS_ADDRESS = TOTAL_OFFSET + 0x49;
+				static const int DESTINATION_CODE_ADDRESS = TOTAL_OFFSET + 0x4A;
+				static const int OLD_LICENSEE_CODE_ADDRESS = TOTAL_OFFSET + 0x4B;
+				static const int ROM_VERSION_NUMBER_ADDRESS = TOTAL_OFFSET + 0x4C;
+				static const int HEADER_CHECKSUM_ADDRESS = TOTAL_OFFSET + 0x4D;
+				static const int GLOBAL_CHECKSUM_ADDRESS = TOTAL_OFFSET + 0x4E;
+			
+			public:
 				Header(int[]);
 				~Header();
 				
-				int entryPoint[4];
-				int nintendoLogo[48];
-				int oldTitle[16];
-				int newTitle[11];
-				int manufacturerCode[4];
+				int entryPoint[ENTRY_POINT_LENGTH];
+				int nintendoLogo[NINTENDO_LOGO_LENGTH];
+				int oldTitle[OLD_TITLE_LENGTH];
+				int newTitle[NEW_TITLE_LENGTH];
+				int manufacturerCode[MANUFACTURER_CODE_LENGTH];
 				PlatformSupport platformSupport;
-				int newLicenseeCode[2];
+				int newLicenseeCode[NEW_LICENSEE_CODE_LENGTH];
 				int superGameboyFlag;
 				CartridgeType cartridgeType;
 				RomDimensions romDimensions;
@@ -35,7 +72,7 @@ namespace gbc
 				int oldLicenseeCode;
 				int romVersionNumber;
 				int headerChecksum;
-				int globalChecksum[2];
+				int globalChecksum[GLOBAL_CHECKSUM_LENGTH];
 			};
 		}
 	}

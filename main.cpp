@@ -27,10 +27,8 @@ int main(int argc, char *argv[])
 	std::cout << path << std::endl << std::endl;
 	
 	std::vector<int> rom;
-	//std::ifstream file("/home/daniel/Downloads/instr_timing/instr_timing.gb", std::ios::in | std::ios::binary);
-	//std::ifstream file("/home/daniel/Downloads/cpu_instrs/individual/01-special.gb", std::ios::in | std::ios::binary);
+	
 	std::ifstream file(path, std::ios::in | std::ios::binary);
-	//std::ifstream file("/home/daniel/tet.gb", std::ios::in | std::ios::binary);
 	
 	if (file.is_open())
 	{
@@ -50,6 +48,10 @@ int main(int argc, char *argv[])
 		{
 			arrayRom[i] = rom[i] & 0xFF;
 		}
+		
+		/*gbc::core::GameboyColor gbc;
+		gbc.SetRom(arrayRom, rom.size());
+		gbc.RenderFrame();*/
 		
 		gbc::ui::GameWindow window(160, 144, arrayRom, rom.size());
 	

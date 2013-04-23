@@ -2,7 +2,6 @@
 #define _Processor_hpp_
 
 #include "../GBC.hpp"
-#include "../Tools.hpp"
 #include "../MemoryBus.hpp"
 #include "State.hpp"
 #include "../InterruptHandler.hpp"

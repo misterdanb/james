@@ -148,9 +148,9 @@ void gbc::ui::GameWindow::DrawScanline(core::Scanline scanline)
 void gbc::ui::GameWindow::FinishFrame()
 {
 	_frame.create(160, 144, _rawFrame);
-	static int i = 0;
+	/*static int i = 0;
 	printf("%d\n", i);
-	i++;
+	i++;*/
 	/*for (int i = 0; i < 144 * 160 * 4; i++)
 	{
 		delete &rawData[i];

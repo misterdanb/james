@@ -130,37 +130,6 @@ void gbc::core::GameboyColor::RenderFrame()
 	{	
 		RenderScanline();
 	}
-	
-	/*// test output background maps
-	std::cout << "Background map 0: " << std::endl;
-	
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 32; x++)
-		{
-			std::cout << ToHex(_tileMaps[0][y * 32 + x]) << " ";
-		}
-		
-		std::cout << std::endl;
-	}
-	
-	std::cout << std::endl;
-	
-	std::cout << "Background map 1: " << std::endl;
-	
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 32; x++)
-		{
-			std::cout << ToHex(_tileMaps[1][y * 32 + x]) << " ";
-		}
-		
-		std::cout << std::endl;
-	}
-	
-	std::cout << std::endl;
-	
-	std::cin.get();*/
 }
 
 void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
@@ -213,82 +182,34 @@ int gbc::core::GameboyColor::ReadByte(int address)
 	
 	if (address >= 0x0000 && address <= 0x7FFF)
 	{
-		LOG_L3("Cartridge: " +
-		       std::string("Read ") +
-		       ToHex(_cartridge->ReadByte(address)) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _cartridge->ReadByte(address);
 	}
 	else if (address >= 0x8000 && address <= 0x9FFF)
 	{
-		LOG_L3("Video ram [" + ToDec(_selectedVideoRamBank) + "]: " +
-		       std::string("Read ") +
-		       ToHex(_cartridge->ReadByte(address)) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _videoRam[_selectedVideoRamBank][address - 0x8000];
 	}
 	else if (address >= 0xA000 && address <= 0xBFFF)
 	{
-		LOG_L3("Cartridge: " +
-		       std::string("Read ") +
-		       ToHex(_cartridge->ReadByte(address)) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _cartridge->ReadByte(address);
 	}
 	else if (address >= 0xC000 && address <= 0xCFFF)
 	{
-		LOG_L3("Work ram [0]: " +
-		       std::string("Read ") +
-		       ToHex(_workRam[0][address - 0xC000]) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _workRam[0][address - 0xC000];
 	}
 	else if (address >= 0xD000 && address <= 0xDFFF)
 	{
-		LOG_L3("Work ram [" + ToDec(_selectedWorkRamBank) + "]: " +
-		       std::string("Read ") +
-		       ToHex(_workRam[_selectedWorkRamBank][address - 0xD000]) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _workRam[_selectedWorkRamBank][address - 0xD000];
 	}
 	else if (address >= 0xE000 && address <= 0xEFFF)
 	{
-		LOG_L3("Work ram [0]: " +
-		       std::string("Read ") +
-		       ToHex(_workRam[0][address - 0xE000]) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _workRam[0][address - 0xE000];
 	}
 	else if (address >= 0xF000 && address <= 0xFDFF)
 	{
-		LOG_L3("Work ram [" + ToDec(_selectedWorkRamBank) + "]: " +
-		       std::string("Read ") +
-		       ToHex(_workRam[_selectedWorkRamBank][address - 0xF000]) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _workRam[_selectedWorkRamBank][address - 0xF000];
 	}
 	else if (address >= 0xFE00 && address <= 0xFE9F)
 	{
-		LOG_L3("OAM: " +
-		       std::string("Read ") +
-		       ToHex(_cartridge->ReadByte(address)) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _oam[address - 0xFE00];
 	}
 	else if (address >= 0xFEA0 && address <= 0xFEFF)
@@ -331,12 +252,6 @@ int gbc::core::GameboyColor::ReadByte(int address)
 	}
 	else if (address >= 0xFF80 && address <= 0xFFFE)
 	{
-		LOG_L3("High ram: " +
-		       std::string("Read ") +
-		       ToHex(_highRam[address - 0xFF80]) +
-		       std::string(" from address ") +
-		       ToHex(address));
-		
 		return _highRam[address - 0xFF80];
 	}
 	else if (address == 0xFFFF)

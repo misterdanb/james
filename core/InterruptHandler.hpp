@@ -1,6 +1,8 @@
 #ifndef _InterruptHandler_hpp_
 #define _InterruptHandler_hpp
 
+#include "GBC.hpp"
+
 namespace gbc
 {
 	namespace core
@@ -10,11 +12,11 @@ namespace gbc
 		public:
 			virtual ~IInterruptHandler();
 			
-			virtual void SignalVBlankInterrupt() = 0;
-			virtual void SignalLCDStatusInterrupt() = 0;
-			virtual void SignalTimerInterrupt() = 0;
-			virtual void SignalSerialInterrupt() = 0;
-			virtual void SignalJoypadInterrupt() = 0;
+			virtual void SignalVBlankInterrupt() = GBC_NULL;
+			virtual void SignalLCDStatusInterrupt() = GBC_NULL;
+			virtual void SignalTimerInterrupt() = GBC_NULL;
+			virtual void SignalSerialInterrupt() = GBC_NULL;
+			virtual void SignalJoypadInterrupt() = GBC_NULL;
 		};
 	}
 }
