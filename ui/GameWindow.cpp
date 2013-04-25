@@ -126,35 +126,24 @@ void gbc::ui::GameWindow::Render()
 	display();
 }
 
-void gbc::ui::GameWindow::DrawScanline(core::Scanline scanline)
+void gbc::ui::GameWindow::DrawFrame(core::Frame frame)
 {
-	if (scanline.GetLineIndex() < 144)
-	{
-		core::Color *realColors = scanline.GetRealColors();
+		core::Color *rawMap = frame.GetRawMap();
 		
-		for (int i = 0; i < 160; i++)
+		for (int y = 0; y < frame.GetHeight(); y++)
 		{
-			int lineIndex = scanline.GetLineIndex();
-			int lineOffset = lineIndex * 160;
-			
-			_rawFrame[(lineOffset + i) * 4] = (sf::Uint8) (realColors[i].red);
-			_rawFrame[(lineOffset + i) * 4 + 1] = (sf::Uint8) (realColors[i].green);
-			_rawFrame[(lineOffset + i) * 4 + 2] = (sf::Uint8) (realColors[i].blue);
-			_rawFrame[(lineOffset + i) * 4 + 3] = (sf::Uint8) (0xFF); // test
+			for (int x = 0; x < frame.GetWidth(); x++)
+			{
+				int pixelIndex = y * frame.GetWidth() + x;
+				
+				_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[pixelIndex].red);
+				_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[pixelIndex].green);
+				_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rawMap[pixelIndex].blue);
+				_rawFrame[pixelIndex * 4 + 3] = (sf::Uint8) (0xFF);
+			}
 		}
-	}
-}
-
-void gbc::ui::GameWindow::FinishFrame()
-{
-	_frame.create(160, 144, _rawFrame);
-	/*static int i = 0;
-	printf("%d\n", i);
-	i++;*/
-	/*for (int i = 0; i < 144 * 160 * 4; i++)
-	{
-		delete &rawData[i];
-	}*/
+	
+	_frame.create(frame.GetWidth(), frame.GetHeight(), _rawFrame);
 }
 
 int gbc::ui::GameWindow::GetRight()

@@ -85,7 +85,7 @@ namespace gbc
 			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
 			
 			// current scanline
-			Color _currentScanline[160];
+			Color _rawFrame[Frame::WIDTH * Frame::HEIGHT];
 			
 			// lcd
 			ILCD *_lcd;

@@ -1,4 +1,4 @@
-CC=clang++
+CC=g++
 
 CFLAGS=-c -std=c++11 -O2
 CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O2
@@ -23,7 +23,8 @@ OBJECTS=core/GBC.o \
 	core/cartridges/MBC5.o \
 	core/cartridges/RomRam.o \
 	core/cartridges/MMM01.o \
-	core/Scanline.o \
+	core/PixelMap.o \
+	core/Frame.o \
 	core/LCD.o \
 	core/Joypad.o \
 	core/GameboyColor.o \
@@ -47,7 +48,8 @@ OBJECTSDEBUG=core/GBC-debug.o \
 	core/cartridges/MBC5-debug.o \
 	core/cartridges/RomRam-debug.o \
 	core/cartridges/MMM01-debug.o \
-	core/Scanline-debug.o \
+	core/PixelMap-debug.o \
+	core/Frame-debug.o \
 	core/LCD-debug.o \
 	core/Joypad-debug.o \
 	core/GameboyColor-debug.o \
@@ -77,8 +79,11 @@ core/Joypad.o: core/Joypad.cpp
 core/LCD.o: core/LCD.cpp
 	$(CC) $(CFLAGS) core/LCD.cpp -o core/LCD.o
 
-core/Scanline.o: core/Scanline.cpp
-	$(CC) $(CFLAGS) core/Scanline.cpp -o core/Scanline.o
+core/Frame.o: core/Frame.cpp
+	$(CC) $(CFLAGS) core/Frame.cpp -o core/Frame.o
+
+core/PixelMap.o: core/PixelMap.cpp
+	$(CC) $(CFLAGS) core/PixelMap.cpp -o core/PixelMap.o
 
 core/cartridges/MMM01.o: core/cartridges/MMM01.cpp
 	$(CC) $(CFLAGS) core/cartridges/MMM01.cpp -o core/cartridges/MMM01.o
@@ -151,8 +156,11 @@ core/Joypad-debug.o: core/Joypad.cpp
 core/LCD-debug.o: core/LCD.cpp
 	$(CC) $(CFLAGSDEBUG) core/LCD.cpp -o core/LCD-debug.o
 
-core/Scanline-debug.o: core/Scanline.cpp
-	$(CC) $(CFLAGSDEBUG) core/Scanline.cpp -o core/Scanline-debug.o
+core/Frame-debug.o: core/Frame.cpp
+	$(CC) $(CFLAGSDEBUG) core/Frame.cpp -o core/Frame-debug.o
+
+core/PixelMap-debug.o: core/PixelMap.cpp
+	$(CC) $(CFLAGSDEBUG) core/PixelMap.cpp -o core/PixelMap-debug.o
 
 core/cartridges/MMM01-debug.o: core/cartridges/MMM01.cpp
 	$(CC) $(CFLAGSDEBUG) core/cartridges/MMM01.cpp -o core/cartridges/MMM01-debug.o

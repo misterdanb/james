@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <stdarg.h>
 
-#define DEBUG
+//#define DEBUG
 
 #define LOG_LEVEL_2
 

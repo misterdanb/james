@@ -2,7 +2,7 @@
 #define _LCD_hpp_
 
 #include "GBC.hpp"
-#include "Scanline.hpp"
+#include "Frame.hpp"
 
 namespace gbc
 {
@@ -11,14 +11,13 @@ namespace gbc
 		class ILCD
 		{
 		public:
-			static const int LCD_WIDTH = Scanline::WIDTH;
-			static const int LCD_HEIGHT = 144;
+			static const int LCD_WIDTH = Frame::WIDTH;
+			static const int LCD_HEIGHT = Frame::HEIGHT;
 		
 		public:
 			virtual ~ILCD();
 			
-			virtual void DrawScanline(Scanline) = GBC_NULL;
-			virtual void FinishFrame() = GBC_NULL;
+			virtual void DrawFrame(Frame) = GBC_NULL;
 		};
 	}
 }

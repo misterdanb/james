@@ -908,15 +908,6 @@ void gbc::core::GameboyColor::DoTransferData()
 			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND);
 		}
 	}
-	
-	if (_lcd)
-	{
-		_lcd->DrawScanline(Scanline(_lcdY, _currentScanline));
-	}
-	else
-	{
-		ERROR("GameboyColor: No LCD set.");
-	}
 }
 
 void gbc::core::GameboyColor::DoHBlank()
@@ -991,7 +982,11 @@ void gbc::core::GameboyColor::DoVBlank()
 	{
 		if (_lcd)
 		{
-			_lcd->FinishFrame();
+			_lcd->DrawFrame(Frame(_rawFrame));
+		}
+		else
+		{
+			ERROR("GameboyColor: No LCD set.");
 		}
 		
 		_lcdY = 0;
@@ -1199,8 +1194,8 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors,
 			mapElementY += TileMap::HEIGHT;
 		}
 	
-		mapElementX &= 0x1F; // % 32
-		mapElementY &= 0x1F; // % 32
+		mapElementX %= TileMap::WIDTH;
+		mapElementY %= TileMap::HEIGHT;
 		
 		int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 		
@@ -1375,7 +1370,8 @@ void gbc::core::GameboyColor::DrawTile(int x, int y,
 		{
 			int scanlinePosition = x + tileX;
 			
-			if (scanlinePosition >= 0 && scanlinePosition < Scanline::WIDTH)
+			if (scanlinePosition >= 0 && scanlinePosition < Frame::WIDTH &&
+			    _lcdY >= 0 && _lcdY < Frame::HEIGHT)
 			{
 				int realTileX = tileX;
 				int realTileY = tileY;
@@ -1397,7 +1393,7 @@ void gbc::core::GameboyColor::DrawTile(int x, int y,
 				    ((colorNumber == 2) && (enabledColors & COLOR_2)) ||
 				    ((colorNumber == 3) && (enabledColors & COLOR_3)))
 				{
-					_currentScanline[scanlinePosition] = colorPalette.colors[colorNumber];
+					_rawFrame[_lcdY * Frame::WIDTH + scanlinePosition] = colorPalette.colors[colorNumber];
 				}
 			}
 		}

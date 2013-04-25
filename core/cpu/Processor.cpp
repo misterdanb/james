@@ -737,7 +737,7 @@ int gbc::core::cpu::Processor::GetCounter()
 }
 
 // helper methods
-void gbc::core::cpu::Processor::FetchInstruction(InstructionTable instructionTable)
+inline void gbc::core::cpu::Processor::FetchInstruction(InstructionTable instructionTable)
 {
 	if (instructionTable == InstructionTable::DEFAULT)
 	{

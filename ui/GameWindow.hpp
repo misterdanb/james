@@ -18,8 +18,7 @@ namespace gbc
 			
 			void Render();
 			
-			void DrawScanline(core::Scanline);
-			void FinishFrame();
+			void DrawFrame(core::Frame);
 			
 			int GetRight();
 			int GetLeft();
@@ -33,7 +32,7 @@ namespace gbc
 		private:
 			core::GameboyColor _gbc;
 			
-			sf::Uint8 _rawFrame[160 * 144 * 4];
+			sf::Uint8 _rawFrame[core::Frame::WIDTH * core::Frame::HEIGHT * 4];
 			sf::Image _frame;
 			
 			int _rightPressed;
