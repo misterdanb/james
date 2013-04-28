@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include "GBC.hpp"
+#include "gbc.hpp"
 #include "LCD.hpp"
 #include "Joypad.hpp"
 #include "cartridges/Cartridge.hpp"
@@ -24,9 +24,13 @@ namespace gbc
 {
 	namespace core
 	{
+		using namespace cpu;
+		using namespace cartridges;
+		
 		class GameboyColor : public IMemoryBus
 		{
 		public:
+			// memory dimensions
 			static const int VIDEO_RAM_BANKS = 2;
 			static const int VIDEO_RAM_BANK_SIZE = 0x2000;
 			
@@ -39,6 +43,7 @@ namespace gbc
 			
 			static const int HIGH_RAM_SIZE = 0x80;
 			
+			// color enable masks
 			static const int COLOR_0 = 0b00000001;
 			static const int COLOR_1 = 0b00000010;
 			static const int COLOR_2 = 0b00000100;
@@ -81,7 +86,7 @@ namespace gbc
 			void DrawBackgroundMap(int);
 			void DrawWindowMap(int, BackgroundToOAMPriority);
 			void DrawWindowMap(int);
-			void DrawMapTile(int, int, int, int, int, cartridges::PlatformSupport);
+			void DrawMapTile(int, int, int, int, int, PlatformSupport);
 			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
 			
 			// current scanline
@@ -97,11 +102,11 @@ namespace gbc
 			int _buttonKeysSelected;
 			
 			// cartridge
-			cartridges::Cartridge *_cartridge;
+			Cartridge *_cartridge;
 			int _forceClassicGameboy;
 			
 			// processor
-			cpu::Processor _hybr1s80;
+			Processor _hybr1s80;
 			int _speedFactor;
 			
 			// ram
@@ -164,7 +169,7 @@ namespace gbc
 			ColorPalette _monochromeSpritePalette1;
 			ColorPalette _monochromePalette;
 			
-			// lcd color phunalettes
+			// lcd color palettes
 			int _colorBackgroundPaletteIndexAutoIncrement;
 			ColorPalette _colorBackgroundPalettes[8];
 			int _colorSpritePaletteIndexAutoIncrement;

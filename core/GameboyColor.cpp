@@ -1,5 +1,8 @@
 #include "GameboyColor.hpp"
 
+using namespace gbc::core::cpu;
+using namespace gbc::core::cartridges;
+
 gbc::core::GameboyColor::GameboyColor()
 	: _joypad(NULL),
 	  _directionKeysSelected(0),
@@ -157,7 +160,7 @@ void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
 				if (_ioPorts[0xFF05 - 0xFF00] + 1 >= 0xFF)
 				{
 					_ioPorts[0xFF05 - 0xFF00] = _ioPorts[0xFF06  - 0xFF00];
-					_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 2, GBC_TRUE);
+					
 					_hybr1s80.SignalTimerInterrupt();
 				}
 				else
@@ -459,34 +462,9 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				
 				break;
 			
-			case 0xFF0F:
-				// interrupt flags
-				_ioPorts[address - 0xFF00] = value;
-				
-				if (GetBit(value, 0))
-				{
-					_hybr1s80.SignalVBlankInterrupt();
-				}
-				
-				if (GetBit(value, 1))
-				{
-					_hybr1s80.SignalLCDStatusInterrupt();
-				}
-				
-				if (GetBit(value, 2))
-				{
-					_hybr1s80.SignalTimerInterrupt();
-				}
-				
-				if (GetBit(value, 3))
-				{
-					_hybr1s80.SignalSerialInterrupt();
-				}
-				
-				if (GetBit(value, 4))
-				{
-					_hybr1s80.SignalJoypadInterrupt();
-				}
+			case IInterruptHandler::INTERRUPT_REQUEST_ADDRESS:
+				// interrupt request flags
+				_ioPorts[IInterruptHandler::INTERRUPT_REQUEST_ADDRESS - 0xFF00] = value;
 				
 				break;
 			
@@ -785,16 +763,16 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 	{
 		_highRam[address - 0xFF80] = value;
 	}
-	else if (address == 0xFFFF)
+	else if (address == IInterruptHandler::INTERRUPT_ENABLE_ADDRESS)
 	{
 		// interrupt enable
 		_interruptEnableRegister = value;
 		
-		_vBlankInterruptEnabled = GetBit(value, 0);
-		_lcdStatusInterruptEnabled = GetBit(value, 1);
-		_timerInterruptEnabled = GetBit(value, 2);
-		_serialInterruptEnabled = GetBit(value, 3);
-		_joypadInterruptEnabled = GetBit(value, 4);
+		_vBlankInterruptEnabled = GetBit(value, IInterruptHandler::VERTICAL_BLANK_INTERRUPT_ENABLE_BIT);
+		_lcdStatusInterruptEnabled = GetBit(value, IInterruptHandler::LCD_STATUS_INTERRUPT_ENABLE_BIT);
+		_timerInterruptEnabled = GetBit(value, IInterruptHandler::TIMER_INTERRUPT_ENABLE_BIT);
+		_serialInterruptEnabled = GetBit(value, IInterruptHandler::SERIAL_INTERRUPT_ENABLE_BIT);
+		_joypadInterruptEnabled = GetBit(value, IInterruptHandler::JOYPAD_INTERRUPT_ENABLE_BIT);
 	}
 	else
 	{
@@ -810,13 +788,11 @@ void gbc::core::GameboyColor::DoOAMSearch()
 	
 	if (_oamInterruptEnabled)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
 	if (_coincidenceInterruptEnabled && _coincidenceFlag)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
@@ -834,8 +810,8 @@ void gbc::core::GameboyColor::DoTransferData()
 	
 	if (_lcdDisplayEnabled)
 	{
-		if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-		    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+		if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+	        _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 		    !_forceClassicGameboy)
 		{
 			if (!_backgroundDisplayEnabled)
@@ -916,7 +892,6 @@ void gbc::core::GameboyColor::DoHBlank()
 	
 	if (_hBlankInterruptEnabled)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
@@ -963,12 +938,11 @@ void gbc::core::GameboyColor::DoVBlank()
 	
 	if (_coincidenceInterruptEnabled && _coincidenceFlag)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 1, GBC_TRUE);
+		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
 	if (_vBlankInterruptEnabled && !_vBlankInterruptAlreadyRequested)
 	{
-		_ioPorts[0xFF0F - 0xFF00] = SetBit(_ioPorts[0xFF0F - 0xFF00], 0, GBC_TRUE);
 		_hybr1s80.SignalVBlankInterrupt();
 		_vBlankInterruptAlreadyRequested = GBC_TRUE;
 	}
@@ -1103,15 +1077,15 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors,
 			                            _monochromeSpritePalette0 :
 			                            _monochromeSpritePalette1;
 			
-			if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-			    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+			if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+			    _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 			    !_forceClassicGameboy)
 			{
 				colorPalette = _colorSpritePalettes[spriteAttribute.spriteColorPaletteNumber];
 			}
 			
-			if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-			    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+			if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+			    _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 			    !_forceClassicGameboy)
 			{
 				DrawTile(spriteAttribute.x, spriteAttribute.y,
@@ -1146,15 +1120,15 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors)
 			                        _monochromeSpritePalette0 :
 			                        _monochromeSpritePalette1;
 		
-		if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-		    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+		if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+	        _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 		    !_forceClassicGameboy)
 		{
 			colorPalette = _colorSpritePalettes[spriteAttribute.spriteColorPaletteNumber];
 		}			
 	    
-		if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-		    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+		if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+	        _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 		    !_forceClassicGameboy)
 		{
 			DrawTile(spriteAttribute.x, spriteAttribute.y,
@@ -1277,7 +1251,7 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
                                           int yOffset,
                                           int tileMapDisplaySelect,
                                           int enabledColors,
-                                          cartridges::PlatformSupport platformSupport)
+                                          PlatformSupport platformSupport)
 {
 	//if (tileMapDisplaySelect == 0) return; ////////////////////
 	int x = (mapX * Tile::WIDTH) + xOffset;
@@ -1311,8 +1285,8 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 	
 	int tileVideoRamBankNumber = 0;
 	
-	if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-	    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+	if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+	    _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 	    !_forceClassicGameboy)
 	{
 		tileVideoRamBankNumber = backgroundMapAttribute.tileVideoRamBankNumber;
@@ -1326,15 +1300,15 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 	
 	ColorPalette colorPalette = _monochromeBackgroundPalette;
 	
-	if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-	    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+	if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+	    _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 	    !_forceClassicGameboy)
 	{
 		colorPalette = _colorBackgroundPalettes[backgroundMapAttribute.backgroundColorPaletteNumber];
 	}
 	
-	if ((_cartridge->GetHeader().platformSupport == cartridges::gameboyColorSupport ||
-	    _cartridge->GetHeader().platformSupport == cartridges::gameboyColorOnly) &&
+	if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+	    _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 	    !_forceClassicGameboy)
 	{
 		DrawTile(x, y,

@@ -589,51 +589,91 @@ void gbc::core::cpu::Processor::ExecuteInterrupt()
 {
 	if (_state.interruptsEnabled || _state.halted)
 	{
-		if ((GetBit(_bus->ReadByte(0xFFFF), 0) && _vBlankInterruptSignalled) ||
-		    (GetBit(_bus->ReadByte(0xFFFF), 1) && _lcdStatusInterruptSignalled) ||
-		    (GetBit(_bus->ReadByte(0xFFFF), 2) && _timerInterruptSignalled) ||
-		    (GetBit(_bus->ReadByte(0xFFFF), 3) && _serialInterruptSignalled) ||
-		    (GetBit(_bus->ReadByte(0xFFFF), 4) && _joypadInterruptSignalled))
+		int verticalBlankInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
+		                                                                VERTICAL_BLANK_INTERRUPT_ENABLE_BIT) &&
+		                                          GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+		                                                                VERTICAL_BLANK_INTERRUPT_REQUEST_BIT);
+		
+		int lcdStatusInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
+		                                                            LCD_STATUS_INTERRUPT_ENABLE_BIT) &&
+		                                      GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+		                                                            LCD_STATUS_INTERRUPT_REQUEST_BIT);
+		
+		int timerInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
+		                                                        TIMER_INTERRUPT_ENABLE_BIT) &&
+		                                  GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+		                                                        TIMER_INTERRUPT_REQUEST_BIT);
+		
+		int serialInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
+		                                                         SERIAL_INTERRUPT_ENABLE_BIT) &&
+		                                   GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+		                                                         SERIAL_INTERRUPT_REQUEST_BIT);
+		
+		int joypadInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
+		                                                         JOYPAD_INTERRUPT_ENABLE_BIT) &&
+		                                   GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+		                                                         JOYPAD_INTERRUPT_REQUEST_BIT);
+		
+		if (verticalBlankInterruptToBePerformed ||
+		    lcdStatusInterruptToBePerformed ||
+		    timerInterruptToBePerformed ||
+		    serialInterruptToBePerformed ||
+		    joypadInterruptToBePerformed)
 		{
 			_state.sp -= 2;
 			
-			_bus->WriteByte(_state.sp, _state.pc & 0xFF);
-			_bus->WriteByte(_state.sp + 1, (_state.pc >> 8) & 0xFF);
+			_bus->WriteByte(_state.sp, GetLow(_state.pc));
+			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
-			if (GetBit(_bus->ReadByte(0xFFFF), 0) && _vBlankInterruptSignalled)
+			if (verticalBlankInterruptToBePerformed)
 			{
-				_state.pc = 0x0040;
+				_state.pc = VERTICAL_BLANK_INTERRUPT_VECTOR;
 				
-				_vBlankInterruptSignalled = GBC_FALSE;
-				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 0, GBC_FALSE));
+				int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+				                                                        VERTICAL_BLANK_INTERRUPT_REQUEST_BIT,
+				                                                        GBC_FALSE);
+				
+				_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			}
-			else if (GetBit(_bus->ReadByte(0xFFFF), 1) && _lcdStatusInterruptSignalled)
+			else if (lcdStatusInterruptToBePerformed)
 			{
-				_state.pc = 0x0048;
+				_state.pc = LCD_STATUS_INTERRUPT_VECTOR;
 				
-				_lcdStatusInterruptSignalled = GBC_FALSE;
-				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 1, GBC_FALSE));
+				int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+				                                                        LCD_STATUS_INTERRUPT_REQUEST_BIT,
+				                                                        GBC_FALSE);
+				
+				_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			}
-			else if (GetBit(_bus->ReadByte(0xFFFF), 2) && _timerInterruptSignalled)
+			else if (timerInterruptToBePerformed)
 			{
-				_state.pc = 0x0050;
+				_state.pc = TIMER_INTERRUPT_VECTOR;
 				
-				_timerInterruptSignalled = GBC_FALSE;
-				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 2, GBC_FALSE));
+				int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+				                                                        TIMER_INTERRUPT_REQUEST_BIT,
+				                                                        GBC_FALSE);
+				
+				_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			}
-			else if (GetBit(_bus->ReadByte(0xFFFF), 3) && _serialInterruptSignalled)
+			else if (serialInterruptToBePerformed)
 			{
-				_state.pc = 0x0058;
+				_state.pc = SERIAL_INTERRUPT_VECTOR;
 				
-				_serialInterruptSignalled = GBC_FALSE;
-				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 3, GBC_FALSE));
+				int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+				                                                        SERIAL_INTERRUPT_REQUEST_BIT,
+				                                                        GBC_FALSE);
+				
+				_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			}
-			else if (GetBit(_bus->ReadByte(0xFFFF), 4) && _joypadInterruptSignalled)
+			else if (joypadInterruptToBePerformed)
 			{
-				_state.pc = 0x0060;
+				_state.pc = JOYPAD_INTERRUPT_VECTOR;
 				
-				_joypadInterruptSignalled = GBC_FALSE;
-				_bus->WriteByte(0xFF0F, SetBit(_bus->ReadByte(0xFF0F), 4, GBC_FALSE));
+				int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+				                                                        JOYPAD_INTERRUPT_REQUEST_BIT,
+				                                                        GBC_FALSE);
+				
+				_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			}
 			
 			_state.interruptsEnabled = GBC_FALSE;
@@ -698,27 +738,47 @@ void gbc::core::cpu::Processor::PowerUp()
 
 void gbc::core::cpu::Processor::SignalVBlankInterrupt()
 {
-	_vBlankInterruptSignalled = GBC_TRUE;
+	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+	                                                        VERTICAL_BLANK_INTERRUPT_REQUEST_BIT,
+	                                                        GBC_TRUE);
+	
+	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
 void gbc::core::cpu::Processor::SignalLCDStatusInterrupt()
 {
-	_lcdStatusInterruptSignalled = GBC_TRUE;
+	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+	                                                        LCD_STATUS_INTERRUPT_REQUEST_BIT,
+	                                                        GBC_TRUE);
+	
+	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
 void gbc::core::cpu::Processor::SignalTimerInterrupt()
 {
-	_timerInterruptSignalled = GBC_TRUE;
+	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+	                                                        TIMER_INTERRUPT_REQUEST_BIT,
+	                                                        GBC_TRUE);
+	
+	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
 void gbc::core::cpu::Processor::SignalSerialInterrupt()
 {
-	_serialInterruptSignalled = GBC_TRUE;
+	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+	                                                        SERIAL_INTERRUPT_REQUEST_BIT,
+	                                                        GBC_TRUE);
+	
+	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
 void gbc::core::cpu::Processor::SignalJoypadInterrupt()
 {
-	_joypadInterruptSignalled = GBC_TRUE;
+	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
+	                                                        JOYPAD_INTERRUPT_REQUEST_BIT,
+	                                                        GBC_TRUE);
+	
+	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
 void gbc::core::cpu::Processor::SetState(gbc::core::cpu::State state)

@@ -1,7 +1,7 @@
 #ifndef _LCD_hpp_
 #define _LCD_hpp_
 
-#include "GBC.hpp"
+#include "gbc.hpp"
 #include "Frame.hpp"
 
 namespace gbc

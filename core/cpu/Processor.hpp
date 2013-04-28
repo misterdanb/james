@@ -179,15 +179,9 @@ namespace gbc
 				
 				int _counter;
 				
-				int _currentOpCodes[2];
-				int _currentOpLows[2];
-				int _currentOpHighs[2];
-							
-				int _vBlankInterruptSignalled;
-				int _lcdStatusInterruptSignalled;
-				int _timerInterruptSignalled;
-				int _serialInterruptSignalled;
-				int _joypadInterruptSignalled;
+				int _currentOpCodes[LookUpTables::AMOUNT_OF_INSTUCTION_TABLES];
+				int _currentOpLows[LookUpTables::AMOUNT_OF_INSTUCTION_TABLES];
+				int _currentOpHighs[LookUpTables::AMOUNT_OF_INSTUCTION_TABLES];
 				
 				State _state;
 				IMemoryBus *_bus;

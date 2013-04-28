@@ -6,7 +6,7 @@ CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O2
 LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system
 LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -pg
 
-OBJECTS=core/GBC.o \
+OBJECTS=core/gbc.o \
 	core/MemoryBus.o \
 	core/InterruptHandler.o \
 	core/cpu/LookUpTables.o \
@@ -31,7 +31,7 @@ OBJECTS=core/GBC.o \
 	ui/GameWindow.o \
 	main.o
 
-OBJECTSDEBUG=core/GBC-debug.o \
+OBJECTSDEBUG=core/gbc-debug.o \
 	core/MemoryBus-debug.o \
 	core/InterruptHandler-debug.o \
 	core/cpu/LookUpTables-debug.o \
@@ -133,8 +133,8 @@ core/InterruptHandler.o: core/InterruptHandler.cpp
 core/MemoryBus.o: core/MemoryBus.cpp
 	$(CC) $(CFLAGS) core/MemoryBus.cpp -o core/MemoryBus.o
 
-core/GBC.o: core/GBC.cpp
-	$(CC) $(CFLAGS) core/GBC.cpp -o core/GBC.o
+core/gbc.o: core/gbc.cpp
+	$(CC) $(CFLAGS) core/gbc.cpp -o core/gbc.o
 
 ######################################################################################################
 
@@ -210,8 +210,8 @@ core/InterruptHandler-debug.o: core/InterruptHandler.cpp
 core/MemoryBus-debug.o: core/MemoryBus.cpp
 	$(CC) $(CFLAGSDEBUG) core/MemoryBus.cpp -o core/MemoryBus-debug.o
 
-core/GBC-debug.o: core/GBC.cpp
-	$(CC) $(CFLAGSDEBUG) core/GBC.cpp -o core/GBC-debug.o
+core/gbc-debug.o: core/gbc.cpp
+	$(CC) $(CFLAGSDEBUG) core/gbc.cpp -o core/gbc-debug.o
 
 clean:
 	rm -rf *.o $(EXECUTABLE) $(EXECUTABLE)-debug

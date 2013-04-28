@@ -7,10 +7,10 @@ namespace gbc
 	{
 		namespace cartridges
 		{
-			enum PlatformSupport
+			enum class PlatformSupport
 			{
-				gameboyColorSupport = 0x80,
-				gameboyColorOnly = 0xC0
+				GAMEBOY_COLOR_SUPPORT = 0x80,
+				GAMEBOY_COLOR_ONLY = 0xC0
 			};
 		}
 	}

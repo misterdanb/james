@@ -1,7 +1,7 @@
 #ifndef _MemoryBus_hpp_
 #define _MemoryBus_hpp_
 
-#include "GBC.hpp"
+#include "gbc.hpp"
 
 namespace gbc
 {

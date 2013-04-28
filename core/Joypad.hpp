@@ -1,7 +1,7 @@
 #ifndef _Joypad_hpp_
 #define _Joypad_hpp_
 
-#include "GBC.hpp"
+#include "gbc.hpp"
 
 namespace gbc
 {
