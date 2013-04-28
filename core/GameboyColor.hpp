@@ -19,6 +19,7 @@
 #include "TileMap.hpp"
 #include "Color.hpp"
 #include "ColorPalette.hpp"
+#include "RenderContext.hpp"
 
 namespace gbc
 {
@@ -127,6 +128,16 @@ namespace gbc
 			int _deviderCounter;
 			int _timerCounter;
 			
+			RenderContext _renderContext;
+			
+			// 
+			// replaces all this
+			// 
+			//   ||
+			//   ||
+			//   \/
+			
+			/////////////////////////////7
 			// interrupt requests
 			int _vBlankInterruptAlreadyRequested;
 			

@@ -1,5 +1,4 @@
 #include "Header.hpp"
-#include <iostream>
 
 gbc::core::cartridges::Header::Header(int rom[])
 	: platformSupport(PlatformSupport(rom[PLATFORM_SUPPORT_ADDRESS])),

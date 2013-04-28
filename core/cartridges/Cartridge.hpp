@@ -3,7 +3,7 @@
 
 #include <cstring>
 
-#include "../GBC.hpp"
+#include "../gbc.hpp"
 #include "../MemoryBus.hpp"
 #include "Header.hpp"
 

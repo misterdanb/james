@@ -1,7 +1,7 @@
 #ifndef _Processor_hpp_
 #define _Processor_hpp_
 
-#include "../GBC.hpp"
+#include "../gbc.hpp"
 #include "../MemoryBus.hpp"
 #include "State.hpp"
 #include "../InterruptHandler.hpp"

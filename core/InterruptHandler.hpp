@@ -1,5 +1,5 @@
 #ifndef _InterruptHandler_hpp_
-#define _InterruptHandler_hpp
+#define _InterruptHandler_hpp_
 
 #include "gbc.hpp"
 

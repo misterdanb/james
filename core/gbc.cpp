@@ -1,4 +1,4 @@
-#include "GBC.hpp"
+#include "gbc.hpp"
 
 void gbc::Log(std::string log)
 {
