@@ -19,40 +19,41 @@ gbc::core::GameboyColor::GameboyColor()
 	  _timerStopped(GBC_TRUE),
 	  _deviderCounter(0),
 	  _timerCounter(0),
-	  _vBlankInterruptAlreadyRequested(GBC_FALSE),
-	  _lcdDisplayEnabled(GBC_FALSE),
-	  _windowTileMapDisplaySelect(0),
-	  _windowDisplayEnabled(GBC_FALSE),
-	  _backgroundAndWindowTileDataSelect(0),
-	  _backgroundTileMapDisplaySelect(0),
-	  _spriteSize(0), // missing enum for sprite size (and implementation of this)
-	  _spriteDisplayEnabled(GBC_FALSE),
-	  _backgroundDisplayEnabled(GBC_FALSE),
-	  _lcdMode(LCDMode::VERTICAL_BLANK),
-	  _coincidenceFlag(GBC_FALSE),
-	  _hBlankInterruptEnabled(GBC_FALSE),
-	  _vBlankInterruptEnabledInLCD(GBC_FALSE),
-	  _oamInterruptEnabled(GBC_FALSE),
-	  _coincidenceInterruptEnabled(GBC_FALSE),
-	  _scrollX(0),
-	  _scrollY(0),
-	  _lcdY(0),
-	  _lcdYCompare(GBC_FALSE),
-	  _windowY(0),
-	  _windowX(0),
 	  _colorBackgroundPaletteIndexAutoIncrement(0),
-	  _colorSpritePaletteIndexAutoIncrement(0),
-	  _hBlankDMATransferActive(GBC_FALSE),
-	  _hBlankDMATransferSourceAddress(0x0000),
-	  _hBlankDMATransferDestinationAddress(0x0000),
-	  _hBlankDMATransferLength(0),
-	  _currentHBlankDMATransferAddressOffset(0x0000)
+	  _colorSpritePaletteIndexAutoIncrement(0)
 {
 	std::memset(_videoRam, 0x00, VIDEO_RAM_BANKS * VIDEO_RAM_BANK_SIZE);
 	std::memset(_workRam, 0x00, WORK_RAM_BANKS * WORK_RAM_BANK_SIZE);
 	std::memset(_oam, 0x00, OAM_SIZE);
 	std::memset(_ioPorts, 0x00, IO_PORTS_SIZE);
 	std::memset(_highRam, 0x00, HIGH_RAM_SIZE);
+	
+	_rc.verticalBlankInterruptAlreadyRequested = GBC_FALSE;
+	_rc.lcdDisplayEnabled = GBC_FALSE;
+	_rc.windowTileMapDisplaySelect = 0;
+	_rc.windowDisplayEnabled = GBC_FALSE;
+	_rc.backgroundAndWindowTileDataSelect = 0;
+	_rc.backgroundTileMapDisplaySelect = 0;
+	_rc.spriteSize = 0; // missing enum for sprite size (and implementation of this)
+	_rc.spriteDisplayEnabled = GBC_FALSE;
+	_rc.backgroundDisplayEnabled = GBC_FALSE;
+	_rc.lcdMode = LCDMode::VERTICAL_BLANK;
+	_rc.coincidenceFlag = GBC_FALSE;
+	_rc.horizontalBlankInterruptEnabled = GBC_FALSE;
+	_rc.verticalBlankInterruptEnabledInLCD = GBC_FALSE;
+	_rc.oamInterruptEnabled = GBC_FALSE;
+	_rc.coincidenceInterruptEnabled = GBC_FALSE;
+	_rc.scrollX = 0;
+	_rc.scrollY = 0;
+	_rc.lcdY = 0;
+	_rc.lcdYCompare = GBC_FALSE;
+	_rc.windowX = 0;
+	_rc.windowY = 0;
+	_rcColor.horizontalBlankDMATransferActive = GBC_FALSE;
+	_rcColor.horizontalBlankDMATransferSourceAddress = 0x0000;
+	_rcColor.horizontalBlankDMATransferDestinationAddress = 0x0000;
+	_rcColor.horizontalBlankDMATransferLength = 0;
+	_rcColor.currentHorizontalBlankDMATransferAddressOffset = 0x0000;
 }
 
 gbc::core::GameboyColor::~GameboyColor()
@@ -102,14 +103,14 @@ void gbc::core::GameboyColor::Initialize()
 	_monochromePalette.colors[0].green = 0x1F;
 	_monochromePalette.colors[0].blue = 0x1F;
 	
-	std::memcpy(_monochromeBackgroundPalette.colors, _monochromePalette.colors, sizeof(ColorPalette));
-	std::memcpy(_monochromeSpritePalette0.colors, _monochromePalette.colors, sizeof(ColorPalette));
-	std::memcpy(_monochromeSpritePalette1.colors, _monochromePalette.colors, sizeof(ColorPalette));
+	std::memcpy(_rcClassic.monochromeBackgroundPalette.colors, _monochromePalette.colors, sizeof(ColorPalette));
+	std::memcpy(_rcClassic.monochromeSpritePalette0.colors, _monochromePalette.colors, sizeof(ColorPalette));
+	std::memcpy(_rcClassic.monochromeSpritePalette1.colors, _monochromePalette.colors, sizeof(ColorPalette));
 }
 
 void gbc::core::GameboyColor::RenderScanline()
 {
-	if (_lcdY < 144)
+	if (_rc.lcdY < 144)
 	{
 		DoOAMSearch();
 		ExecuteMachineClocks(80 * _speedFactor);
@@ -235,12 +236,12 @@ int gbc::core::GameboyColor::ReadByte(int address)
 			case 0xFF41:
 				// lcd status
 				return (_ioPorts[0xFF41 - 0xFF00] & 0xF8) |
-				       (GetEnumValue(_lcdMode) & 0x03) |
-				       (_coincidenceFlag ? 0x04 : 0x00);
+				       (GetEnumValue(_rc.lcdMode) & 0x03) |
+				       (_rc.coincidenceFlag ? 0x04 : 0x00);
 			
 			case 0xFF44:
 				// lcd y
-				return _lcdY;
+				return _rc.lcdY;
 			
 			case 0xFF4F:
 				// vram bank
@@ -289,10 +290,10 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 			
 			int isAlreadyInList = GBC_FALSE;
 				
-			for (int i = 0; i < _changedTiles.size(); i++)
+			for (int i = 0; i < _rc.changedTiles.size(); i++)
 			{
-				if (changedTile[0] == _changedTiles[i][0] &&
-				    changedTile[1] == _changedTiles[i][1])
+				if (changedTile[0] == _rc.changedTiles[i][0] &&
+				    changedTile[1] == _rc.changedTiles[i][1])
 				{
 					isAlreadyInList = GBC_TRUE;
 					break;
@@ -301,7 +302,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 			
 			if (!isAlreadyInList)
 			{
-				_changedTiles.push_back(changedTile);
+				_rc.changedTiles.push_back(changedTile);
 			}
 		}
 		else
@@ -315,10 +316,10 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				
 				int isAlreadyInList = GBC_FALSE;
 				
-				for (int i = 0; i < _changedBackgroundMapElements.size(); i++)
+				for (int i = 0; i < _rc.changedTileMapElements.size(); i++)
 				{
-					if (changedBackgroundMapElement[0] == _changedBackgroundMapElements[i][0] &&
-					    changedBackgroundMapElement[1] == _changedBackgroundMapElements[i][1])
+					if (changedBackgroundMapElement[0] == _rc.changedTileMapElements[i][0] &&
+					    changedBackgroundMapElement[1] == _rc.changedTileMapElements[i][1])
 					{
 						isAlreadyInList = GBC_TRUE;
 						break;
@@ -327,7 +328,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				
 				if (!isAlreadyInList)
 				{
-					_changedBackgroundMapElements.push_back(changedBackgroundMapElement);
+					_rc.changedTileMapElements.push_back(changedBackgroundMapElement);
 				}
 			}
 			else
@@ -339,10 +340,10 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				
 				int isAlreadyInList = GBC_FALSE;
 				
-				for (int i = 0; i < _changedTileMapAttributes.size(); i++)
+				for (int i = 0; i < _rcColor.changedTileMapAttributes.size(); i++)
 				{
-					if (changedTileMapAttribute[0] == _changedTileMapAttributes[i][0] &&
-					    changedTileMapAttribute[1] == _changedTileMapAttributes[i][1])
+					if (changedTileMapAttribute[0] == _rcColor.changedTileMapAttributes[i][0] &&
+					    changedTileMapAttribute[1] == _rcColor.changedTileMapAttributes[i][1])
 					{
 						isAlreadyInList = GBC_TRUE;
 						break;
@@ -351,7 +352,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				
 				if (!isAlreadyInList)
 				{
-					_changedTileMapAttributes.push_back(changedTileMapAttribute);
+					_rcColor.changedTileMapAttributes.push_back(changedTileMapAttribute);
 				}
 			}
 		}
@@ -384,9 +385,9 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 		
 		int isAlreadyInList = GBC_FALSE;
 		
-		for (int i = 0; i < _changedSpriteAttributes.size(); i++)
+		for (int i = 0; i < _rc.changedSpriteAttributes.size(); i++)
 		{
-			if (changedSpriteAttribute == _changedSpriteAttributes[i])
+			if (changedSpriteAttribute == _rc.changedSpriteAttributes[i])
 			{
 				isAlreadyInList = GBC_TRUE;
 				break;
@@ -395,7 +396,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 		
 		if (!isAlreadyInList)
 		{
-			_changedSpriteAttributes.push_back(changedSpriteAttribute);
+			_rc.changedSpriteAttributes.push_back(changedSpriteAttribute);
 		}
 		
 		_oam[address - 0xFE00] = value;
@@ -472,14 +473,14 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// lcd control
 				_ioPorts[address - 0xFF00] = value;
 				
-				_backgroundDisplayEnabled = GetBit(value, 0);
-				_spriteDisplayEnabled = GetBit(value, 1);
-				_spriteSize = GetBit(value, 2);
-				_backgroundTileMapDisplaySelect = GetBit(value, 3);
-				_backgroundAndWindowTileDataSelect = GetBit(value, 4);
-				_windowDisplayEnabled = GetBit(value, 5);
-				_windowTileMapDisplaySelect = GetBit(value, 6);
-				_lcdDisplayEnabled = GetBit(value, 7);
+				_rc.backgroundDisplayEnabled = GetBit(value, 0);
+				_rc.spriteDisplayEnabled = GetBit(value, 1);
+				_rc.spriteSize = GetBit(value, 2);
+				_rc.backgroundTileMapDisplaySelect = GetBit(value, 3);
+				_rc.backgroundAndWindowTileDataSelect = GetBit(value, 4);
+				_rc.windowDisplayEnabled = GetBit(value, 5);
+				_rc.windowTileMapDisplaySelect = GetBit(value, 6);
+				_rc.lcdDisplayEnabled = GetBit(value, 7);
 				
 				break;
 			
@@ -488,26 +489,26 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// doesn't have any effect
 				_ioPorts[address - 0xFF00] = value;
 				
-				//_lcdMode = LCDMode(value & 0x03);
-				//_coincidenceFlag = GetBit(value, 2);
-				_hBlankInterruptEnabled = GetBit(value, 3);
-				_vBlankInterruptEnabledInLCD = GetBit(value, 4);
-				_oamInterruptEnabled = GetBit(value, 5);
-				_coincidenceInterruptEnabled = GetBit(value, 6);
+				//_rc.lcdMode = LCDMode(value & 0x03);
+				//_rc.coincidenceFlag = GetBit(value, 2);
+				_rc.horizontalBlankInterruptEnabled = GetBit(value, 3);
+				_rc.verticalBlankInterruptEnabledInLCD = GetBit(value, 4);
+				_rc.oamInterruptEnabled = GetBit(value, 5);
+				_rc.coincidenceInterruptEnabled = GetBit(value, 6);
 				
 				break;
 			
 			case 0xFF42:
 				// scroll y
 				_ioPorts[address - 0xFF00] = value;
-				_scrollY = value;
+				_rc.scrollY = value;
 				
 				break;
 			
 			case 0xFF43:
 				// scroll x
 				_ioPorts[address - 0xFF00] = value;
-				_scrollX = value;
+				_rc.scrollX = value;
 				
 				break;
 			
@@ -517,14 +518,14 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				_ioPorts[address - 0xFF00] = value;
 				
 				// reset counter
-				_lcdY = 0;
+				_rc.lcdY = 0;
 				
 				break;
 			
 			case 0xFF45:
 				// lcd y compare
 				_ioPorts[address - 0xFF00] = value;
-				_lcdYCompare = value;
+				_rc.lcdYCompare = value;
 				
 				break;
 			
@@ -543,10 +544,10 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// background palette data
 				_ioPorts[address - 0xFF00] = value;
 				
-				_monochromeBackgroundPalette.colors[0] = _monochromePalette.colors[value & 0b00000011];
-				_monochromeBackgroundPalette.colors[1] = _monochromePalette.colors[(value & 0b00001100) >> 2];
-				_monochromeBackgroundPalette.colors[2] = _monochromePalette.colors[(value & 0b00110000) >> 4];
-				_monochromeBackgroundPalette.colors[3] = _monochromePalette.colors[(value & 0b11000000) >> 6];
+				_rcClassic.monochromeBackgroundPalette.colors[0] = _monochromePalette.colors[value & 0b00000011];
+				_rcClassic.monochromeBackgroundPalette.colors[1] = _monochromePalette.colors[(value & 0b00001100) >> 2];
+				_rcClassic.monochromeBackgroundPalette.colors[2] = _monochromePalette.colors[(value & 0b00110000) >> 4];
+				_rcClassic.monochromeBackgroundPalette.colors[3] = _monochromePalette.colors[(value & 0b11000000) >> 6];
 				
 				break;
 			
@@ -554,10 +555,10 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// sprite palette 0 data
 				_ioPorts[address - 0xFF00] = value;
 				
-				_monochromeSpritePalette0.colors[0] = _monochromePalette.colors[value & 0b00000011];
-				_monochromeSpritePalette0.colors[1] = _monochromePalette.colors[(value & 0b00001100) >> 2];
-				_monochromeSpritePalette0.colors[2] = _monochromePalette.colors[(value & 0b00110000) >> 4];
-				_monochromeSpritePalette0.colors[3] = _monochromePalette.colors[(value & 0b11000000) >> 6];
+				_rcClassic.monochromeSpritePalette0.colors[0] = _monochromePalette.colors[value & 0b00000011];
+				_rcClassic.monochromeSpritePalette0.colors[1] = _monochromePalette.colors[(value & 0b00001100) >> 2];
+				_rcClassic.monochromeSpritePalette0.colors[2] = _monochromePalette.colors[(value & 0b00110000) >> 4];
+				_rcClassic.monochromeSpritePalette0.colors[3] = _monochromePalette.colors[(value & 0b11000000) >> 6];
 				
 				break;
 			
@@ -565,24 +566,24 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// sprite palette 1 data
 				_ioPorts[address - 0xFF00] = value;
 				
-				_monochromeSpritePalette1.colors[0] = _monochromePalette.colors[value & 0b00000011];
-				_monochromeSpritePalette1.colors[1] = _monochromePalette.colors[(value & 0b00001100) >> 2];
-				_monochromeSpritePalette1.colors[2] = _monochromePalette.colors[(value & 0b00110000) >> 4];
-				_monochromeSpritePalette1.colors[3] = _monochromePalette.colors[(value & 0b11000000) >> 6];
+				_rcClassic.monochromeSpritePalette1.colors[0] = _monochromePalette.colors[value & 0b00000011];
+				_rcClassic.monochromeSpritePalette1.colors[1] = _monochromePalette.colors[(value & 0b00001100) >> 2];
+				_rcClassic.monochromeSpritePalette1.colors[2] = _monochromePalette.colors[(value & 0b00110000) >> 4];
+				_rcClassic.monochromeSpritePalette1.colors[3] = _monochromePalette.colors[(value & 0b11000000) >> 6];
 				
 				break;
 			
 			case 0xFF4A:
 				// window y
 				_ioPorts[address - 0xFF00] = value;
-				_windowY = value;
+				_rc.windowY = value;
 				
 				break;
 			
 			case 0xFF4B:
 				// lcd y compare
 				_ioPorts[address - 0xFF00] = value;
-				_windowX = value - 7;
+				_rc.windowX = value - 7;
 				
 				break;
 			
@@ -627,23 +628,23 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 				// new dma length/mode/start
 				_ioPorts[address - 0xFF00] = value;
 				
-				if (GetBit(value, 7) && !_hBlankDMATransferActive)
+				if (GetBit(value, 7) && !_rcColor.horizontalBlankDMATransferActive)
 				{
 					int source = JoinBytes(_ioPorts[0xFF51 - 0xFF00], _ioPorts[0xFF52 - 0xFF00]) & 0x000F;
 					int destination = JoinBytes(_ioPorts[0xFF53 - 0xFF00], _ioPorts[0xFF54 - 0xFF00]) & 0xE00F;
 					int length = ((value & 0x7F) + 1) * 0x10;
 				
-					_hBlankDMATransferActive = GBC_TRUE;
-					_hBlankDMATransferSourceAddress = source;
-					_hBlankDMATransferDestinationAddress = destination;
-					_hBlankDMATransferLength = length;
-					_currentHBlankDMATransferAddressOffset = 0x0000;
+					_rcColor.horizontalBlankDMATransferActive = GBC_TRUE;
+					_rcColor.horizontalBlankDMATransferSourceAddress = source;
+					_rcColor.horizontalBlankDMATransferDestinationAddress = destination;
+					_rcColor.horizontalBlankDMATransferLength = length;
+					_rcColor.currentHorizontalBlankDMATransferAddressOffset = 0x0000;
 					
 					_ioPorts[address - 0xFF00] = SetBit(_ioPorts[address - 0xFF00], 7, GBC_FALSE);
 				}
-				else if (!GetBit(value, 7) && _hBlankDMATransferActive)
+				else if (!GetBit(value, 7) && _rcColor.horizontalBlankDMATransferActive)
 				{
-					_hBlankDMATransferActive = GBC_FALSE;
+					_rcColor.horizontalBlankDMATransferActive = GBC_FALSE;
 					_ioPorts[address - 0xFF00] = SetBit(_ioPorts[address - 0xFF00], 7, GBC_TRUE);
 				}
 				else
@@ -689,18 +690,18 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 					int palette = (_ioPorts[0xFF68 - 0xFF00] & 0x3F) / 8;
 					int color = ((_ioPorts[0xFF68 - 0xFF00] & 0x3F) % 8) / 2;
 					
-					_colorBackgroundPalettes[palette].colors[color].red = value & 0b00011111;
-					_colorBackgroundPalettes[palette].colors[color].green &= 0b00011000;
-					_colorBackgroundPalettes[palette].colors[color].green |= (value >> 5) & 0b00000111;
+					_rcColor.colorBackgroundPalettes[palette].colors[color].red = value & 0b00011111;
+					_rcColor.colorBackgroundPalettes[palette].colors[color].green &= 0b00011000;
+					_rcColor.colorBackgroundPalettes[palette].colors[color].green |= (value >> 5) & 0b00000111;
 				}
 				else
 				{
 					int palette = (_ioPorts[0xFF68 - 0xFF00] & 0x3F) / 8;
 					int color = ((_ioPorts[0xFF68 - 0xFF00] & 0x3F) % 8) / 2;
 					
-					_colorBackgroundPalettes[palette].colors[color].green &= 0b00000111;
-					_colorBackgroundPalettes[palette].colors[color].green |= (value << 3) & 0b00011000;
-					_colorBackgroundPalettes[palette].colors[color].blue = (value >> 2) & 0b00011111;
+					_rcColor.colorBackgroundPalettes[palette].colors[color].green &= 0b00000111;
+					_rcColor.colorBackgroundPalettes[palette].colors[color].green |= (value << 3) & 0b00011000;
+					_rcColor.colorBackgroundPalettes[palette].colors[color].blue = (value >> 2) & 0b00011111;
 				}
 				
 				if (_colorBackgroundPaletteIndexAutoIncrement) _ioPorts[0xFF68 - 0xFF00]++; // take care because of bti 7
@@ -726,18 +727,18 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 					int palette = (_ioPorts[0xFF6A - 0xFF00] & 0x3F) / 8;
 					int color = ((_ioPorts[0xFF6A - 0xFF00] & 0x3F) % 8) / 2;
 					
-					_colorSpritePalettes[palette].colors[color].red = value & 0b00011111;
-					_colorSpritePalettes[palette].colors[color].green &= 0b00011000;
-					_colorSpritePalettes[palette].colors[color].green |= (value >> 5) & 0b00000111;
+					_rcColor.colorSpritePalettes[palette].colors[color].red = value & 0b00011111;
+					_rcColor.colorSpritePalettes[palette].colors[color].green &= 0b00011000;
+					_rcColor.colorSpritePalettes[palette].colors[color].green |= (value >> 5) & 0b00000111;
 				}
 				else
 				{
 					int palette = (_ioPorts[0xFF6A - 0xFF00] & 0x3F) / 8;
 					int color = ((_ioPorts[0xFF6A - 0xFF00] & 0x3F) % 8) / 2;
 					
-					_colorSpritePalettes[palette].colors[color].green &= 0b00000111;
-					_colorSpritePalettes[palette].colors[color].green |= (value << 3) & 0b00011000;
-					_colorSpritePalettes[palette].colors[color].blue = (value >> 2) & 0b00011111;
+					_rcColor.colorSpritePalettes[palette].colors[color].green &= 0b00000111;
+					_rcColor.colorSpritePalettes[palette].colors[color].green |= (value << 3) & 0b00011000;
+					_rcColor.colorSpritePalettes[palette].colors[color].blue = (value >> 2) & 0b00011111;
 				}
 				
 			
@@ -768,11 +769,11 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 		// interrupt enable
 		_interruptEnableRegister = value;
 		
-		_vBlankInterruptEnabled = GetBit(value, IInterruptHandler::VERTICAL_BLANK_INTERRUPT_ENABLE_BIT);
-		_lcdStatusInterruptEnabled = GetBit(value, IInterruptHandler::LCD_STATUS_INTERRUPT_ENABLE_BIT);
-		_timerInterruptEnabled = GetBit(value, IInterruptHandler::TIMER_INTERRUPT_ENABLE_BIT);
-		_serialInterruptEnabled = GetBit(value, IInterruptHandler::SERIAL_INTERRUPT_ENABLE_BIT);
-		_joypadInterruptEnabled = GetBit(value, IInterruptHandler::JOYPAD_INTERRUPT_ENABLE_BIT);
+		_rc.verticalBlankInterruptEnabled = GetBit(value, IInterruptHandler::VERTICAL_BLANK_INTERRUPT_ENABLE_BIT);
+		_rc.lcdStatusInterruptEnabled = GetBit(value, IInterruptHandler::LCD_STATUS_INTERRUPT_ENABLE_BIT);
+		_rc.timerInterruptEnabled = GetBit(value, IInterruptHandler::TIMER_INTERRUPT_ENABLE_BIT);
+		_rc.serialInterruptEnabled = GetBit(value, IInterruptHandler::SERIAL_INTERRUPT_ENABLE_BIT);
+		_rc.joypadInterruptEnabled = GetBit(value, IInterruptHandler::JOYPAD_INTERRUPT_ENABLE_BIT);
 	}
 	else
 	{
@@ -782,16 +783,16 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 
 void gbc::core::GameboyColor::DoOAMSearch()
 {
-	_lcdMode = LCDMode::SEARCHING_OAM;
+	_rc.lcdMode = LCDMode::SEARCHING_OAM;
 	
-	_coincidenceFlag = (_lcdY == _lcdYCompare);
+	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
 	
-	if (_oamInterruptEnabled)
+	if (_rc.oamInterruptEnabled)
 	{
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
-	if (_coincidenceInterruptEnabled && _coincidenceFlag)
+	if (_rc.coincidenceInterruptEnabled && _rc.coincidenceFlag)
 	{
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
@@ -801,20 +802,20 @@ void gbc::core::GameboyColor::DoOAMSearch()
 
 void gbc::core::GameboyColor::DoTransferData()
 {
-	_lcdMode = LCDMode::TRANSFERRING_DATA;
+	_rc.lcdMode = LCDMode::TRANSFERRING_DATA;
 	
 	UpdateTiles();
 	UpdateBackgroundMapElements();
 	UpdateTileMapAttributes();
 	UpdateSpriteAttributes();
 	
-	if (_lcdDisplayEnabled)
+	if (_rc.lcdDisplayEnabled)
 	{
 		if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	        _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 		    !_forceClassicGameboy)
 		{
-			if (!_backgroundDisplayEnabled)
+			if (!_rc.backgroundDisplayEnabled)
 			{
 				DrawBackgroundMap(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3);
 				DrawWindowMap(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3);
@@ -822,36 +823,36 @@ void gbc::core::GameboyColor::DoTransferData()
 			}
 			else
 			{
-				if (_backgroundDisplayEnabled)
+				if (_rc.backgroundDisplayEnabled)
 				{
 					DrawBackgroundMap(COLOR_0, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
 				}
 				
-				if (_windowDisplayEnabled)
+				if (_rc.windowDisplayEnabled)
 				{
 					DrawWindowMap(COLOR_0, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
 				}
 				
 				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND);
 				
-				if (_backgroundDisplayEnabled)
+				if (_rc.backgroundDisplayEnabled)
 				{
 					DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
 				}
 				
-				if (_windowDisplayEnabled)
+				if (_rc.windowDisplayEnabled)
 				{
 					DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::USE_OAM_PRIORITY_BIT);
 				}
 				
 				DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND);
 				
-				if (_backgroundDisplayEnabled)
+				if (_rc.backgroundDisplayEnabled)
 				{
 					DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::BACKGROUND_PRIORITY);
 				}
 				
-				if (_windowDisplayEnabled)
+				if (_rc.windowDisplayEnabled)
 				{
 					DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, BackgroundToOAMPriority::BACKGROUND_PRIORITY);
 				}
@@ -859,24 +860,24 @@ void gbc::core::GameboyColor::DoTransferData()
 		}
 		else
 		{
-			if (_backgroundDisplayEnabled)
+			if (_rc.backgroundDisplayEnabled)
 			{
 				DrawBackgroundMap(COLOR_0);
 			}
 			
-			if (_windowDisplayEnabled)
+			if (_rc.windowDisplayEnabled)
 			{
 				DrawWindowMap(COLOR_0);
 			}
 			
 			DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND);
 			
-			if (_backgroundDisplayEnabled)
+			if (_rc.backgroundDisplayEnabled)
 			{
 				DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3);
 			}
 			
-			if (_windowDisplayEnabled)
+			if (_rc.windowDisplayEnabled)
 			{
 				DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3);
 			}
@@ -888,71 +889,76 @@ void gbc::core::GameboyColor::DoTransferData()
 
 void gbc::core::GameboyColor::DoHBlank()
 {
-	_lcdMode = LCDMode::HORIZONTAL_BLANK;
+	_rc.lcdMode = LCDMode::HORIZONTAL_BLANK;
 	
-	if (_hBlankInterruptEnabled)
+	if (_rc.horizontalBlankInterruptEnabled)
 	{
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
-	if (_hBlankDMATransferActive)
+	if (_rcColor.horizontalBlankDMATransferActive)
 	{
-		if (_currentHBlankDMATransferAddressOffset < _hBlankDMATransferLength)
+		if (_rcColor.currentHorizontalBlankDMATransferAddressOffset <
+		    _rcColor.horizontalBlankDMATransferLength)
 		{
-			int currentSource = _hBlankDMATransferSourceAddress + _currentHBlankDMATransferAddressOffset;
-			int currentDestination = _hBlankDMATransferDestinationAddress + _currentHBlankDMATransferAddressOffset;
+			int currentSource = _rcColor.horizontalBlankDMATransferSourceAddress +
+			                    _rcColor.currentHorizontalBlankDMATransferAddressOffset;
+			
+			int currentDestination = _rcColor.horizontalBlankDMATransferDestinationAddress +
+			                         _rcColor.currentHorizontalBlankDMATransferAddressOffset;
 			
 			for (int i = 0; i < 0x10; i++)
 			{
 				WriteByte(currentDestination + i, ReadByte(currentSource + i));
 			}
 			
-			_currentHBlankDMATransferAddressOffset += 0x10;
+			_rcColor.currentHorizontalBlankDMATransferAddressOffset += 0x10;
 			
 			_ioPorts[0xFF55 - 0xFF00] &= 0x80;
-			_ioPorts[0xFF55 - 0xFF00] |= (((_hBlankDMATransferLength - _currentHBlankDMATransferAddressOffset) / 0x10) - 1) & 0x7F;
+			_ioPorts[0xFF55 - 0xFF00] |= (((_rcColor.horizontalBlankDMATransferLength -
+			                                _rcColor.currentHorizontalBlankDMATransferAddressOffset) / 0x10) - 1) & 0x7F;
 		}
 		else
 		{
 			_ioPorts[0xFF55 - 0xFF00] = 0xFF;
 
-			_hBlankDMATransferActive = GBC_FALSE;
-			_hBlankDMATransferSourceAddress = 0x0000;
-			_hBlankDMATransferDestinationAddress = 0x0000;
-			_hBlankDMATransferLength = 0x0000;
-			_currentHBlankDMATransferAddressOffset = 0x0000;
+			_rcColor.horizontalBlankDMATransferActive = GBC_FALSE;
+			_rcColor.horizontalBlankDMATransferSourceAddress = 0x0000;
+			_rcColor.horizontalBlankDMATransferDestinationAddress = 0x0000;
+			_rcColor.horizontalBlankDMATransferLength = 0x0000;
+			_rcColor.currentHorizontalBlankDMATransferAddressOffset = 0x0000;
 		}
 	}
 
-	if (_lcdY < 144)
+	if (_rc.lcdY < 144)
 	{
-		_lcdY++;
+		_rc.lcdY++;
 	}
 }
 
 void gbc::core::GameboyColor::DoVBlank()
 {
-	_lcdMode = LCDMode::VERTICAL_BLANK;
+	_rc.lcdMode = LCDMode::VERTICAL_BLANK;
 	
-	_coincidenceFlag = (_lcdY == _lcdYCompare);
+	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
 	
-	if (_coincidenceInterruptEnabled && _coincidenceFlag)
+	if (_rc.coincidenceInterruptEnabled && _rc.coincidenceFlag)
 	{
 		_hybr1s80.SignalLCDStatusInterrupt();
 	}
 	
-	if (_vBlankInterruptEnabled && !_vBlankInterruptAlreadyRequested)
+	if (_rc.verticalBlankInterruptEnabled && !_rc.verticalBlankInterruptAlreadyRequested)
 	{
 		_hybr1s80.SignalVBlankInterrupt();
-		_vBlankInterruptAlreadyRequested = GBC_TRUE;
+		_rc.verticalBlankInterruptAlreadyRequested = GBC_TRUE;
 	}
 	
-	if (_lcdY >= 144)
+	if (_rc.lcdY >= 144)
 	{
-		_lcdY++;
+		_rc.lcdY++;
 	}
 	
-	if (_lcdY > 153)
+	if (_rc.lcdY > 153)
 	{
 		if (_lcd)
 		{
@@ -963,8 +969,8 @@ void gbc::core::GameboyColor::DoVBlank()
 			ERROR("GameboyColor: No LCD set.");
 		}
 		
-		_lcdY = 0;
-		_vBlankInterruptAlreadyRequested = GBC_FALSE;
+		_rc.lcdY = 0;
+		_rc.verticalBlankInterruptAlreadyRequested = GBC_FALSE;
 	}
 }
 
@@ -972,10 +978,10 @@ void gbc::core::GameboyColor::UpdateTiles()
 {
 	int lastTile = 0;
 	
-	while (_changedTiles.size() > 0)
+	while (_rc.changedTiles.size() > 0)
 	{
-		int videoRamBank = _changedTiles.back()[0];
-		int tileNumber = _changedTiles.back()[1];
+		int videoRamBank = _rc.changedTiles.back()[0];
+		int tileNumber = _rc.changedTiles.back()[1];
 		int videoRamAddress = tileNumber << 4; // * 0x10
 		
 		for (int y = 0; y < Tile::HEIGHT; y++)
@@ -985,82 +991,84 @@ void gbc::core::GameboyColor::UpdateTiles()
 			
 			for (int x = 0; x < Tile::WIDTH; x++)
 			{
-				_tiles[videoRamBank][tileNumber].data[x][y] = (((colorNumbersHigh << 1) >> (7 - x)) & 0b10) |
-				                                              ((colorNumbersLow >> (7 - x)) & 0b01);
+				_rc.tiles[videoRamBank][tileNumber].data[x][y] = (((colorNumbersHigh << 1) >> (7 - x)) & 0b10) |
+				                                                 ((colorNumbersLow >> (7 - x)) & 0b01);
 			}
 		}
 		
-		delete[] _changedTiles.back();
+		delete[] _rc.changedTiles.back();
 		
-		_changedTiles.pop_back();
+		_rc.changedTiles.pop_back();
 	}
 }
 
 void gbc::core::GameboyColor::UpdateBackgroundMapElements()
 {
-	while (_changedBackgroundMapElements.size() > 0)
+	while (_rc.changedTileMapElements.size() > 0)
 	{
-		int mapNumber = _changedBackgroundMapElements.back()[0];
-		int mapElementNumber = _changedBackgroundMapElements.back()[1];
+		int mapNumber = _rc.changedTileMapElements.back()[0];
+		int mapElementNumber = _rc.changedTileMapElements.back()[1];
 		
-		_tileMaps[mapNumber].data
+		_rc.tileMaps[mapNumber].data
 		[mapElementNumber % TileMap::WIDTH]
 		[mapElementNumber / TileMap::WIDTH] = _videoRam[0][(mapNumber == 0) ?
 		                                                   (0x9800 - 0x8000 + mapElementNumber) :
 		                                                   (0x9C00 - 0x8000 + mapElementNumber)];
 		
-		delete[] _changedBackgroundMapElements.back();
+		delete[] _rc.changedTileMapElements.back();
 		
-		_changedBackgroundMapElements.pop_back();
+		_rc.changedTileMapElements.pop_back();
 	}
 }
 
 void gbc::core::GameboyColor::UpdateTileMapAttributes()
 {
-	while (_changedTileMapAttributes.size() > 0)
+	while (_rcColor.changedTileMapAttributes.size() > 0)
 	{
-		int mapNumber = _changedTileMapAttributes.back()[0];
-		int mapElementNumber = _changedTileMapAttributes.back()[1];
+		int mapNumber = _rcColor.changedTileMapAttributes.back()[0];
+		int mapElementNumber = _rcColor.changedTileMapAttributes.back()[1];
 		
-		int backgroundMapAttribute = _videoRam[1][(mapNumber == 0) ?
-		                             (0x9800 + mapElementNumber) :
-		                             (0x9C00 + mapElementNumber)];
+		int tileMapAttribute = _videoRam[1][(mapNumber == 0) ?
+		                       (0x9800 + mapElementNumber) :
+		                       (0x9C00 + mapElementNumber)];
 		
-		_backgroundMapAttributes[mapNumber][mapElementNumber].backgroundColorPaletteNumber = backgroundMapAttribute & 0x07;
-		_backgroundMapAttributes[mapNumber][mapElementNumber].tileVideoRamBankNumber = (backgroundMapAttribute >> 3) & 0x01;
-		_backgroundMapAttributes[mapNumber][mapElementNumber].horizontalFlip = HorizontalFlip((backgroundMapAttribute >> 5) & 0x01);
-		_backgroundMapAttributes[mapNumber][mapElementNumber].verticalFlip = VerticalFlip((backgroundMapAttribute >> 6) & 0x01);
-		_backgroundMapAttributes[mapNumber][mapElementNumber].backgroundToOAMPriority = BackgroundToOAMPriority((backgroundMapAttribute >> 7) & 0x01);
+		TileMapAttribute &tileMapAttributeToChange = _rcColor.tileMapAttributes[mapNumber][mapElementNumber];
 		
-		delete[] _changedTileMapAttributes.back();
+		tileMapAttributeToChange.backgroundColorPaletteNumber = tileMapAttribute & 0x07;
+		tileMapAttributeToChange.tileVideoRamBankNumber = (tileMapAttribute >> 3) & 0x01;
+		tileMapAttributeToChange.horizontalFlip = HorizontalFlip((tileMapAttribute >> 5) & 0x01);
+		tileMapAttributeToChange.verticalFlip = VerticalFlip((tileMapAttribute >> 6) & 0x01);
+		tileMapAttributeToChange.backgroundToOAMPriority = BackgroundToOAMPriority((tileMapAttribute >> 7) & 0x01);
 		
-		_changedTileMapAttributes.pop_back();
+		delete[] _rcColor.changedTileMapAttributes.back();
+		
+		_rcColor.changedTileMapAttributes.pop_back();
 	}
 }
 
 void gbc::core::GameboyColor::UpdateSpriteAttributes()
 {
-	while (_changedSpriteAttributes.size() > 0)
+	while (_rc.changedSpriteAttributes.size() > 0)
 	{
-		int spriteAttributeNumber = _changedSpriteAttributes.back();
+		int spriteAttributeNumber = _rc.changedSpriteAttributes.back();
 		int oamAddress = spriteAttributeNumber << 2; // * 4
 		
 		int spriteAttributeFlags = _oam[oamAddress + 3];
 		
-		_spriteAttributes[spriteAttributeNumber].y = _oam[oamAddress] - 16;
-		_spriteAttributes[spriteAttributeNumber].x = _oam[oamAddress + 1] - 8;
-		_spriteAttributes[spriteAttributeNumber].tileNumber = _oam[oamAddress + 2];
+		SpriteAttribute &spriteAttributeToChange = _rc.spriteAttributes[spriteAttributeNumber];
 		
-		_spriteAttributes[spriteAttributeNumber].spriteColorPaletteNumber = spriteAttributeFlags & 0x07;
-		_spriteAttributes[spriteAttributeNumber].tileVideoRamBankNumber = (spriteAttributeFlags >> 3) & 0x01;
-		_spriteAttributes[spriteAttributeNumber].spriteMonochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
-		_spriteAttributes[spriteAttributeNumber].horizontalFlip = HorizontalFlip((spriteAttributeFlags >> 5) & 0x01);
-		_spriteAttributes[spriteAttributeNumber].verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
-		_spriteAttributes[spriteAttributeNumber].spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);
+		spriteAttributeToChange.y = _oam[oamAddress] - 16;
+		spriteAttributeToChange.x = _oam[oamAddress + 1] - 8;
+		spriteAttributeToChange.tileNumber = _oam[oamAddress + 2];
 		
-		/*std::cout << "updated sprite attribute, tilenumber nao: " << ToDec(_spriteAttributes[spriteAttributeNumber].tileNumber) << std::endl << std::endl;*/
+		spriteAttributeToChange.spriteColorPaletteNumber = spriteAttributeFlags & 0x07;
+		spriteAttributeToChange.tileVideoRamBankNumber = (spriteAttributeFlags >> 3) & 0x01;
+		spriteAttributeToChange.spriteMonochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
+		spriteAttributeToChange.horizontalFlip = HorizontalFlip((spriteAttributeFlags >> 5) & 0x01);
+		spriteAttributeToChange.verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
+		spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);
 		
-		_changedSpriteAttributes.pop_back();
+		_rc.changedSpriteAttributes.pop_back();
 	}
 }
 
@@ -1069,19 +1077,19 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors,
 {
 	for (int i = 0; i < 40; i++)
 	{
-		SpriteAttribute spriteAttribute = _spriteAttributes[i];
+		SpriteAttribute spriteAttribute = _rc.spriteAttributes[i];
 		
 		if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
 		{
 			ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
-			                            _monochromeSpritePalette0 :
-			                            _monochromeSpritePalette1;
+			                            _rcClassic.monochromeSpritePalette0 :
+			                            _rcClassic.monochromeSpritePalette1;
 			
 			if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 			    _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 			    !_forceClassicGameboy)
 			{
-				colorPalette = _colorSpritePalettes[spriteAttribute.spriteColorPaletteNumber];
+				colorPalette = _rcColor.colorSpritePalettes[spriteAttribute.spriteColorPaletteNumber];
 			}
 			
 			if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
@@ -1089,7 +1097,7 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors,
 			    !_forceClassicGameboy)
 			{
 				DrawTile(spriteAttribute.x, spriteAttribute.y,
-						 _tiles[spriteAttribute.tileVideoRamBankNumber][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+						 _rc.tiles[spriteAttribute.tileVideoRamBankNumber][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 						 spriteAttribute.horizontalFlip,
 						 spriteAttribute.verticalFlip,
 						 colorPalette,
@@ -1098,7 +1106,7 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors,
 			else
 			{
 				DrawTile(spriteAttribute.x, spriteAttribute.y,
-						 _tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+						 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 						 spriteAttribute.horizontalFlip,
 						 spriteAttribute.verticalFlip,
 						 colorPalette,
@@ -1112,19 +1120,19 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors)
 {
 	for (int i = 0; i < 40; i++)
 	{
-		SpriteAttribute spriteAttribute = _spriteAttributes[i];
+		SpriteAttribute spriteAttribute = _rc.spriteAttributes[i];
 		
 		int tileNumber = (0x8000 - 0x8000) + spriteAttribute.tileNumber;
 		
 		ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
-			                        _monochromeSpritePalette0 :
-			                        _monochromeSpritePalette1;
+			                        _rcClassic.monochromeSpritePalette0 :
+			                        _rcClassic.monochromeSpritePalette1;
 		
 		if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	        _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 		    !_forceClassicGameboy)
 		{
-			colorPalette = _colorSpritePalettes[spriteAttribute.spriteColorPaletteNumber];
+			colorPalette = _rcColor.colorSpritePalettes[spriteAttribute.spriteColorPaletteNumber];
 		}			
 	    
 		if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
@@ -1132,7 +1140,7 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors)
 		    !_forceClassicGameboy)
 		{
 			DrawTile(spriteAttribute.x, spriteAttribute.y,
-					 _tiles[spriteAttribute.tileVideoRamBankNumber][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+					 _rc.tiles[spriteAttribute.tileVideoRamBankNumber][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 					 spriteAttribute.horizontalFlip,
 					 spriteAttribute.verticalFlip,
 					 colorPalette,
@@ -1141,7 +1149,7 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors)
 		else
 		{
 			DrawTile(spriteAttribute.x, spriteAttribute.y,
-					 _tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+					 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 					 spriteAttribute.horizontalFlip,
 					 spriteAttribute.verticalFlip,
 					 colorPalette,
@@ -1155,8 +1163,8 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors,
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		int mapElementX = ((mapX * Tile::WIDTH) + _scrollX) / Tile::WIDTH;
-		int mapElementY = (_lcdY + _scrollY) / Tile::HEIGHT;
+		int mapElementX = ((mapX * Tile::WIDTH) + _rc.scrollX) / Tile::WIDTH;
+		int mapElementY = (_rc.lcdY + _rc.scrollY) / Tile::HEIGHT;
 		
 		if (mapElementX < 0)
 		{
@@ -1173,14 +1181,14 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors,
 		
 		int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 		
-		TileMapAttribute backgroundMapAttribute = _backgroundMapAttributes
-			                                            [_backgroundTileMapDisplaySelect]
+		TileMapAttribute backgroundMapAttribute = _rcColor.tileMapAttributes
+			                                            [_rc.backgroundTileMapDisplaySelect]
 			                                            [mapElementNumber];
 		
 		if (backgroundMapAttribute.backgroundToOAMPriority == backgroundToOAMPriority)
 		{
-			DrawMapTile(mapX, -_scrollX, -_scrollY, 
-			            _backgroundTileMapDisplaySelect,
+			DrawMapTile(mapX, -_rc.scrollX, -_rc.scrollY, 
+			            _rc.backgroundTileMapDisplaySelect,
 			            enabledColors,
 			            _cartridge->GetHeader().platformSupport);
 		}
@@ -1191,8 +1199,8 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		DrawMapTile(mapX, -_scrollX, -_scrollY, 
-		            _backgroundTileMapDisplaySelect,
+		DrawMapTile(mapX, -_rc.scrollX, -_rc.scrollY, 
+		            _rc.backgroundTileMapDisplaySelect,
 		            enabledColors,
 		            _cartridge->GetHeader().platformSupport);
 	}
@@ -1203,8 +1211,8 @@ void gbc::core::GameboyColor::DrawWindowMap(int enabledColors,
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		int mapElementX = ((mapX * Tile::WIDTH) - _windowX) / Tile::WIDTH;
-		int mapElementY = (_lcdY - _windowY) / Tile::HEIGHT;
+		int mapElementX = ((mapX * Tile::WIDTH) - _rc.windowX) / Tile::WIDTH;
+		int mapElementY = (_rc.lcdY - _rc.windowY) / Tile::HEIGHT;
 		
 		if (mapElementX < 0)
 		{
@@ -1221,14 +1229,14 @@ void gbc::core::GameboyColor::DrawWindowMap(int enabledColors,
 		
 		int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 		
-		TileMapAttribute backgroundMapAttribute = _backgroundMapAttributes
-			                                            [_windowTileMapDisplaySelect]
+		TileMapAttribute backgroundMapAttribute = _rcColor.tileMapAttributes
+			                                            [_rc.windowTileMapDisplaySelect]
 			                                            [mapElementNumber];
 		
 		if (backgroundMapAttribute.backgroundToOAMPriority == backgroundToOAMPriority)
 		{
-			DrawMapTile(mapX, _windowX, _windowY,
-			            _windowTileMapDisplaySelect,
+			DrawMapTile(mapX, _rc.windowX, _rc.windowY,
+			            _rc.windowTileMapDisplaySelect,
 			            enabledColors,
 			            _cartridge->GetHeader().platformSupport);
 		}
@@ -1239,8 +1247,8 @@ void gbc::core::GameboyColor::DrawWindowMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		DrawMapTile(mapX, _windowX, _windowY,
-		            _windowTileMapDisplaySelect,
+		DrawMapTile(mapX, _rc.windowX, _rc.windowY,
+		            _rc.windowTileMapDisplaySelect,
 		            enabledColors,
 		            _cartridge->GetHeader().platformSupport);
 	}
@@ -1255,10 +1263,10 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 {
 	//if (tileMapDisplaySelect == 0) return; ////////////////////
 	int x = (mapX * Tile::WIDTH) + xOffset;
-	int y = (_lcdY - yOffset) - ((_lcdY - yOffset) % Tile::HEIGHT) + yOffset;
+	int y = (_rc.lcdY - yOffset) - ((_rc.lcdY - yOffset) % Tile::HEIGHT) + yOffset;
 	
 	int mapElementX = ((mapX * Tile::WIDTH) - xOffset) / Tile::WIDTH;
-	int mapElementY = (_lcdY - yOffset) / Tile::HEIGHT;
+	int mapElementY = (_rc.lcdY - yOffset) / Tile::HEIGHT;
 	
 	if (mapElementX < 0)
 	{
@@ -1275,11 +1283,11 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 	
 	int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 	
-	TileMapAttribute backgroundMapAttribute = _backgroundMapAttributes
+	TileMapAttribute backgroundMapAttribute = _rcColor.tileMapAttributes
 		                                      [tileMapDisplaySelect]
 		                                      [mapElementNumber];
 	
-	int backgroundMapElement = _tileMaps
+	int backgroundMapElement = _rc.tileMaps
 		                       [tileMapDisplaySelect].data
 		                       [mapElementX][mapElementY];
 	
@@ -1292,19 +1300,19 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 		tileVideoRamBankNumber = backgroundMapAttribute.tileVideoRamBankNumber;
 	}
 	
-	int tileNumber = (!_backgroundAndWindowTileDataSelect) ?
+	int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
 		             (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
 		             (((0x8000 - 0x8000) / 16) + backgroundMapElement);
 	
-	Tile tile = _tiles[tileVideoRamBankNumber][tileNumber];
+	Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
 	
-	ColorPalette colorPalette = _monochromeBackgroundPalette;
+	ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
 	
 	if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	    _cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_ONLY) &&
 	    !_forceClassicGameboy)
 	{
-		colorPalette = _colorBackgroundPalettes[backgroundMapAttribute.backgroundColorPaletteNumber];
+		colorPalette = _rcColor.colorBackgroundPalettes[backgroundMapAttribute.backgroundColorPaletteNumber];
 	}
 	
 	if ((_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
@@ -1336,7 +1344,7 @@ void gbc::core::GameboyColor::DrawTile(int x, int y,
                                        ColorPalette colorPalette,
                                        int enabledColors)
 {
-	int tileY = _lcdY - y;
+	int tileY = _rc.lcdY - y;
 	
 	if (tileY >= 0 && tileY < Tile::HEIGHT)
 	{
@@ -1345,7 +1353,7 @@ void gbc::core::GameboyColor::DrawTile(int x, int y,
 			int scanlinePosition = x + tileX;
 			
 			if (scanlinePosition >= 0 && scanlinePosition < Frame::WIDTH &&
-			    _lcdY >= 0 && _lcdY < Frame::HEIGHT)
+			    _rc.lcdY >= 0 && _rc.lcdY < Frame::HEIGHT)
 			{
 				int realTileX = tileX;
 				int realTileY = tileY;
@@ -1367,7 +1375,7 @@ void gbc::core::GameboyColor::DrawTile(int x, int y,
 				    ((colorNumber == 2) && (enabledColors & COLOR_2)) ||
 				    ((colorNumber == 3) && (enabledColors & COLOR_3)))
 				{
-					_rawFrame[_lcdY * Frame::WIDTH + scanlinePosition] = colorPalette.colors[colorNumber];
+					_rawFrame[_rc.lcdY * Frame::WIDTH + scanlinePosition] = colorPalette.colors[colorNumber];
 				}
 			}
 		}

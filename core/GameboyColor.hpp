@@ -128,86 +128,15 @@ namespace gbc
 			int _deviderCounter;
 			int _timerCounter;
 			
-			RenderContext _renderContext;
-			
-			// 
-			// replaces all this
-			// 
-			//   ||
-			//   ||
-			//   \/
-			
-			/////////////////////////////7
-			// interrupt requests
-			int _vBlankInterruptAlreadyRequested;
-			
-			// interrupt enablers
-			int _vBlankInterruptEnabled;
-			int _lcdStatusInterruptEnabled;
-			int _timerInterruptEnabled;
-			int _serialInterruptEnabled;
-			int _joypadInterruptEnabled;
-			
-			// lcd control
-			int _lcdDisplayEnabled;
-			int _windowTileMapDisplaySelect;
-			int _windowDisplayEnabled;
-			int _backgroundAndWindowTileDataSelect;
-			int _backgroundTileMapDisplaySelect;
-			int _spriteSize;
-			int _spriteDisplayEnabled;
-			int _backgroundDisplayEnabled;
-			
-			// lcd status
-			LCDMode _lcdMode;
-			int _coincidenceFlag;
-			int _hBlankInterruptEnabled;
-			int _vBlankInterruptEnabledInLCD;
-			int _oamInterruptEnabled;
-			int _coincidenceInterruptEnabled;
-			
-			// lcd position and scrolling
-			int _scrollX;
-			int _scrollY;
-			int _lcdY;
-			int _lcdYCompare;
-			int _windowY;
-			int _windowX;
-			
-			// lcd monochrome palettes
-			ColorPalette _monochromeBackgroundPalette;
-			ColorPalette _monochromeSpritePalette0;
-			ColorPalette _monochromeSpritePalette1;
 			ColorPalette _monochromePalette;
 			
-			// lcd color palettes
 			int _colorBackgroundPaletteIndexAutoIncrement;
-			ColorPalette _colorBackgroundPalettes[8];
 			int _colorSpritePaletteIndexAutoIncrement;
-			ColorPalette _colorSpritePalettes[8];
 			
-			// tile data
-			Tile _tiles[2][384];
-			std::vector<int *> _changedTiles; // (tile vram bank, tile number)
+			RenderContext _rc;
 			
-			// background map elements
-			TileMap _tileMaps[2];
-			std::vector<int *> _changedBackgroundMapElements;
-			
-			// background map attributes
-			TileMapAttribute _backgroundMapAttributes[2][32 * 32];
-			std::vector<int *> _changedTileMapAttributes;
-			
-			// sprite attributes
-			SpriteAttribute _spriteAttributes[40];
-			std::vector<int> _changedSpriteAttributes;
-			
-			// hblank dma transfer
-			int _hBlankDMATransferActive;
-			int _hBlankDMATransferSourceAddress;
-			int _hBlankDMATransferDestinationAddress;
-			int _hBlankDMATransferLength;
-			int _currentHBlankDMATransferAddressOffset;
+			RenderContext::GameboyClassicSpecificRenderContext &_rcClassic = _rc.gameboyClassicSpecific;
+			RenderContext::GameboyColorSpecificRenderContext &_rcColor = _rc.gameboyColorSpecific;
 		};
 	}
 }

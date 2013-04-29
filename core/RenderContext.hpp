@@ -17,14 +17,17 @@ namespace gbc
 		class RenderContext
 		{
 		public:
+			// memory bus
+			IMemoryBus *memoryBus;
+			
 			// interrupt handler
 			IInterruptHandler *interruptHandler;
 			
 			// interrupt requests
-			int vBlankInterruptAlreadyRequested;
+			int verticalBlankInterruptAlreadyRequested;
 			
 			// interrupt enablers
-			int vBlankInterruptEnabled;
+			int verticalBlankInterruptEnabled;
 			int lcdStatusInterruptEnabled;
 			int timerInterruptEnabled;
 			int serialInterruptEnabled;
@@ -53,32 +56,34 @@ namespace gbc
 			int scrollY;
 			int lcdY;
 			int lcdYCompare;
-			int windowY;
 			int windowX;
+			int windowY;
 			
 			// tile data
 			Tile tiles[2][384];
+			std::vector<int *> changedTiles;
 			
 			// background map elements
 			TileMap tileMaps[2];
+			std::vector<int *> changedTileMapElements;
 			
 			// sprite attributes
 			SpriteAttribute spriteAttributes[40];
 			std::vector<int> changedSpriteAttributes;
 			
-			struct
+			struct GameboyClassicSpecificRenderContext
 			{
 				// lcd monochrome palettes
 				ColorPalette monochromeBackgroundPalette;
 				ColorPalette monochromeSpritePalette0;
 				ColorPalette monochromeSpritePalette1;
-				ColorPalette monochromePalette;
-			} gameboySpecific;
+			} gameboyClassicSpecific;
 			
-			struct
+			struct GameboyColorSpecificRenderContext
 			{
 				// background map attributes
-				TileMapAttribute backgroundMapAttributes[2][32 * 32];
+				TileMapAttribute tileMapAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
+				std::vector<int *> changedTileMapAttributes;
 				
 				// lcd color palettes
 				ColorPalette colorBackgroundPalettes[8];
