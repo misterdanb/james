@@ -14,7 +14,7 @@ namespace gbc
 			static const int HEIGHT = 32;
 		
 		public:
-			int data[WIDTH][HEIGHT];
+			int data[WIDTH][HEIGHT] = { { 0, }, };
 		};
 	}
 }

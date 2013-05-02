@@ -3,10 +3,14 @@
 
 #include <vector>
 #include "gbc.hpp"
+#include "MemoryBus.hpp"
+#include "InterruptHandler.hpp"
 #include "Tile.hpp"
 #include "TileMap.hpp"
+#include "TileMapAttribute.hpp"
 #include "InterruptHandler.hpp"
 #include "LCDMode.hpp"
+#include "Frame.hpp"
 #include "SpriteAttribute.hpp"
 #include "ColorPalette.hpp"
 
@@ -17,11 +21,40 @@ namespace gbc
 		class RenderContext
 		{
 		public:
+			// memory dimensions
+			static const int VIDEO_RAM_BANKS = 2;
+			static const int VIDEO_RAM_BANK_SIZE = 0x2000;
+			
+			static const int WORK_RAM_BANKS = 8;
+			static const int WORK_RAM_BANK_SIZE = 0x1000;
+			
+			static const int OAM_SIZE = 0x80;
+			
+			static const int IO_PORTS_SIZE = 0x80;
+			
+			static const int HIGH_RAM_SIZE = 0x80;
+		
+		public:
+			// ram
+			int videoRam[VIDEO_RAM_BANKS][VIDEO_RAM_BANK_SIZE];
+			int workRam[WORK_RAM_BANKS][WORK_RAM_BANK_SIZE];
+			int oam[OAM_SIZE];
+			int ioPorts[IO_PORTS_SIZE];
+			int highRam[HIGH_RAM_SIZE];
+			int interruptEnableRegister;
+			
+			// ram banks
+			int selectedWorkRamBank;
+			int selectedVideoRamBank;
+			
 			// memory bus
 			IMemoryBus *memoryBus;
 			
 			// interrupt handler
 			IInterruptHandler *interruptHandler;
+			
+			// current scanline
+			Color rawFrame[Frame::WIDTH * Frame::HEIGHT];
 			
 			// interrupt requests
 			int verticalBlankInterruptAlreadyRequested;
@@ -90,11 +123,11 @@ namespace gbc
 				ColorPalette colorSpritePalettes[8];
 				
 				// hblank dma transfer
-				int horizontalBlankDMATransferActive;
-				int horizontalBlankDMATransferSourceAddress;
-				int horizontalBlankDMATransferDestinationAddress;
-				int horizontalBlankDMATransferLength;
-				int currentHorizontalBlankDMATransferAddressOffset;
+				int dmaTransferActive;
+				int dmaTransferSourceAddress;
+				int dmaTransferDestinationAddress;
+				int dmaTransferLength;
+				int currentDMATransferOffset;
 			} gameboyColorSpecific;
 		};
 	}

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "core/GameboyColor.hpp"
 #include "ui/GameWindow.hpp"
+#include "core/Vector2.template"
 
 int main(int argc, char *argv[])
 {

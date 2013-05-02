@@ -1,4 +1,4 @@
-CC=g++
+CC=clang++
 
 CFLAGS=-c -std=c++11 -O2
 CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O2
@@ -27,6 +27,8 @@ OBJECTS=core/gbc.o \
 	core/Frame.o \
 	core/LCD.o \
 	core/Joypad.o \
+	core/Renderer.o \
+	core/ClassicRenderer.o \
 	core/GameboyColor.o \
 	ui/GameWindow.o \
 	main.o
@@ -34,7 +36,7 @@ OBJECTS=core/gbc.o \
 OBJECTSDEBUG=core/gbc-debug.o \
 	core/MemoryBus-debug.o \
 	core/InterruptHandler-debug.o \
-	core/cpu/LookUpTables-debug.o \
+	core/cpu/LookUpTabcore/ClassicRenderer.o \les-debug.o \
 	core/cpu/Processor-debug.o \
 	core/cartridges/RomDimensions-debug.o \
 	core/cartridges/RamDimensions-debug.o \
@@ -52,6 +54,8 @@ OBJECTSDEBUG=core/gbc-debug.o \
 	core/Frame-debug.o \
 	core/LCD-debug.o \
 	core/Joypad-debug.o \
+	core/Renderer-debug.o \
+	core/ClassicRenderer-debug.o \
 	core/GameboyColor-debug.o \
 	ui/GameWindow-debug.o \
 	main-debug.o
@@ -72,6 +76,12 @@ ui/GameWindow.o: ui/GameWindow.cpp
 
 core/GameboyColor.o: core/GameboyColor.cpp
 	$(CC) $(CFLAGS) core/GameboyColor.cpp -o core/GameboyColor.o
+
+core/ClassicRenderer.o: core/ClassicRenderer.cpp
+	$(CC) $(CFLAGS) core/ClassicRenderer.cpp -o core/ClassicRenderer.o
+
+core/Renderer.o: core/Renderer.cpp
+	$(CC) $(CFLAGS) core/Renderer.cpp -o core/Renderer.o
 
 core/Joypad.o: core/Joypad.cpp
 	$(CC) $(CFLAGS) core/Joypad.cpp -o core/Joypad.o
@@ -149,6 +159,12 @@ ui/GameWindow-debug.o: ui/GameWindow.cpp
 
 core/GameboyColor-debug.o: core/GameboyColor.cpp
 	$(CC) $(CFLAGSDEBUG) core/GameboyColor.cpp -o core/GameboyColor-debug.o
+
+core/ClassicRenderer-debuh.o: core/ClassicRenderer.cpp
+	$(CC) $(CFLAGSDEBUG) core/ClassicRenderer.cpp -o core/ClassicRenderer-debug.o
+
+core/Renderer-debuh.o: core/Renderer.cpp
+	$(CC) $(CFLAGSDEBUG) core/Renderer.cpp -o core/Renderer-debug.o
 
 core/Joypad-debug.o: core/Joypad.cpp
 	$(CC) $(CFLAGS) core/Joypad.cpp -o core/Joypad-debug.o

@@ -1,0 +1,38 @@
+#ifndef _Vector_template_
+#define _Vector_template_
+
+#include <vector>
+#include <cstring>
+
+namespace gbc
+{
+	namespace core
+	{
+		template<class T>
+		class Vector
+		{
+		public:
+			Vector(int size)
+				: _elements(new T[size])
+			{
+			}
+			
+			Vector(T elements[], int size)
+				: _elements(new T[size])
+			{
+				std::memcpy(_elements, elements, size);
+			}
+			
+			Vector(std::vector<T> elements)
+				: _elements(new T[elements.size()])
+			{
+				std::copy(elements.begin(), elements.end(), _elements);
+			}
+		
+		protected:
+			T *_elements;
+		};
+	}
+}
+
+#endif

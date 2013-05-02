@@ -20,6 +20,7 @@
 #include "Color.hpp"
 #include "ColorPalette.hpp"
 #include "RenderContext.hpp"
+#include "ClassicRenderer.hpp"
 
 namespace gbc
 {
@@ -30,7 +31,7 @@ namespace gbc
 		
 		class GameboyColor : public IMemoryBus
 		{
-		public:
+		/*public:
 			// memory dimensions
 			static const int VIDEO_RAM_BANKS = 2;
 			static const int VIDEO_RAM_BANK_SIZE = 0x2000;
@@ -48,7 +49,7 @@ namespace gbc
 			static const int COLOR_0 = 0b00000001;
 			static const int COLOR_1 = 0b00000010;
 			static const int COLOR_2 = 0b00000100;
-			static const int COLOR_3 = 0b00001000;
+			static const int COLOR_3 = 0b00001000;*/
 		
 		public:
 			GameboyColor();
@@ -90,9 +91,6 @@ namespace gbc
 			void DrawMapTile(int, int, int, int, int, PlatformSupport);
 			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
 			
-			// current scanline
-			Color _rawFrame[Frame::WIDTH * Frame::HEIGHT];
-			
 			// lcd
 			ILCD *_lcd;
 			
@@ -110,18 +108,6 @@ namespace gbc
 			Processor _hybr1s80;
 			int _speedFactor;
 			
-			// ram
-			int _videoRam[VIDEO_RAM_BANKS][VIDEO_RAM_BANK_SIZE];
-			int _workRam[WORK_RAM_BANKS][WORK_RAM_BANK_SIZE];
-			int _oam[OAM_SIZE];
-			int _ioPorts[IO_PORTS_SIZE];
-			int _highRam[HIGH_RAM_SIZE];
-			int _interruptEnableRegister;
-			
-			// ram banks
-			int _selectedWorkRamBank;
-			int _selectedVideoRamBank;
-			
 			// timer
 			int _timerClockFrequency;
 			int _timerStopped;
@@ -132,6 +118,8 @@ namespace gbc
 			
 			int _colorBackgroundPaletteIndexAutoIncrement;
 			int _colorSpritePaletteIndexAutoIncrement;
+			
+			Renderer *_renderer;
 			
 			RenderContext _rc;
 			

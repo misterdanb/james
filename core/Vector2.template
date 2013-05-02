@@ -1,0 +1,34 @@
+#ifndef _Vector2_template_
+#define _Vector2_template_
+
+#include "Vector.template"
+
+namespace gbc
+{
+	namespace core
+	{
+		template<class T>
+		class Vector2 : public Vector<T>
+		{
+		public:
+			Vector2(T newX, T newY)
+				: Vector<T>(2), x(_elements[0]), y(_elements[1])
+			{
+				x = newX;
+				y = newY;
+			}
+			
+			virtual ~Vector2()
+			{
+			}
+			
+			T &x;
+			T &y;
+		
+		protected:
+			using Vector<T>::_elements;
+		};
+	}
+}
+
+#endif
