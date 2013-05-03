@@ -1,0 +1,44 @@
+#ifndef _Map_template_
+#define _Map_template_
+
+namespace gbc
+{
+	namespace core
+	{
+		template<class T>
+		class Matrix
+		{
+		public:
+			Matrix(int width, int height)
+			{
+				_width = width;
+				_height = height;
+				
+				_elements = new T*[_width];
+				
+				for (int x = 0; x < _width; x++)
+				{
+					_elements[x] = new T[_height];
+				}
+			}
+			
+			virtual ~Matrix()
+			{
+				for (int x = 0; x < _width; x++)
+				{
+					delete[] _elements[x];
+				}
+				
+				delete[] _elements;
+			}
+		
+		protected:
+			int _width;
+			int _height;
+			
+			T **_elements;
+		};
+	}
+}
+
+#endif

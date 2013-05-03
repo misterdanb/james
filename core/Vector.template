@@ -1,36 +1,29 @@
 #ifndef _Vector_template_
 #define _Vector_template_
 
-#include <vector>
-#include <cstring>
+#include "Matrix.template"
 
 namespace gbc
 {
 	namespace core
 	{
 		template<class T>
-		class Vector
+		class Vector : public Matrix<T>
 		{
 		public:
 			Vector(int size)
-				: _elements(new T[size])
+				: Matrix<T>(1, size), _vectorElements(_elements[0])
 			{
 			}
 			
-			Vector(T elements[], int size)
-				: _elements(new T[size])
+			virtual ~Vector()
 			{
-				std::memcpy(_elements, elements, size);
-			}
-			
-			Vector(std::vector<T> elements)
-				: _elements(new T[elements.size()])
-			{
-				std::copy(elements.begin(), elements.end(), _elements);
 			}
 		
 		protected:
-			T *_elements;
+			using Matrix<T>::_elements;
+			
+			T *_vectorElements;
 		};
 	}
 }
