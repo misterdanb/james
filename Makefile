@@ -23,7 +23,6 @@ OBJECTS=core/gbc.o \
 	core/cartridges/MBC5.o \
 	core/cartridges/RomRam.o \
 	core/cartridges/MMM01.o \
-	core/PixelMap.o \
 	core/Frame.o \
 	core/LCD.o \
 	core/Joypad.o \
@@ -50,7 +49,6 @@ OBJECTSDEBUG=core/gbc-debug.o \
 	core/cartridges/MBC5-debug.o \
 	core/cartridges/RomRam-debug.o \
 	core/cartridges/MMM01-debug.o \
-	core/PixelMap-debug.o \
 	core/Frame-debug.o \
 	core/LCD-debug.o \
 	core/Joypad-debug.o \
@@ -91,9 +89,6 @@ core/LCD.o: core/LCD.cpp
 
 core/Frame.o: core/Frame.cpp
 	$(CC) $(CFLAGS) core/Frame.cpp -o core/Frame.o
-
-core/PixelMap.o: core/PixelMap.cpp
-	$(CC) $(CFLAGS) core/PixelMap.cpp -o core/PixelMap.o
 
 core/cartridges/MMM01.o: core/cartridges/MMM01.cpp
 	$(CC) $(CFLAGS) core/cartridges/MMM01.cpp -o core/cartridges/MMM01.o
@@ -174,9 +169,6 @@ core/LCD-debug.o: core/LCD.cpp
 
 core/Frame-debug.o: core/Frame.cpp
 	$(CC) $(CFLAGSDEBUG) core/Frame.cpp -o core/Frame-debug.o
-
-core/PixelMap-debug.o: core/PixelMap.cpp
-	$(CC) $(CFLAGSDEBUG) core/PixelMap.cpp -o core/PixelMap-debug.o
 
 core/cartridges/MMM01-debug.o: core/cartridges/MMM01.cpp
 	$(CC) $(CFLAGSDEBUG) core/cartridges/MMM01.cpp -o core/cartridges/MMM01-debug.o

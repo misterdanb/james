@@ -128,22 +128,22 @@ void gbc::ui::GameWindow::Render()
 
 void gbc::ui::GameWindow::DrawFrame(core::Frame frame)
 {
-		core::Color *rawMap = frame.GetRawMap();
-		
-		for (int y = 0; y < frame.GetHeight(); y++)
-		{
-			for (int x = 0; x < frame.GetWidth(); x++)
-			{
-				int pixelIndex = y * frame.GetWidth() + x;
-				
-				_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[pixelIndex].red);
-				_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[pixelIndex].green);
-				_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rawMap[pixelIndex].blue);
-				_rawFrame[pixelIndex * 4 + 3] = (sf::Uint8) (0xFF);
-			}
-		}
+	core::Frame::FrameArray2 &rawMap = frame.data;
 	
-	_frame.create(frame.GetWidth(), frame.GetHeight(), _rawFrame);
+	for (int y = 0; y < core::Frame::HEIGHT; y++)
+	{
+		for (int x = 0; x < core::Frame::WIDTH; x++)
+		{
+			int pixelIndex = y * core::Frame::WIDTH + x;
+			
+			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[x][y].red);
+			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[x][y].green);
+			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rawMap[x][y].blue);
+			_rawFrame[pixelIndex * 4 + 3] = (sf::Uint8) (0xFF);
+		}
+	}
+	
+	_frame.create(core::Frame::WIDTH, core::Frame::HEIGHT, _rawFrame);
 }
 
 int gbc::ui::GameWindow::GetRight()

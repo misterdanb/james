@@ -5,6 +5,7 @@
 #include "../core/GameboyColor.hpp"
 #include "../core/LCD.hpp"
 #include "../core/Joypad.hpp"
+#include "../core/Color.hpp"
 
 namespace gbc
 {

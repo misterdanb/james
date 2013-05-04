@@ -7,12 +7,12 @@ namespace gbc
 {
 	namespace core
 	{
-		template<class T>
-		class Vector : public Matrix<T>
+		template<class T, const int size>
+		class Vector : public Matrix<T, 1, size>
 		{
 		public:
-			Vector(int size)
-				: Matrix<T>(1, size), _vectorElements(_elements[0])
+			Vector()
+				: Matrix<T, 1, size>(), _vectorElements(_matrixElements[0])
 			{
 			}
 			
@@ -21,9 +21,9 @@ namespace gbc
 			}
 		
 		protected:
-			using Matrix<T>::_elements;
+			using Matrix<T, 1, size>::_matrixElements;
 			
-			T *_vectorElements;
+			Array<T, size> &_vectorElements;
 		};
 	}
 }

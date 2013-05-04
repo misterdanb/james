@@ -1,42 +1,48 @@
 #ifndef _Map_template_
 #define _Map_template_
 
+#include <array>
+
+#include "gbc.hpp"
+
 namespace gbc
 {
 	namespace core
 	{
-		template<class T>
+		template<class T, int size>
+		using Array = std::array<T, size>;
+		
+		template<class T, int width, int height>
+		using Array2 = std::array<std::array<T, height>, width>;
+		
+		template<class T, int width, int height, int depth>
+		using Array3 = std::array<std::array<std::array<T, depth>, height>, width>;
+		
+		template<class T, int width, int height>
 		class Matrix
 		{
 		public:
-			Matrix(int width, int height)
+			Matrix()
 			{
-				_width = width;
-				_height = height;
-				
-				_elements = new T*[_width];
-				
-				for (int x = 0; x < _width; x++)
-				{
-					_elements[x] = new T[_height];
-				}
 			}
 			
 			virtual ~Matrix()
 			{
-				for (int x = 0; x < _width; x++)
-				{
-					delete[] _elements[x];
-				}
-				
-				delete[] _elements;
 			}
 		
 		protected:
-			int _width;
-			int _height;
+			void Clear(T nullInstance)
+			{
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						std::memcpy(&_matrixElements[x][y], &nullInstance, sizeof(T));
+					}
+				}
+			}
 			
-			T **_elements;
+			Array2<T, width, height> _matrixElements;
 		};
 	}
 }

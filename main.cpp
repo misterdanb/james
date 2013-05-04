@@ -8,6 +8,13 @@
 
 int main(int argc, char *argv[])
 {
+	gbc::core::Vector2<float> a(1.2, 2.3);
+	gbc::core::RenderContext rc;
+	rc.tiles[0][0].data[0][0] = 123;
+	gbc::core::Tile test = rc.tiles[0][0];
+	std::cout << "tile " << test.data[0][0] << std::endl;
+	std::cout << "(" << a.x << ", " << a.y << ")" << std::endl;
+	
 	/*typedef std::chrono::high_resolution_clock Clock;
 	typedef std::chrono::milliseconds milliseconds;
 	
@@ -55,10 +62,22 @@ int main(int argc, char *argv[])
 		gbc.RenderFrame();*/
 		
 		gbc::ui::GameWindow window(160, 144, arrayRom, rom.size());
-	
+		
+		sf::Clock clock;
+		float lastTime = 0;
+		float frames = 0;
+		
 		while (window.isOpen())
 		{
 			window.Render();
+			
+			float currentTime = clock.getElapsedTime().asSeconds();
+			float fps = frames / currentTime;
+			//lastTime = currentTime;
+			
+			std::cout << fps << std::endl;
+			
+			frames++;
 		}
 		
 		delete arrayRom;

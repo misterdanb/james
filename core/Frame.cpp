@@ -1,22 +1,22 @@
 #include "Frame.hpp"
 
 gbc::core::Frame::Frame()
-	: PixelMap(WIDTH, HEIGHT)
+	: PixelMap<WIDTH, HEIGHT>(), data(_matrixElements)
 {
 }
 
 gbc::core::Frame::Frame(Color gameboyColors[])
-	: PixelMap(WIDTH, HEIGHT)
+	: PixelMap<WIDTH, HEIGHT>(), data(_matrixElements)
 {
-	for (int y = 0; y < _height; y++)
+	for (int y = 0; y < HEIGHT; y++)
 	{
-		for (int x = 0; x < _width; x++)
+		for (int x = 0; x < WIDTH; x++)
 		{
-			int pixelIndex = y * _width + x;
+			int pixelIndex = y * WIDTH + x;
 			
-			_rawMap[pixelIndex].red = ((gameboyColors[pixelIndex].red << 3) | (gameboyColors[pixelIndex].red >> 2)) & 0xFF,
-			_rawMap[pixelIndex].green = ((gameboyColors[pixelIndex].green << 3) | (gameboyColors[pixelIndex].green >> 2)) & 0xFF,
-			_rawMap[pixelIndex].blue = ((gameboyColors[pixelIndex].blue << 3) | (gameboyColors[pixelIndex].blue >> 2)) & 0xFF;
+			data[x][y].red = ((gameboyColors[pixelIndex].red << 3) | (gameboyColors[pixelIndex].red >> 2)) & 0xFF,
+			data[x][y].green = ((gameboyColors[pixelIndex].green << 3) | (gameboyColors[pixelIndex].green >> 2)) & 0xFF,
+			data[x][y].blue = ((gameboyColors[pixelIndex].blue << 3) | (gameboyColors[pixelIndex].blue >> 2)) & 0xFF;
 		}
 	}
 }

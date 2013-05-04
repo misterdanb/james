@@ -8,17 +8,17 @@ namespace gbc
 	namespace core
 	{
 		template<class T>
-		class Vector2 : public Vector<T>
+		class Vector2 : public Vector<T, 2>
 		{
 		public:
 			Vector2(T newX, T newY)
-				: Vector<T>(2), x(_vectorElements[0]), y(_vectorElements[1])
+				: Vector<T, 2>(), x(_vectorElements[0]), y(_vectorElements[1])
 			{
 				x = newX;
 				y = newY;
 			}
 			
-			virtual ~Vector2()
+			~Vector2()
 			{
 			}
 			
@@ -26,7 +26,7 @@ namespace gbc
 			T &y;
 		
 		protected:
-			using Vector<T>::_vectorElements;
+			using Vector<T, 2>::_vectorElements;
 		};
 	}
 }

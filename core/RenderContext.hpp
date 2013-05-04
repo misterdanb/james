@@ -93,7 +93,7 @@ namespace gbc
 			int windowY;
 			
 			// tile data
-			Tile tiles[2][384];
+			Tile tiles[2][384] = { { Tile(), }, }; // test
 			std::vector<int *> changedTiles;
 			
 			// background map elements
