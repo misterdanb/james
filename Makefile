@@ -1,4 +1,4 @@
-CC=clang++
+CC=g++
 
 CFLAGS=-c -std=c++11 -O2
 CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O2
@@ -35,7 +35,7 @@ OBJECTS=core/gbc.o \
 OBJECTSDEBUG=core/gbc-debug.o \
 	core/MemoryBus-debug.o \
 	core/InterruptHandler-debug.o \
-	core/cpu/LookUpTabcore/ClassicRenderer.o \les-debug.o \
+	core/cpu/LookUpTables-debug.o \
 	core/cpu/Processor-debug.o \
 	core/cartridges/RomDimensions-debug.o \
 	core/cartridges/RamDimensions-debug.o \
@@ -155,14 +155,14 @@ ui/GameWindow-debug.o: ui/GameWindow.cpp
 core/GameboyColor-debug.o: core/GameboyColor.cpp
 	$(CC) $(CFLAGSDEBUG) core/GameboyColor.cpp -o core/GameboyColor-debug.o
 
-core/ClassicRenderer-debuh.o: core/ClassicRenderer.cpp
+core/ClassicRenderer-debug.o: core/ClassicRenderer.cpp
 	$(CC) $(CFLAGSDEBUG) core/ClassicRenderer.cpp -o core/ClassicRenderer-debug.o
 
-core/Renderer-debuh.o: core/Renderer.cpp
+core/Renderer-debug.o: core/Renderer.cpp
 	$(CC) $(CFLAGSDEBUG) core/Renderer.cpp -o core/Renderer-debug.o
 
 core/Joypad-debug.o: core/Joypad.cpp
-	$(CC) $(CFLAGS) core/Joypad.cpp -o core/Joypad-debug.o
+	$(CC) $(CFLAGSDEBUG) core/Joypad.cpp -o core/Joypad-debug.o
 
 core/LCD-debug.o: core/LCD.cpp
 	$(CC) $(CFLAGSDEBUG) core/LCD.cpp -o core/LCD-debug.o
@@ -213,7 +213,7 @@ core/cpu/LookUpTables-debug.o: core/cpu/LookUpTables.cpp
 	$(CC) $(CFLAGSDEBUG) core/cpu/LookUpTables.cpp -o core/cpu/LookUpTables-debug.o
 
 core/InterruptHandler-debug.o: core/InterruptHandler.cpp
-	$(CC) $(CFLAGS) core/InterruptHandler.cpp -o core/InterruptHandler-debug.o
+	$(CC) $(CFLAGSDEBUG) core/InterruptHandler.cpp -o core/InterruptHandler-debug.o
 
 core/MemoryBus-debug.o: core/MemoryBus.cpp
 	$(CC) $(CFLAGSDEBUG) core/MemoryBus.cpp -o core/MemoryBus-debug.o
