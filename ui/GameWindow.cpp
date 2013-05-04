@@ -1,6 +1,6 @@
 #include "GameWindow.hpp"
 
-gbc::ui::GameWindow::GameWindow(int width, int height, int rom[], int size)
+gbc::ui::GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	: sf::RenderWindow(sf::VideoMode(width, height), "GBC"),
 	  _rightPressed(GBC_FALSE),
 	  _leftPressed(GBC_FALSE),
@@ -12,7 +12,7 @@ gbc::ui::GameWindow::GameWindow(int width, int height, int rom[], int size)
 	  _startPressed(GBC_FALSE)
 {
 	_gbc.Initialize();
-	_gbc.SetRom(rom, size);
+	_gbc.SetRom(rom);
 	_gbc.SetLCD(this);
 	_gbc.SetJoypad(this);
 }

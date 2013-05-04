@@ -43,15 +43,3 @@ std::string gbc::ToUpper(std::string string)
 	
 	return result;
 }
-
-std::string gbc::ToString(int bytes[], int length)
-{
-	std::string string;
-	
-	for (int i = 0; i < length; i++)
-	{
-		string += (char) bytes[i];
-	}
-	
-	return string;
-}

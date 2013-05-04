@@ -14,7 +14,7 @@ namespace gbc
 		class GameWindow : public sf::RenderWindow, public core::ILCD, public core::IJoypad
 		{
 		public:
-			GameWindow(int, int, int[], int);
+			GameWindow(int, int, DynamicArray<int> &);
 			~GameWindow();
 			
 			void Render();

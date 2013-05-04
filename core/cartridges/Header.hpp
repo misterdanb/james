@@ -57,7 +57,7 @@ namespace gbc
 				static const int GLOBAL_CHECKSUM_ADDRESS = TOTAL_OFFSET + 0x4E;
 			
 			public:
-				Header(int[]);
+				Header(DynamicArray<int> &);
 				~Header();
 				
 				Array<int, ENTRY_POINT_LENGTH> entryPoint;

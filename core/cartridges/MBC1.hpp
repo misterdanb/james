@@ -16,7 +16,7 @@ namespace gbc
 			class MBC1 : public Cartridge
 			{
 			public:
-				MBC1(int[], int);
+				MBC1(DynamicArray<int>);
 				~MBC1();
 				
 				int ReadByte(int);

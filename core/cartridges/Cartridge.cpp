@@ -9,22 +9,19 @@
 #include "RomRam.hpp"
 #include "MMM01.hpp"
 
-gbc::core::cartridges::Cartridge::Cartridge(int rom[], int size)
+gbc::core::cartridges::Cartridge::Cartridge(DynamicArray<int> &rom)
 	: _header(rom),
+	  _rom(rom.size()),
+	  _ram(_header.ramDimensions.size),
 	  _selectedRomBank(1),
 	  _selectedRamBank(0)
 {
-	_rom = new int[size];
-	_ram = new int[_header.ramDimensions.size];
-	
-	std::memcpy(_rom, rom, size * sizeof(int));
-	std::memset(_ram, 0x00, _header.ramDimensions.size);
+	std::copy(rom.begin(), rom.end(), _rom.begin());
+	std::fill(_ram.begin(), _ram.end(), 0x00);
 }
 
 gbc::core::cartridges::Cartridge::~Cartridge()
 {
-	delete _rom;
-	delete _ram;
 }
 
 gbc::core::cartridges::Header gbc::core::cartridges::Cartridge::GetHeader()
@@ -32,7 +29,7 @@ gbc::core::cartridges::Header gbc::core::cartridges::Cartridge::GetHeader()
 	return _header;
 }
 
-gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int rom[], int size)
+gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(DynamicArray<int> rom)
 {
 	CartridgeType cartridgeType = CartridgeType(rom[Header::CARTRIDGE_TYPE_ADDRESS]);
 	
@@ -42,33 +39,33 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 	switch (cartridgeType)
 	{
 		case CartridgeType::ROM_ONLY:
-			createdCartridge = new RomOnly(rom, size);
+			createdCartridge = new RomOnly(rom);
 			createdCartridgeName = "Rom only";
 			break;
 		
 		case CartridgeType::MBC1:
 		case CartridgeType::MBC1_RAM:
 		case CartridgeType::MBC1_RAM_BATTERY:
-			createdCartridge = new MBC1(rom, size);
+			createdCartridge = new MBC1(rom);
 			createdCartridgeName = "MBC1";
 			break;
 		
 		case CartridgeType::MBC2:
 		case CartridgeType::MBC2_BATTERY:
-			createdCartridge = new MBC2(rom, size);
+			createdCartridge = new MBC2(rom);
 			createdCartridgeName = "MBC2";
 			break;
 		
 		case CartridgeType::ROM_RAM:
 		case CartridgeType::ROM_RAM_BATTERY:
-			createdCartridge = new RomRam(rom, size);
+			createdCartridge = new RomRam(rom);
 			createdCartridgeName = "Rom and ram";
 			break;
 		
 		case CartridgeType::MMM01:
 		case CartridgeType::MMM01_RAM:
 		case CartridgeType::MMM01_RAM_BATTERY:
-			createdCartridge = new MMM01(rom, size);
+			createdCartridge = new MMM01(rom);
 			createdCartridgeName = "MMM01";
 			break;
 		
@@ -77,14 +74,14 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 		case CartridgeType::MBC3:
 		case CartridgeType::MBC3_RAM:
 		case CartridgeType::MBC3_RAM_BATTERY:
-			createdCartridge = new MBC3(rom, size);
+			createdCartridge = new MBC3(rom);
 			createdCartridgeName = "MBC3";
 			break;
 		
 		case CartridgeType::MBC4:
 		case CartridgeType::MBC4_RAM:
 		case CartridgeType::MBC4_RAM_BATTERY:
-			createdCartridge = new MBC4(rom, size);
+			createdCartridge = new MBC4(rom);
 			createdCartridgeName = "MBC4";
 			break;
 		
@@ -94,7 +91,7 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 		case CartridgeType::MBC5_RUMBLE:
 		case CartridgeType::MBC5_RUMBLE_RAM:
 		case CartridgeType::MBC5_RUMBLE_RAM_BATTERY:
-			createdCartridge = new MBC5(rom, size);
+			createdCartridge = new MBC5(rom);
 			createdCartridgeName = "MBC5";
 			break;
 		
@@ -124,10 +121,10 @@ gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(int r
 	oss <<                      ToHex(createdHeader.entryPoint[1]) << " ";
 	oss <<                      ToHex(createdHeader.entryPoint[2]) << " ";
 	oss <<                      ToHex(createdHeader.entryPoint[3]) << std::endl;
-	oss << "\tTitle: " << ToString(createdHeader.newTitle, 11) << std::endl;
-	oss << "\tManufacturer code: " << ToString(createdHeader.manufacturerCode, 4) << std::endl;
+	oss << "\tTitle: " << ToString(createdHeader.newTitle) << std::endl;
+	oss << "\tManufacturer code: " << ToString(createdHeader.manufacturerCode) << std::endl;
 	oss << "\tCGB flag: " << ToHex((int) createdHeader.platformSupport) << std::endl;
-	oss << "\tNew licensee code: " + ToString(createdHeader.newLicenseeCode, 2) << std::endl;
+	oss << "\tNew licensee code: " + ToString(createdHeader.newLicenseeCode) << std::endl;
 	oss << "\tSGB flag: " << ToHex(createdHeader.superGameboyFlag) << std::endl;
 	oss << "\tCartridge type: " << createdCartridgeName << std::endl;
 	oss << "\tRom size: " << ToDec(createdHeader.romDimensions.size) << " bytes splitted into "; 

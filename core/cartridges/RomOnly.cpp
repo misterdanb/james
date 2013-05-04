@@ -1,7 +1,7 @@
 #include "RomOnly.hpp"
 
-gbc::core::cartridges::RomOnly::RomOnly(int rom[], int size)
-	: Cartridge(rom, size)
+gbc::core::cartridges::RomOnly::RomOnly(DynamicArray<int> rom)
+	: Cartridge(rom)
 {
 }
 

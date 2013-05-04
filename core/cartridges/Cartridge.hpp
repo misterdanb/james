@@ -2,6 +2,7 @@
 #define _Cartridge_hpp_
 
 #include <cstring>
+#include <algorithm>
 
 #include "../gbc.hpp"
 #include "../MemoryBus.hpp"
@@ -16,7 +17,7 @@ namespace gbc
 			class Cartridge : public IMemoryBus
 			{
 			public:
-				Cartridge(int[], int);
+				Cartridge(DynamicArray<int> &);
 				virtual ~Cartridge();
 				
 				Header GetHeader();
@@ -24,11 +25,12 @@ namespace gbc
 				virtual int ReadByte(int) = GBC_NULL;
 				virtual void WriteByte(int, int) = GBC_NULL;
 				
-				static Cartridge *Create(int[], int);
+				static Cartridge *Create(DynamicArray<int>);
 				
 			protected:
-				int *_rom;
-				int *_ram;
+				// dynamic array, because of size is not known at compile time
+				DynamicArray<int> _rom;
+				DynamicArray<int> _ram;
 				
 				Header _header;
 				

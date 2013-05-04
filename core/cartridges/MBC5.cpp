@@ -1,7 +1,7 @@
 #include "MBC5.hpp"
 
-gbc::core::cartridges::MBC5::MBC5(int rom[], int size)
-	: Cartridge(rom, size)
+gbc::core::cartridges::MBC5::MBC5(DynamicArray<int> rom)
+	: Cartridge(rom)
 {
 }
 

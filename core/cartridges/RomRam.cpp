@@ -1,7 +1,7 @@
 #include "RomRam.hpp"
 
-gbc::core::cartridges::RomRam::RomRam(int rom[], int size)
-	: Cartridge(rom, size)
+gbc::core::cartridges::RomRam::RomRam(DynamicArray<int> rom)
+	: Cartridge(rom)
 {
 }
 

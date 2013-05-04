@@ -45,23 +45,16 @@ int main(int argc, char *argv[])
 			char byte;
 			
 			file.get(byte);
-			rom.push_back((int) byte);
+			rom.push_back(((int) byte) & 0xFF);
 		}
 		
 		file.close();
-		
-		int *arrayRom = new int[rom.size()];
-		
-		for (int i = 0; i < rom.size(); i++)
-		{
-			arrayRom[i] = rom[i] & 0xFF;
-		}
 		
 		/*gbc::core::GameboyColor gbc;
 		gbc.SetRom(arrayRom, rom.size());
 		gbc.RenderFrame();*/
 		
-		gbc::ui::GameWindow window(160, 144, arrayRom, rom.size());
+		gbc::ui::GameWindow window(160, 144, rom);
 		
 		sf::Clock clock;
 		float lastTime = 0;
@@ -79,8 +72,6 @@ int main(int argc, char *argv[])
 			
 			frames++;
 		}
-		
-		delete arrayRom;
 	}
 	else
 	{

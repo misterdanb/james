@@ -1,7 +1,7 @@
 #include "MBC1.hpp"
 
-gbc::core::cartridges::MBC1::MBC1(int rom[], int size)
-	: Cartridge(rom, size), _ramEnabled(GBC_FALSE), _romRamMode(0x00)
+gbc::core::cartridges::MBC1::MBC1(DynamicArray<int> rom)
+	: Cartridge(rom), _ramEnabled(GBC_FALSE), _romRamMode(0x00)
 {
 }
 

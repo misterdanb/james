@@ -82,11 +82,11 @@ void gbc::core::GameboyColor::SetJoypad(IJoypad *joypad)
 	_joypad = joypad;
 }
 
-void gbc::core::GameboyColor::SetRom(int rom[], int size)
+void gbc::core::GameboyColor::SetRom(DynamicArray<int> &rom)
 {
 	LOG_L2("Loading cartridge");
 	
-	_cartridge = cartridges::Cartridge::Create(rom, size);
+	_cartridge = cartridges::Cartridge::Create(rom);
 	
 	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)

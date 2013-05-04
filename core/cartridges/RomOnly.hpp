@@ -16,7 +16,7 @@ namespace gbc
 			class RomOnly : public Cartridge
 			{
 			public:
-				RomOnly(int[], int);
+				RomOnly(DynamicArray<int>);
 				~RomOnly();
 				
 				int ReadByte(int);

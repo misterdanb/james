@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <array>
+#include <vector>
 #include <sstream>
 #include <fstream>
 #include <iomanip>
@@ -61,6 +62,15 @@ namespace gbc
 	template<class T, int width, int height, int depth>
 	using Array3 = std::array<std::array<std::array<T, depth>, height>, width>;
 	
+	template<class T>
+	using DynamicArray = std::vector<T>;
+	
+	template<class T>
+	using DynamicArray2 = std::vector<std::vector<T>>;
+	
+	template<class T>
+	using DynamicArray3 = std::vector<std::vector<std::vector<T>>>;
+	
 	// consts
 	const int GBC_FALSE = 0;
 	const int GBC_TRUE = 1;
@@ -111,12 +121,23 @@ namespace gbc
 	void Log(std::string);
 	void LogToFile(std::string, std::string);
 	
+	template<unsigned long T>
+	std::string ToString(Array<int, T> array)
+	{
+		std::string string;
+		
+		for (int &i : array)
+		{
+			string += (char) i;
+		}
+		
+		return string;
+	}
+	
 	std::string ToHex(int);
 	std::string ToDec(int);
 	
 	std::string ToUpper(std::string);
-	
-	std::string ToString(int[], int);
 }
 
 #endif

@@ -16,7 +16,7 @@ namespace gbc
 			class RomRam : public Cartridge
 			{
 			public:
-				RomRam(int[], int);
+				RomRam(DynamicArray<int>);
 				~RomRam();
 				
 				int ReadByte(int);

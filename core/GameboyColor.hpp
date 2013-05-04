@@ -57,7 +57,7 @@ namespace gbc
 			
 			void SetLCD(ILCD *);
 			void SetJoypad(IJoypad *);
-			void SetRom(int[], int);
+			void SetRom(DynamicArray<int> &);
 			
 			IInterruptHandler *GetInterruptHandler();
 			

@@ -1,7 +1,7 @@
 #include "MBC3.hpp"
 
-gbc::core::cartridges::MBC3::MBC3(int rom[], int size)
-	: Cartridge(rom, size), _ramRtcEnabled(GBC_FALSE), _ramRtcMode(0x00)
+gbc::core::cartridges::MBC3::MBC3(DynamicArray<int> rom)
+	: Cartridge(rom), _ramRtcEnabled(GBC_FALSE), _ramRtcMode(0x00)
 {
 }
 

@@ -1,7 +1,7 @@
 #include "MMM01.hpp"
 
-gbc::core::cartridges::MMM01::MMM01(int rom[], int size)
-	: Cartridge(rom, size)
+gbc::core::cartridges::MMM01::MMM01(DynamicArray<int> rom)
+	: Cartridge(rom)
 {
 }
 
