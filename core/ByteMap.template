@@ -1,0 +1,44 @@
+#ifndef _ByteMap_template_
+#define _ByteMap_template_
+
+#include <cstring>
+
+#include "Matrix.template"
+
+namespace gbc
+{
+	namespace core
+	{
+		template<int width, int height>
+		class ByteMap : public Matrix<int, width, height>
+		{
+		public:
+			ByteMap()
+				: Matrix<int, width, height>()
+			{
+				Clear(0);
+			}
+			
+			virtual ~ByteMap()
+			{
+			}
+			
+			int GetByte(int x, int y)
+			{
+				return _matrixElements[x][y];
+			}
+			
+			Array2<int, width, height> &GetMap()
+			{
+				return _matrixElements;
+			}
+		
+		protected:
+			using Matrix<int, width, height>::Clear;
+			
+			using Matrix<int, width, height>::_matrixElements;
+		};
+	}
+}
+
+#endif

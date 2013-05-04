@@ -1,0 +1,51 @@
+#ifndef _PixelMap_template_
+#define _PixelMap_template_
+
+#include <cstring>
+
+#include "Matrix.template"
+#include "Color.hpp"
+
+namespace gbc
+{
+	namespace core
+	{
+		template<int width, int height>
+		class PixelMap : public Matrix<Color, width, height>
+		{
+		public:
+			PixelMap()
+				: Matrix<Color, width, height>()
+			{
+				Color nullColor;
+				
+				nullColor.red = 0;
+				nullColor.green = 0;
+				nullColor.blue = 0;
+				
+				Clear(nullColor);
+			}
+			
+			virtual ~PixelMap()
+			{
+			}
+			
+			Color GetPixel(int x, int y)
+			{
+				return _matrixElements[x][y];
+			}
+			
+			Array2<Color, width, height> &GetMap()
+			{
+				return _matrixElements;
+			}
+		
+		protected:
+			using Matrix<Color, width, height>::Clear;
+			
+			using Matrix<Color, width, height>::_matrixElements;
+		};
+	}
+}
+
+#endif
