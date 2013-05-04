@@ -36,11 +36,11 @@ namespace gbc
 		
 		public:
 			// ram
-			int videoRam[VIDEO_RAM_BANKS][VIDEO_RAM_BANK_SIZE];
-			int workRam[WORK_RAM_BANKS][WORK_RAM_BANK_SIZE];
-			int oam[OAM_SIZE];
-			int ioPorts[IO_PORTS_SIZE];
-			int highRam[HIGH_RAM_SIZE];
+			Array2<int, VIDEO_RAM_BANKS, VIDEO_RAM_BANK_SIZE> videoRam;
+			Array2<int, WORK_RAM_BANKS, WORK_RAM_BANK_SIZE> workRam;
+			Array<int, OAM_SIZE> oam;
+			Array<int, IO_PORTS_SIZE> ioPorts;
+			Array<int, HIGH_RAM_SIZE> highRam;
 			int interruptEnableRegister;
 			
 			// ram banks

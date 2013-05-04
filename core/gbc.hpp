@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <array>
 #include <sstream>
 #include <fstream>
 #include <iomanip>
@@ -50,6 +51,16 @@
 
 namespace gbc
 {
+	// templates
+	template<class T, int size>
+	using Array = std::array<T, size>;
+	
+	template<class T, int width, int height>
+	using Array2 = std::array<std::array<T, height>, width>;
+	
+	template<class T, int width, int height, int depth>
+	using Array3 = std::array<std::array<std::array<T, depth>, height>, width>;
+	
 	// consts
 	const int GBC_FALSE = 0;
 	const int GBC_TRUE = 1;

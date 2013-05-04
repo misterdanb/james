@@ -11,13 +11,33 @@ gbc::core::cartridges::Header::Header(int rom[])
 	  romVersionNumber(rom[ROM_VERSION_NUMBER_ADDRESS]),
 	  headerChecksum(rom[HEADER_CHECKSUM_ADDRESS])
 {
-	std::memcpy(entryPoint, &rom[ENTRY_POINT_ADDRESS], ENTRY_POINT_LENGTH * sizeof(int));
-	std::memcpy(nintendoLogo, &rom[NINTENDO_LOGO_ADDRESS], NINTENDO_LOGO_LENGTH * sizeof(int));
-	std::memcpy(oldTitle, &rom[OLD_TITLE_ADDRESS], OLD_TITLE_LENGTH * sizeof(int));
-	std::memcpy(newTitle, &rom[NEW_TITLE_ADDRESS], NEW_TITLE_LENGTH * sizeof(int));
-	std::memcpy(manufacturerCode, &rom[MANUFACTURER_CODE_ADDRESS], MANUFACTURER_CODE_LENGTH * sizeof(int));
-	std::memcpy(newLicenseeCode, &rom[NEW_LICENSEE_CODE_ADDRESS], NEW_LICENSEE_CODE_LENGTH * sizeof(int));
-	std::memcpy(globalChecksum, &rom[GLOBAL_CHECKSUM_ADDRESS], GLOBAL_CHECKSUM_LENGTH * sizeof(int));
+	std::copy(rom + ENTRY_POINT_ADDRESS,
+	          rom + ENTRY_POINT_ADDRESS + ENTRY_POINT_LENGTH,
+	          entryPoint.begin());
+	
+	std::copy(rom + NINTENDO_LOGO_ADDRESS,
+	          rom + NINTENDO_LOGO_ADDRESS + NINTENDO_LOGO_LENGTH,
+	          nintendoLogo.begin());
+	
+	std::copy(rom + OLD_TITLE_ADDRESS,
+	          rom + OLD_TITLE_ADDRESS + OLD_TITLE_LENGTH,
+	          oldTitle.begin());
+	
+	std::copy(rom + NEW_TITLE_ADDRESS,
+	          rom + NEW_TITLE_ADDRESS + NEW_TITLE_LENGTH,
+	          newTitle.begin());
+	
+	std::copy(rom + MANUFACTURER_CODE_ADDRESS,
+	          rom + MANUFACTURER_CODE_ADDRESS + MANUFACTURER_CODE_LENGTH,
+	          manufacturerCode.begin());
+	
+	std::copy(rom + NEW_LICENSEE_CODE_ADDRESS,
+	          rom + NEW_LICENSEE_CODE_ADDRESS + NEW_LICENSEE_CODE_LENGTH,
+	          newLicenseeCode.begin());
+	
+	std::copy(rom + GLOBAL_CHECKSUM_ADDRESS,
+	          rom + GLOBAL_CHECKSUM_ADDRESS + GLOBAL_CHECKSUM_LENGTH,
+	          globalChecksum.begin());
 }
 
 gbc::core::cartridges::Header::~Header()

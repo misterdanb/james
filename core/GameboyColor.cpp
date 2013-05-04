@@ -19,11 +19,19 @@ gbc::core::GameboyColor::GameboyColor()
 	  _colorBackgroundPaletteIndexAutoIncrement(0),
 	  _colorSpritePaletteIndexAutoIncrement(0)
 {
-	std::memset(_rc.videoRam, 0x00, RenderContext::VIDEO_RAM_BANKS * RenderContext::VIDEO_RAM_BANK_SIZE);
-	std::memset(_rc.workRam, 0x00, RenderContext::WORK_RAM_BANKS * RenderContext::WORK_RAM_BANK_SIZE);
-	std::memset(_rc.oam, 0x00, RenderContext::OAM_SIZE);
-	std::memset(_rc.ioPorts, 0x00, RenderContext::IO_PORTS_SIZE);
-	std::memset(_rc.highRam, 0x00, RenderContext::HIGH_RAM_SIZE);
+	for (Array<int, RenderContext::VIDEO_RAM_BANK_SIZE> &videoRamBank : _rc.videoRam)
+	{
+		std::fill(videoRamBank.begin(), videoRamBank.end(), 0x00);
+	}
+	
+	for (Array<int, RenderContext::WORK_RAM_BANK_SIZE> &workRamBank : _rc.workRam)
+	{
+		std::fill(workRamBank.begin(), workRamBank.end(), 0x00);
+	}
+	
+	std::fill(_rc.oam.begin(), _rc.oam.end(), 0x00);
+	std::fill(_rc.ioPorts.begin(), _rc.ioPorts.end(), 0x00);
+	std::fill(_rc.highRam.begin(), _rc.highRam.end(), 0x00);
 	
 	_rc.memoryBus = this;
 	_rc.interruptHandler = &_hybr1s80;

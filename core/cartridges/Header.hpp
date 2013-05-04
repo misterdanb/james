@@ -1,7 +1,10 @@
 #ifndef _Header_hpp_
 #define _Header_hpp_
 
+#include "../gbc.hpp"
+
 #include <cstring>
+#include <algorithm>
 #include "PlatformSupport.hpp"
 #include "CartridgeType.hpp"
 #include "RomDimensions.hpp"
@@ -57,13 +60,13 @@ namespace gbc
 				Header(int[]);
 				~Header();
 				
-				int entryPoint[ENTRY_POINT_LENGTH];
-				int nintendoLogo[NINTENDO_LOGO_LENGTH];
-				int oldTitle[OLD_TITLE_LENGTH];
-				int newTitle[NEW_TITLE_LENGTH];
-				int manufacturerCode[MANUFACTURER_CODE_LENGTH];
+				Array<int, ENTRY_POINT_LENGTH> entryPoint;
+				Array<int, NINTENDO_LOGO_LENGTH> nintendoLogo;
+				Array<int, OLD_TITLE_LENGTH> oldTitle;
+				Array<int, NEW_TITLE_LENGTH> newTitle;
+				Array<int, MANUFACTURER_CODE_LENGTH> manufacturerCode;
 				PlatformSupport platformSupport;
-				int newLicenseeCode[NEW_LICENSEE_CODE_LENGTH];
+				Array<int, NEW_LICENSEE_CODE_LENGTH> newLicenseeCode;
 				int superGameboyFlag;
 				CartridgeType cartridgeType;
 				RomDimensions romDimensions;
@@ -72,7 +75,7 @@ namespace gbc
 				int oldLicenseeCode;
 				int romVersionNumber;
 				int headerChecksum;
-				int globalChecksum[GLOBAL_CHECKSUM_LENGTH];
+				Array<int, GLOBAL_CHECKSUM_LENGTH> globalChecksum;
 			};
 		}
 	}
