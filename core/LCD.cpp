@@ -1,5 +1,8 @@
 #include "LCD.hpp"
 
-gbc::core::ILCD::~ILCD()
+using namespace gbc;
+using namespace gbc::core;
+
+ILCD::~ILCD()
 {
 }

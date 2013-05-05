@@ -1,6 +1,10 @@
 #include "Header.hpp"
 
-gbc::core::cartridges::Header::Header(DynamicArray<int> &rom)
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cartridges;
+
+Header::Header(DynamicArray<int> &rom)
 	: platformSupport(PlatformSupport(rom[PLATFORM_SUPPORT_ADDRESS])),
 	  superGameboyFlag(rom[SUPER_GAMEBOY_FLAG_ADDRESS]),
 	  cartridgeType(CartridgeType(rom[CARTRIDGE_TYPE_ADDRESS])), 
@@ -40,6 +44,6 @@ gbc::core::cartridges::Header::Header(DynamicArray<int> &rom)
 	          globalChecksum.begin());
 }
 
-gbc::core::cartridges::Header::~Header()
+Header::~Header()
 {
 }

@@ -1,6 +1,10 @@
 #include "RomDimensions.hpp"
 
-gbc::core::cartridges::RomDimensions::RomDimensions(int romDimensionsIdentifier)
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cartridges;
+
+RomDimensions::RomDimensions(int romDimensionsIdentifier)
 {
 	switch (romDimensionsIdentifier)
 	{
@@ -74,6 +78,6 @@ gbc::core::cartridges::RomDimensions::RomDimensions(int romDimensionsIdentifier)
 	}
 }
 
-gbc::core::cartridges::RomDimensions::~RomDimensions()
+RomDimensions::~RomDimensions()
 {
 }

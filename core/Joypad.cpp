@@ -1,5 +1,8 @@
 #include "Joypad.hpp"
 
-gbc::core::IJoypad::~IJoypad()
+using namespace gbc;
+using namespace gbc::core;
+
+IJoypad::~IJoypad()
 {
 }

@@ -1,19 +1,23 @@
 #include "RomRam.hpp"
 
-gbc::core::cartridges::RomRam::RomRam(DynamicArray<int> rom)
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cartridges;
+
+RomRam::RomRam(DynamicArray<int> rom)
 	: Cartridge(rom)
 {
 }
 
-gbc::core::cartridges::RomRam::~RomRam()
+RomRam::~RomRam()
 {
 }
 
-int gbc::core::cartridges::RomRam::ReadByte(int address)
+int RomRam::ReadByte(int address)
 {
 	return 0;
 }
 
-void gbc::core::cartridges::RomRam::WriteByte(int address, int value)
+void RomRam::WriteByte(int address, int value)
 {
 }

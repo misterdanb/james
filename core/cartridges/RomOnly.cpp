@@ -1,15 +1,19 @@
 #include "RomOnly.hpp"
 
-gbc::core::cartridges::RomOnly::RomOnly(DynamicArray<int> rom)
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cartridges;
+
+RomOnly::RomOnly(DynamicArray<int> rom)
 	: Cartridge(rom)
 {
 }
 
-gbc::core::cartridges::RomOnly::~RomOnly()
+RomOnly::~RomOnly()
 {
 }
 
-int gbc::core::cartridges::RomOnly::ReadByte(int address)
+int RomOnly::ReadByte(int address)
 {
 	if (address >= 0x0000 && address <= 0x7FFF)
 	{
@@ -25,7 +29,7 @@ int gbc::core::cartridges::RomOnly::ReadByte(int address)
 	return 0x00;
 }
 
-void gbc::core::cartridges::RomOnly::WriteByte(int address, int value)
+void RomOnly::WriteByte(int address, int value)
 {
 	if (address >= 0x0000 && address <= 0x7FFF)
 	{

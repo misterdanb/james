@@ -1,5 +1,8 @@
 #include "InterruptHandler.hpp"
 
-gbc::core::IInterruptHandler::~IInterruptHandler()
+using namespace gbc;
+using namespace gbc::core;
+
+IInterruptHandler::~IInterruptHandler()
 {
 }

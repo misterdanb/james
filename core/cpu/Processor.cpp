@@ -1,20 +1,24 @@
 #include "Processor.hpp"
 
-gbc::core::cpu::Processor::Processor()
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cpu;
+
+Processor::Processor()
 	: _counter(0), _state(), _bus(NULL)
 {
 }
 
-gbc::core::cpu::Processor::~Processor()
+Processor::~Processor()
 {
 }
 
-void gbc::core::cpu::Processor::SetMemoryBus(IMemoryBus *bus)
+void Processor::SetMemoryBus(IMemoryBus *bus)
 {
 	_bus = bus;
 }
 
-void gbc::core::cpu::Processor::Step()
+void Processor::Step()
 {
 	if (_state.ticks > 0)
 	{
@@ -27,7 +31,7 @@ void gbc::core::cpu::Processor::Step()
 	}
 }
 
-void gbc::core::cpu::Processor::ExecuteInstruction()
+void Processor::ExecuteInstruction()
 {
 	if (!_state.halted)
 	{
@@ -585,7 +589,7 @@ void gbc::core::cpu::Processor::ExecuteInstruction()
 	}
 }
 
-void gbc::core::cpu::Processor::ExecuteInterrupt()
+void Processor::ExecuteInterrupt()
 {
 	if (_state.interruptsEnabled || _state.halted)
 	{
@@ -685,7 +689,7 @@ void gbc::core::cpu::Processor::ExecuteInterrupt()
 	}
 }
 
-void gbc::core::cpu::Processor::PowerUp()
+void Processor::PowerUp()
 {
 	_state.a = 0x01;
 	//_state.a = 0x11; //test
@@ -736,7 +740,7 @@ void gbc::core::cpu::Processor::PowerUp()
 	_bus->WriteByte(0xFFFF, 0x00); // IE
 }
 
-void gbc::core::cpu::Processor::SignalVBlankInterrupt()
+void Processor::SignalVBlankInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        VERTICAL_BLANK_INTERRUPT_REQUEST_BIT,
@@ -745,7 +749,7 @@ void gbc::core::cpu::Processor::SignalVBlankInterrupt()
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
-void gbc::core::cpu::Processor::SignalLCDStatusInterrupt()
+void Processor::SignalLCDStatusInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        LCD_STATUS_INTERRUPT_REQUEST_BIT,
@@ -754,7 +758,7 @@ void gbc::core::cpu::Processor::SignalLCDStatusInterrupt()
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
-void gbc::core::cpu::Processor::SignalTimerInterrupt()
+void Processor::SignalTimerInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        TIMER_INTERRUPT_REQUEST_BIT,
@@ -763,7 +767,7 @@ void gbc::core::cpu::Processor::SignalTimerInterrupt()
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
-void gbc::core::cpu::Processor::SignalSerialInterrupt()
+void Processor::SignalSerialInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        SERIAL_INTERRUPT_REQUEST_BIT,
@@ -772,7 +776,7 @@ void gbc::core::cpu::Processor::SignalSerialInterrupt()
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
-void gbc::core::cpu::Processor::SignalJoypadInterrupt()
+void Processor::SignalJoypadInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        JOYPAD_INTERRUPT_REQUEST_BIT,
@@ -781,23 +785,23 @@ void gbc::core::cpu::Processor::SignalJoypadInterrupt()
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
-void gbc::core::cpu::Processor::SetState(gbc::core::cpu::State state)
+void Processor::SetState(State state)
 {
 	_state = state;
 }
 
-gbc::core::cpu::State gbc::core::cpu::Processor::GetState()
+State Processor::GetState()
 {
 	return _state;
 }
 
-int gbc::core::cpu::Processor::GetCounter()
+int Processor::GetCounter()
 {
 	return _counter;
 }
 
 // helper methods
-inline void gbc::core::cpu::Processor::FetchInstruction(InstructionTable instructionTable)
+inline void Processor::FetchInstruction(InstructionTable instructionTable)
 {
 	if (instructionTable == InstructionTable::DEFAULT)
 	{
@@ -813,83 +817,83 @@ inline void gbc::core::cpu::Processor::FetchInstruction(InstructionTable instruc
 	}
 }
 
-void gbc::core::cpu::Processor::UpdatePC(InstructionTable instructionTable)
+void Processor::UpdatePC(InstructionTable instructionTable)
 {
 	int tableNumber = GetEnumValue(instructionTable);
 	
 	_state.pc += LookUpTables::INSTRUCTION_LENGTHS[tableNumber][_currentOpCodes[tableNumber]];
 }
 
-void gbc::core::cpu::Processor::UpdateTicks(InstructionTable instructionTable)
+void Processor::UpdateTicks(InstructionTable instructionTable)
 {
 	int tableNumber = GetEnumValue(instructionTable);
 	
 	_state.ticks += LookUpTables::INSTRUCTION_CYCLES[tableNumber][_currentOpCodes[tableNumber]];
 }
 
-void gbc::core::cpu::Processor::UpdateAdditionalTicks(InstructionTable instructionTable)
+void Processor::UpdateAdditionalTicks(InstructionTable instructionTable)
 {
 	int tableNumber = GetEnumValue(instructionTable);
 	
 	_state.ticks += LookUpTables::ADDITIONAL_INSTRUCTION_CYCLES[tableNumber][_currentOpCodes[tableNumber]];
 }
 
-void gbc::core::cpu::Processor::SetCFlag(int value)
+void Processor::SetCFlag(int value)
 {
 	_state.f = SetBit(_state.f, CFLAG_BIT, value);
 }
 
-void gbc::core::cpu::Processor::SetHFlag(int value)
+void Processor::SetHFlag(int value)
 {
 	_state.f = SetBit(_state.f, HFLAG_BIT, value);
 }
 
-void gbc::core::cpu::Processor::SetNFlag(int value)
+void Processor::SetNFlag(int value)
 {
 	_state.f = SetBit(_state.f, NFLAG_BIT, value);
 }
 
-void gbc::core::cpu::Processor::SetZFlag(int value)
+void Processor::SetZFlag(int value)
 {
 	_state.f = SetBit(_state.f, ZFLAG_BIT, value);
 }
 
-int gbc::core::cpu::Processor::GetCFlag()
+int Processor::GetCFlag()
 {
 	return GetBit(_state.f, CFLAG_BIT);
 }
 
-int gbc::core::cpu::Processor::GetHFlag()
+int Processor::GetHFlag()
 {
 	return GetBit(_state.f, HFLAG_BIT);
 }
 
-int gbc::core::cpu::Processor::GetNFlag()
+int Processor::GetNFlag()
 {
 	return GetBit(_state.f, NFLAG_BIT);
 }
 
-int gbc::core::cpu::Processor::GetZFlag()
+int Processor::GetZFlag()
 {
 	return GetBit(_state.f, ZFLAG_BIT);
 }
 
-int gbc::core::cpu::Processor::GetOpCode(InstructionTable instructionTable)
+int Processor::GetOpCode(InstructionTable instructionTable)
 {
 	return _currentOpCodes[GetEnumValue(instructionTable)];
 }
 
-int gbc::core::cpu::Processor::GetOpLow(InstructionTable instructionTable)
+int Processor::GetOpLow(InstructionTable instructionTable)
 {
 	return _currentOpLows[GetEnumValue(instructionTable)];
 }
 
-int gbc::core::cpu::Processor::GetOpHigh(InstructionTable instructionTable)
+int Processor::GetOpHigh(InstructionTable instructionTable)
 {
 	return _currentOpHighs[GetEnumValue(instructionTable)];
 }
 
-int gbc::core::cpu::Processor::GetOpLength(InstructionTable instructionTable)
+int Processor::GetOpLength(InstructionTable instructionTable)
 {
 	int tableNumber = GetEnumValue(instructionTable);
 	
@@ -898,13 +902,13 @@ int gbc::core::cpu::Processor::GetOpLength(InstructionTable instructionTable)
 
 // default instruction set
 
-void gbc::core::cpu::Processor::NOP()
+void Processor::NOP()
 {
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::INC_RR(int &r1, int &r2)
+void Processor::INC_RR(int &r1, int &r2)
 {
 	r2++;
 	
@@ -919,7 +923,7 @@ void gbc::core::cpu::Processor::INC_RR(int &r1, int &r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::INC_R(int &r)
+void Processor::INC_R(int &r)
 {
 	SetHFlag((r & 0x0F) == 0x0F);
 	
@@ -933,7 +937,7 @@ void gbc::core::cpu::Processor::INC_R(int &r)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::INC_AA(int a1, int a2)
+void Processor::INC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -952,7 +956,7 @@ void gbc::core::cpu::Processor::INC_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::INC_SP()
+void Processor::INC_SP()
 {
 	_state.sp++;
 	_state.sp &= 0xFFFF;
@@ -961,7 +965,7 @@ void gbc::core::cpu::Processor::INC_SP()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::DEC_AA(int a1, int a2)
+void Processor::DEC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -980,7 +984,7 @@ void gbc::core::cpu::Processor::DEC_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::DEC_RR(int &r1, int &r2)
+void Processor::DEC_RR(int &r1, int &r2)
 {
 	r2--;
 	
@@ -995,7 +999,7 @@ void gbc::core::cpu::Processor::DEC_RR(int &r1, int &r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::DEC_R(int &r)
+void Processor::DEC_R(int &r)
 {
 	SetHFlag((r & 0x0F) == 0x00);
 	
@@ -1009,7 +1013,7 @@ void gbc::core::cpu::Processor::DEC_R(int &r)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::DEC_SP()
+void Processor::DEC_SP()
 {
 	_state.sp--;
 	_state.sp &= 0xFFFF;
@@ -1018,7 +1022,7 @@ void gbc::core::cpu::Processor::DEC_SP()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_RR_NN(int &r1, int &r2)
+void Processor::LD_RR_NN(int &r1, int &r2)
 {
 	r1 = GetOpHigh(InstructionTable::DEFAULT);
 	r2 = GetOpLow(InstructionTable::DEFAULT);
@@ -1027,7 +1031,7 @@ void gbc::core::cpu::Processor::LD_RR_NN(int &r1, int &r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_SP_NN()
+void Processor::LD_SP_NN()
 {
 	_state.sp = JoinBytes(GetOpHigh(InstructionTable::DEFAULT), GetOpLow(InstructionTable::DEFAULT));
 	
@@ -1035,7 +1039,7 @@ void gbc::core::cpu::Processor::LD_SP_NN()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::RLCA()
+void Processor::RLCA()
 {
 	SetCFlag(GetBit(_state.a, 7));
 	
@@ -1049,7 +1053,7 @@ void gbc::core::cpu::Processor::RLCA()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_AA_SP(int a1, int a2)
+void Processor::LD_AA_SP(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	
@@ -1060,7 +1064,7 @@ void gbc::core::cpu::Processor::LD_AA_SP(int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADD_RR_RR(int &r11, int &r12, int r21, int r22)
+void Processor::ADD_RR_RR(int &r11, int &r12, int r21, int r22)
 {
 	int r1Full = JoinBytes(r11, r12);
 	int r2Full = JoinBytes(r21, r22);
@@ -1079,7 +1083,7 @@ void gbc::core::cpu::Processor::ADD_RR_RR(int &r11, int &r12, int r21, int r22)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADD_RR_SP(int &r1, int &r2)
+void Processor::ADD_RR_SP(int &r1, int &r2)
 {
 	int rFull = JoinBytes(r1, r2);
 	
@@ -1099,7 +1103,7 @@ void gbc::core::cpu::Processor::ADD_RR_SP(int &r1, int &r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_R_AA(int &r, int a1, int a2)
+void Processor::LD_R_AA(int &r, int a1, int a2)
 {
 	r = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1107,7 +1111,7 @@ void gbc::core::cpu::Processor::LD_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_R_N(int &r)
+void Processor::LD_R_N(int &r)
 {
 	r = GetOpLow(InstructionTable::DEFAULT);
 	
@@ -1115,7 +1119,7 @@ void gbc::core::cpu::Processor::LD_R_N(int &r)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_AA_N(int a1, int a2)
+void Processor::LD_AA_N(int a1, int a2)
 {
 	_bus->WriteByte(JoinBytes(a1, a2), GetOpLow(InstructionTable::DEFAULT));
 	
@@ -1123,7 +1127,7 @@ void gbc::core::cpu::Processor::LD_AA_N(int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::RRCA()
+void Processor::RRCA()
 {
 	SetCFlag(GetBit(_state.a, 0));
 	
@@ -1137,7 +1141,7 @@ void gbc::core::cpu::Processor::RRCA()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::STOP()
+void Processor::STOP()
 {
 	_state.stopped = GBC_TRUE;
 	
@@ -1145,7 +1149,7 @@ void gbc::core::cpu::Processor::STOP()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::RLA()
+void Processor::RLA()
 {
 	int oldCFlag = GetCFlag();
 	
@@ -1161,7 +1165,7 @@ void gbc::core::cpu::Processor::RLA()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::JR_N()
+void Processor::JR_N()
 {
 	_state.pc += GetSignedValue(GetOpLow(InstructionTable::DEFAULT));
 	
@@ -1169,7 +1173,7 @@ void gbc::core::cpu::Processor::JR_N()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::RRA()
+void Processor::RRA()
 {
 	int oldCFlag = GetCFlag();
 	
@@ -1185,7 +1189,7 @@ void gbc::core::cpu::Processor::RRA()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::JR_N_IF(int c)
+void Processor::JR_N_IF(int c)
 {
 	if (c)
 	{
@@ -1198,7 +1202,7 @@ void gbc::core::cpu::Processor::JR_N_IF(int c)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_AA_R_INC(int &a1, int &a2, int r)
+void Processor::LD_AA_R_INC(int &a1, int &a2, int r)
 {
 	_bus->WriteByte(JoinBytes(a1, a2), r);
 	
@@ -1215,7 +1219,7 @@ void gbc::core::cpu::Processor::LD_AA_R_INC(int &a1, int &a2, int r)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_AA_R_DEC(int &a1, int &a2, int r)
+void Processor::LD_AA_R_DEC(int &a1, int &a2, int r)
 {
 	_bus->WriteByte(JoinBytes(a1, a2), r);
 	
@@ -1232,7 +1236,7 @@ void gbc::core::cpu::Processor::LD_AA_R_DEC(int &a1, int &a2, int r)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_R_AA_INC(int &r, int &a1, int &a2)
+void Processor::LD_R_AA_INC(int &r, int &a1, int &a2)
 {
 	r = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1249,7 +1253,7 @@ void gbc::core::cpu::Processor::LD_R_AA_INC(int &r, int &a1, int &a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_R_AA_DEC(int &r, int &a1, int &a2)
+void Processor::LD_R_AA_DEC(int &r, int &a1, int &a2)
 {
 	r = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1266,7 +1270,7 @@ void gbc::core::cpu::Processor::LD_R_AA_DEC(int &r, int &a1, int &a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::DAA()
+void Processor::DAA()
 {
 	if (!GetNFlag())
 	{
@@ -1313,7 +1317,7 @@ void gbc::core::cpu::Processor::DAA()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::CPL()
+void Processor::CPL()
 {
 	_state.a = ~_state.a;
 	_state.a &= 0xFF;
@@ -1325,7 +1329,7 @@ void gbc::core::cpu::Processor::CPL()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::SCF()
+void Processor::SCF()
 {
 	SetHFlag(GBC_FALSE);
 	SetNFlag(GBC_FALSE);
@@ -1335,7 +1339,7 @@ void gbc::core::cpu::Processor::SCF()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::CCF()
+void Processor::CCF()
 {
 	SetHFlag(GBC_FALSE);
 	SetCFlag(!GetCFlag());
@@ -1345,7 +1349,7 @@ void gbc::core::cpu::Processor::CCF()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_R_R(int &r1, int r2)
+void Processor::LD_R_R(int &r1, int r2)
 {
 	r1 = r2;
 	
@@ -1353,7 +1357,7 @@ void gbc::core::cpu::Processor::LD_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::HALT()
+void Processor::HALT()
 {
 	_state.halted = GBC_TRUE;
 	
@@ -1361,7 +1365,7 @@ void gbc::core::cpu::Processor::HALT()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADD_R_R(int &r1, int r2)
+void Processor::ADD_R_R(int &r1, int r2)
 {
 	SetNFlag(GBC_FALSE);
 	SetHFlag(((r1 & 0x0F) + (r2 & 0x0F)) > 0x0F);
@@ -1378,7 +1382,7 @@ void gbc::core::cpu::Processor::ADD_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADD_R_AA(int &r, int a1, int a2)
+void Processor::ADD_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1397,7 +1401,7 @@ void gbc::core::cpu::Processor::ADD_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADC_R_R(int &r1, int r2)
+void Processor::ADC_R_R(int &r1, int r2)
 {
 	int oldCFlag = GetCFlag();
 	
@@ -1416,7 +1420,7 @@ void gbc::core::cpu::Processor::ADC_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADC_R_AA(int &r, int a1, int a2)
+void Processor::ADC_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
@@ -1436,7 +1440,7 @@ void gbc::core::cpu::Processor::ADC_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::SUB_R_R(int &r1, int r2)
+void Processor::SUB_R_R(int &r1, int r2)
 {
 	SetNFlag(GBC_TRUE);
 	SetHFlag(((r1 & 0x0F) - (r2 & 0x0F)) < 0x00);
@@ -1453,7 +1457,7 @@ void gbc::core::cpu::Processor::SUB_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::SUB_R_AA(int &r, int a1, int a2)
+void Processor::SUB_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1472,7 +1476,7 @@ void gbc::core::cpu::Processor::SUB_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::SBC_R_R(int &r1, int r2)
+void Processor::SBC_R_R(int &r1, int r2)
 {
 	int oldCFlag = GetCFlag();
 	
@@ -1491,7 +1495,7 @@ void gbc::core::cpu::Processor::SBC_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::SBC_R_AA(int &r, int a1, int a2)
+void Processor::SBC_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
@@ -1511,7 +1515,7 @@ void gbc::core::cpu::Processor::SBC_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::AND_R_R(int &r1, int r2)
+void Processor::AND_R_R(int &r1, int r2)
 {
 	r1 &= r2;
 	
@@ -1524,7 +1528,7 @@ void gbc::core::cpu::Processor::AND_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::AND_R_AA(int &r, int a1, int a2)
+void Processor::AND_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1539,7 +1543,7 @@ void gbc::core::cpu::Processor::AND_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::XOR_R_R(int &r1, int r2)
+void Processor::XOR_R_R(int &r1, int r2)
 {
 	r1 ^= r2;
 	
@@ -1552,7 +1556,7 @@ void gbc::core::cpu::Processor::XOR_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::XOR_R_AA(int &r, int a1, int a2)
+void Processor::XOR_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1567,7 +1571,7 @@ void gbc::core::cpu::Processor::XOR_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::OR_R_R(int &r1, int r2)
+void Processor::OR_R_R(int &r1, int r2)
 {
 	r1 |= r2;
 	
@@ -1580,7 +1584,7 @@ void gbc::core::cpu::Processor::OR_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::OR_R_AA(int &r, int a1, int a2)
+void Processor::OR_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1595,7 +1599,7 @@ void gbc::core::cpu::Processor::OR_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::CP_R_R(int &r1, int r2)
+void Processor::CP_R_R(int &r1, int r2)
 {
 	SetCFlag(r2 > r1);
 	SetHFlag((r2 & 0x0F) > (r1 & 0x0F));
@@ -1606,7 +1610,7 @@ void gbc::core::cpu::Processor::CP_R_R(int &r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::CP_R_AA(int &r, int a1, int a2)
+void Processor::CP_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
@@ -1619,7 +1623,7 @@ void gbc::core::cpu::Processor::CP_R_AA(int &r, int a1, int a2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::CALL_NN()
+void Processor::CALL_NN()
 {
 	_state.sp -= 2;
 	
@@ -1631,7 +1635,7 @@ void gbc::core::cpu::Processor::CALL_NN()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::CALL_NN_IF(int c)
+void Processor::CALL_NN_IF(int c)
 {
 	if (c)
 	{
@@ -1652,7 +1656,7 @@ void gbc::core::cpu::Processor::CALL_NN_IF(int c)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::RET()
+void Processor::RET()
 {
 	_state.pc = JoinBytes(_bus->ReadByte(_state.sp + 1), _bus->ReadByte(_state.sp));
 	
@@ -1661,7 +1665,7 @@ void gbc::core::cpu::Processor::RET()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::RET_IF(int c)
+void Processor::RET_IF(int c)
 {
 	if (c)
 	{
@@ -1679,7 +1683,7 @@ void gbc::core::cpu::Processor::RET_IF(int c)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::RETI()
+void Processor::RETI()
 {
 	_state.interruptsEnabled = GBC_TRUE;
 	_state.halted = GBC_FALSE;
@@ -1691,14 +1695,14 @@ void gbc::core::cpu::Processor::RETI()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::JP_NN()
+void Processor::JP_NN()
 {
 	_state.pc = JoinBytes(GetOpHigh(InstructionTable::DEFAULT), GetOpLow(InstructionTable::DEFAULT));
 	
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::JP_NN_IF(int c)
+void Processor::JP_NN_IF(int c)
 {
 	if (c)
 	{
@@ -1714,14 +1718,14 @@ void gbc::core::cpu::Processor::JP_NN_IF(int c)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::JP_RR(int r1, int r2)
+void Processor::JP_RR(int r1, int r2)
 {
 	_state.pc = JoinBytes(r1, r2);
 	
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::POP_RR(int &r1, int &r2)
+void Processor::POP_RR(int &r1, int &r2)
 {
 	r1 = _bus->ReadByte(_state.sp + 1);
 	r2 = _bus->ReadByte(_state.sp);
@@ -1732,7 +1736,7 @@ void gbc::core::cpu::Processor::POP_RR(int &r1, int &r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::POP_AF()
+void Processor::POP_AF()
 {
 	_state.a = _bus->ReadByte(_state.sp + 1);
 	_state.f = _bus->ReadByte(_state.sp) & 0xF0;
@@ -1743,7 +1747,7 @@ void gbc::core::cpu::Processor::POP_AF()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::PUSH_RR(int r1, int r2)
+void Processor::PUSH_RR(int r1, int r2)
 {
 	_state.sp -= 2;
 	
@@ -1754,7 +1758,7 @@ void gbc::core::cpu::Processor::PUSH_RR(int r1, int r2)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::PUSH_AF()
+void Processor::PUSH_AF()
 {
 	_state.sp -= 2;
 	
@@ -1765,47 +1769,47 @@ void gbc::core::cpu::Processor::PUSH_AF()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADD_R_N(int &r)
+void Processor::ADD_R_N(int &r)
 {
 	ADD_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::ADC_R_N(int &r)
+void Processor::ADC_R_N(int &r)
 {
 	ADC_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::SUB_R_N(int &r)
+void Processor::SUB_R_N(int &r)
 {
 	SUB_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::SBC_R_N(int &r)
+void Processor::SBC_R_N(int &r)
 {
 	SBC_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::AND_R_N(int &r)
+void Processor::AND_R_N(int &r)
 {
 	AND_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::XOR_R_N(int &r)
+void Processor::XOR_R_N(int &r)
 {
 	XOR_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::OR_R_N(int &r)
+void Processor::OR_R_N(int &r)
 {
 	OR_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::CP_R_N(int &r)
+void Processor::CP_R_N(int &r)
 {
 	CP_R_R(r, GetOpLow(InstructionTable::DEFAULT));
 }
 
-void gbc::core::cpu::Processor::RST(int a)
+void Processor::RST(int a)
 {
 	_state.sp -= 2;
 	
@@ -1817,17 +1821,17 @@ void gbc::core::cpu::Processor::RST(int a)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LDH_A_R(int a, int r)
+void Processor::LDH_A_R(int a, int r)
 {
 	LD_A_R(a, r);
 }
 
-void gbc::core::cpu::Processor::LDH_R_A(int &r, int a)
+void Processor::LDH_R_A(int &r, int a)
 {
 	LD_R_A(r, a);
 }
 
-void gbc::core::cpu::Processor::LD_A_R(int a, int r)
+void Processor::LD_A_R(int a, int r)
 {
 	_bus->WriteByte(JoinBytes(0xFF, a), r);
 	
@@ -1835,7 +1839,7 @@ void gbc::core::cpu::Processor::LD_A_R(int a, int r)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_R_A(int &r, int a)
+void Processor::LD_R_A(int &r, int a)
 {
 	r = _bus->ReadByte(JoinBytes(0xFF, a));
 	
@@ -1843,7 +1847,7 @@ void gbc::core::cpu::Processor::LD_R_A(int &r, int a)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_AA_R(int a1, int a2, int r)
+void Processor::LD_AA_R(int a1, int a2, int r)
 {
 	_bus->WriteByte(JoinBytes(a1, a2), r);
 	
@@ -1851,7 +1855,7 @@ void gbc::core::cpu::Processor::LD_AA_R(int a1, int a2, int r)
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::ADD_SP_N()
+void Processor::ADD_SP_N()
 {
 	SetCFlag(0xFF - (_state.sp & 0xFF) < GetOpLow(InstructionTable::DEFAULT));          // to be understood
 	SetHFlag(0x0F - (_state.sp & 0x0F) < (GetOpLow(InstructionTable::DEFAULT) & 0x0F)); // to be understood
@@ -1865,7 +1869,7 @@ void gbc::core::cpu::Processor::ADD_SP_N()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_HL_SP_N()
+void Processor::LD_HL_SP_N()
 {
 	SetCFlag(0xFF - (_state.sp & 0xFF) < GetOpLow(InstructionTable::DEFAULT));          // to be understood
 	SetHFlag(0x0F - (_state.sp & 0x0F) < (GetOpLow(InstructionTable::DEFAULT) & 0x0F)); // to be understood
@@ -1881,7 +1885,7 @@ void gbc::core::cpu::Processor::LD_HL_SP_N()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::LD_SP_HL()
+void Processor::LD_SP_HL()
 {
 	_state.sp = JoinBytes(_state.h, _state.l);
 	
@@ -1889,7 +1893,7 @@ void gbc::core::cpu::Processor::LD_SP_HL()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::DI()
+void Processor::DI()
 {
 	_state.interruptsEnabled = GBC_FALSE;
 	
@@ -1897,7 +1901,7 @@ void gbc::core::cpu::Processor::DI()
 	UpdateTicks(InstructionTable::DEFAULT);
 }
 
-void gbc::core::cpu::Processor::EI()
+void Processor::EI()
 {
 	_state.interruptsEnabled = GBC_TRUE;
 	
@@ -1907,7 +1911,7 @@ void gbc::core::cpu::Processor::EI()
 
 // cb instruction set
 
-void gbc::core::cpu::Processor::RLC_R(int &r)
+void Processor::RLC_R(int &r)
 {
 	SetCFlag(GetBit(r, 7));
 	
@@ -1921,7 +1925,7 @@ void gbc::core::cpu::Processor::RLC_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RLC_AA(int a1, int a2)
+void Processor::RLC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -1940,7 +1944,7 @@ void gbc::core::cpu::Processor::RLC_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RRC_R(int &r)
+void Processor::RRC_R(int &r)
 {
 	SetCFlag(GetBit(r, 0));
 	
@@ -1954,7 +1958,7 @@ void gbc::core::cpu::Processor::RRC_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RRC_AA(int a1, int a2)
+void Processor::RRC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -1973,7 +1977,7 @@ void gbc::core::cpu::Processor::RRC_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RL_R(int &r)
+void Processor::RL_R(int &r)
 {
 	int oldCFlag = GetCFlag();
 	
@@ -1989,7 +1993,7 @@ void gbc::core::cpu::Processor::RL_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RL_AA(int a1, int a2)
+void Processor::RL_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2010,7 +2014,7 @@ void gbc::core::cpu::Processor::RL_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RR_R(int &r)
+void Processor::RR_R(int &r)
 {
 	int oldCFlag = GetCFlag();
 	
@@ -2026,7 +2030,7 @@ void gbc::core::cpu::Processor::RR_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RR_AA(int a1, int a2)
+void Processor::RR_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2047,7 +2051,7 @@ void gbc::core::cpu::Processor::RR_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SLA_R(int &r)
+void Processor::SLA_R(int &r)
 {
 	SetCFlag(GetBit(r, 7));
 	
@@ -2061,7 +2065,7 @@ void gbc::core::cpu::Processor::SLA_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SLA_AA(int a1, int a2)
+void Processor::SLA_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2080,7 +2084,7 @@ void gbc::core::cpu::Processor::SLA_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SRA_R(int &r)
+void Processor::SRA_R(int &r)
 {
 	SetCFlag(GetBit(r, 0));
 	
@@ -2094,7 +2098,7 @@ void gbc::core::cpu::Processor::SRA_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SRA_AA(int a1, int a2)
+void Processor::SRA_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2113,7 +2117,7 @@ void gbc::core::cpu::Processor::SRA_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SWAP_R(int &r)
+void Processor::SWAP_R(int &r)
 {
 	r = ((r << 4) | (r >> 4)) & 0xFF;
 	
@@ -2126,7 +2130,7 @@ void gbc::core::cpu::Processor::SWAP_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SWAP_AA(int a1, int a2)
+void Processor::SWAP_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2144,7 +2148,7 @@ void gbc::core::cpu::Processor::SWAP_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SRL_R(int &r)
+void Processor::SRL_R(int &r)
 {
 	SetCFlag(GetBit(r, 0));
 	
@@ -2158,7 +2162,7 @@ void gbc::core::cpu::Processor::SRL_R(int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SRL_AA(int a1, int a2)
+void Processor::SRL_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2177,7 +2181,7 @@ void gbc::core::cpu::Processor::SRL_AA(int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::BIT_X_R(int x, int &r)
+void Processor::BIT_X_R(int x, int &r)
 {
 	SetHFlag(GBC_TRUE);
 	SetNFlag(GBC_FALSE);
@@ -2187,7 +2191,7 @@ void gbc::core::cpu::Processor::BIT_X_R(int x, int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::BIT_X_AA(int x, int a1, int a2)
+void Processor::BIT_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2202,7 +2206,7 @@ void gbc::core::cpu::Processor::BIT_X_AA(int x, int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RES_X_R(int x, int &r)
+void Processor::RES_X_R(int x, int &r)
 {
 	r = SetBit(r, x, GBC_FALSE);
 	
@@ -2210,7 +2214,7 @@ void gbc::core::cpu::Processor::RES_X_R(int x, int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::RES_X_AA(int x, int a1, int a2)
+void Processor::RES_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
@@ -2223,7 +2227,7 @@ void gbc::core::cpu::Processor::RES_X_AA(int x, int a1, int a2)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SET_X_R(int x, int &r)
+void Processor::SET_X_R(int x, int &r)
 {
 	r = SetBit(r, x, GBC_TRUE);
 	
@@ -2231,7 +2235,7 @@ void gbc::core::cpu::Processor::SET_X_R(int x, int &r)
 	UpdateTicks(InstructionTable::CB);
 }
 
-void gbc::core::cpu::Processor::SET_X_AA(int x, int a1, int a2)
+void Processor::SET_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);

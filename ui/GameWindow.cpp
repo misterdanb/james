@@ -1,6 +1,9 @@
 #include "GameWindow.hpp"
 
-gbc::ui::GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
+using namespace gbc;
+using namespace gbc::ui;
+
+GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	: sf::RenderWindow(sf::VideoMode(width, height), "GBC"),
 	  _rightPressed(GBC_FALSE),
 	  _leftPressed(GBC_FALSE),
@@ -17,11 +20,11 @@ gbc::ui::GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	_gbc.SetJoypad(this);
 }
 
-gbc::ui::GameWindow::~GameWindow()
+GameWindow::~GameWindow()
 {
 }
 
-void gbc::ui::GameWindow::Render()
+void GameWindow::Render()
 {
 	_gbc.RenderFrame();
 	
@@ -126,7 +129,7 @@ void gbc::ui::GameWindow::Render()
 	display();
 }
 
-void gbc::ui::GameWindow::DrawFrame(core::Frame frame)
+void GameWindow::DrawFrame(core::Frame frame)
 {
 	core::Frame::FrameArray2 &rawMap = frame.data;
 	
@@ -146,42 +149,42 @@ void gbc::ui::GameWindow::DrawFrame(core::Frame frame)
 	_frame.create(core::Frame::WIDTH, core::Frame::HEIGHT, &_rawFrame[0]);
 }
 
-int gbc::ui::GameWindow::GetRight()
+int GameWindow::GetRight()
 {
 	return _rightPressed;
 }
 
-int gbc::ui::GameWindow::GetLeft()
+int GameWindow::GetLeft()
 {
 	return _leftPressed;
 }
 
-int gbc::ui::GameWindow::GetUp()
+int GameWindow::GetUp()
 {
 	return _upPressed;
 }
 
-int gbc::ui::GameWindow::GetDown()
+int GameWindow::GetDown()
 {
 	return _downPressed;
 }
 
-int gbc::ui::GameWindow::GetButtonA()
+int GameWindow::GetButtonA()
 {
 	return _buttonAPressed;
 }
 
-int gbc::ui::GameWindow::GetButtonB()
+int GameWindow::GetButtonB()
 {
 	return _buttonBPressed;
 }
 
-int gbc::ui::GameWindow::GetSelect()
+int GameWindow::GetSelect()
 {
 	return _selectPressed;
 }
 
-int gbc::ui::GameWindow::GetStart()
+int GameWindow::GetStart()
 {
 	return _startPressed;
 }

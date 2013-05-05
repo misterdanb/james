@@ -1,9 +1,11 @@
 #include "GameboyColor.hpp"
 
-using namespace gbc::core::cpu;
-using namespace gbc::core::cartridges;
+using namespace gbc;
+using namespace gbc::core;
+using namespace cpu;
+using namespace cartridges;
 
-gbc::core::GameboyColor::GameboyColor()
+GameboyColor::GameboyColor()
 	: _joypad(NULL),
 	  _directionKeysSelected(0),
 	  _buttonKeysSelected(1),
@@ -67,22 +69,22 @@ gbc::core::GameboyColor::GameboyColor()
 	_rcColor.currentDMATransferOffset = 0x0000;
 }
 
-gbc::core::GameboyColor::~GameboyColor()
+GameboyColor::~GameboyColor()
 {
 	delete _cartridge;
 }
 
-void gbc::core::GameboyColor::SetLCD(ILCD *lcd)
+void GameboyColor::SetLCD(ILCD *lcd)
 {
 	_lcd = lcd;
 }
 
-void gbc::core::GameboyColor::SetJoypad(IJoypad *joypad)
+void GameboyColor::SetJoypad(IJoypad *joypad)
 {
 	_joypad = joypad;
 }
 
-void gbc::core::GameboyColor::SetRom(DynamicArray<int> &rom)
+void GameboyColor::SetRom(DynamicArray<int> &rom)
 {
 	LOG_L2("Loading cartridge");
 	
@@ -95,12 +97,12 @@ void gbc::core::GameboyColor::SetRom(DynamicArray<int> &rom)
 	}
 }
 
-gbc::core::IInterruptHandler *gbc::core::GameboyColor::GetInterruptHandler()
+IInterruptHandler *GameboyColor::GetInterruptHandler()
 {
 	return &_hybr1s80;
 }
 
-void gbc::core::GameboyColor::Initialize()
+void GameboyColor::Initialize()
 {
 	LOG_L2("Initializing Gameboy Color emulation");
 	
@@ -133,7 +135,7 @@ void gbc::core::GameboyColor::Initialize()
 	          _rcClassic.monochromeSpritePalette1.colors.begin());
 }
 
-void gbc::core::GameboyColor::RenderScanline()
+void GameboyColor::RenderScanline()
 {
 	if (_rc.lcdY < 144)
 	{
@@ -166,7 +168,7 @@ void gbc::core::GameboyColor::RenderScanline()
 	}
 }
 
-void gbc::core::GameboyColor::RenderFrame()
+void GameboyColor::RenderFrame()
 {
 	for (int i = 0; i < 154; i++)
 	{	
@@ -174,7 +176,7 @@ void gbc::core::GameboyColor::RenderFrame()
 	}
 }
 
-void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
+void GameboyColor::ExecuteMachineClocks(int clocks)
 {
 	for (int i = 0; i < clocks * 4; i++)
 	{
@@ -217,7 +219,7 @@ void gbc::core::GameboyColor::ExecuteMachineClocks(int clocks)
 	}
 }
 
-int gbc::core::GameboyColor::ReadByte(int address)
+int GameboyColor::ReadByte(int address)
 {
 	// das geht eleganter...
 	address &= 0xFFFF;
@@ -307,7 +309,7 @@ int gbc::core::GameboyColor::ReadByte(int address)
 	return 0x00;
 }
 
-void gbc::core::GameboyColor::WriteByte(int address, int value)
+void GameboyColor::WriteByte(int address, int value)
 {
 	// das geht eleganter...
 	address &= 0xFFFF;
@@ -819,7 +821,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 	}
 }
 
-/*void gbc::core::GameboyColor::DoOAMSearch()
+/*void GameboyColor::DoOAMSearch()
 {
 	_rc.lcdMode = LCDMode::SEARCHING_OAM;
 	
@@ -838,7 +840,7 @@ void gbc::core::GameboyColor::WriteByte(int address, int value)
 	UpdateSpriteAttributes();
 }
 
-void gbc::core::GameboyColor::DoTransferData()
+void GameboyColor::DoTransferData()
 {
 	_rc.lcdMode = LCDMode::TRANSFERRING_DATA;
 	
@@ -925,7 +927,7 @@ void gbc::core::GameboyColor::DoTransferData()
 	}
 }
 
-void gbc::core::GameboyColor::DoHBlank()
+void GameboyColor::DoHBlank()
 {
 	_rc.lcdMode = LCDMode::HORIZONTAL_BLANK;
 	
@@ -974,7 +976,7 @@ void gbc::core::GameboyColor::DoHBlank()
 	}
 }
 
-void gbc::core::GameboyColor::DoVBlank()
+void GameboyColor::DoVBlank()
 {
 	_rc.lcdMode = LCDMode::VERTICAL_BLANK;
 	
@@ -1003,7 +1005,7 @@ void gbc::core::GameboyColor::DoVBlank()
 	}
 }
 
-void gbc::core::GameboyColor::UpdateTiles()
+void GameboyColor::UpdateTiles()
 {
 	int lastTile = 0;
 	
@@ -1031,7 +1033,7 @@ void gbc::core::GameboyColor::UpdateTiles()
 	}
 }
 
-void gbc::core::GameboyColor::UpdateBackgroundMapElements()
+void GameboyColor::UpdateBackgroundMapElements()
 {
 	while (_rc.changedTileMapElements.size() > 0)
 	{
@@ -1050,7 +1052,7 @@ void gbc::core::GameboyColor::UpdateBackgroundMapElements()
 	}
 }
 
-void gbc::core::GameboyColor::UpdateTileMapAttributes()
+void GameboyColor::UpdateTileMapAttributes()
 {
 	while (_rcColor.changedTileMapAttributes.size() > 0)
 	{
@@ -1075,7 +1077,7 @@ void gbc::core::GameboyColor::UpdateTileMapAttributes()
 	}
 }
 
-void gbc::core::GameboyColor::UpdateSpriteAttributes()
+void GameboyColor::UpdateSpriteAttributes()
 {
 	while (_rc.changedSpriteAttributes.size() > 0)
 	{
@@ -1101,7 +1103,7 @@ void gbc::core::GameboyColor::UpdateSpriteAttributes()
 	}
 }
 
-void gbc::core::GameboyColor::DrawSprites(int enabledColors,
+void GameboyColor::DrawSprites(int enabledColors,
                                           SpriteToBackgroundPriority spriteToBackgroundPriority)
 {
 	for (int i = 0; i < 40; i++)
@@ -1145,7 +1147,7 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors,
 	}
 }
 
-void gbc::core::GameboyColor::DrawSprites(int enabledColors)
+void GameboyColor::DrawSprites(int enabledColors)
 {
 	for (int i = 0; i < 40; i++)
 	{
@@ -1187,7 +1189,7 @@ void gbc::core::GameboyColor::DrawSprites(int enabledColors)
 	}
 }
 
-void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors,
+void GameboyColor::DrawBackgroundMap(int enabledColors,
                                                 BackgroundToOAMPriority backgroundToOAMPriority)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
@@ -1224,7 +1226,7 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors,
 	}
 }
 
-void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors)
+void GameboyColor::DrawBackgroundMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
@@ -1235,7 +1237,7 @@ void gbc::core::GameboyColor::DrawBackgroundMap(int enabledColors)
 	}
 }
 
-void gbc::core::GameboyColor::DrawWindowMap(int enabledColors,
+void GameboyColor::DrawWindowMap(int enabledColors,
                                             BackgroundToOAMPriority backgroundToOAMPriority)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
@@ -1272,7 +1274,7 @@ void gbc::core::GameboyColor::DrawWindowMap(int enabledColors,
 	}
 }
 
-void gbc::core::GameboyColor::DrawWindowMap(int enabledColors)
+void GameboyColor::DrawWindowMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
@@ -1283,7 +1285,7 @@ void gbc::core::GameboyColor::DrawWindowMap(int enabledColors)
 	}
 }
 
-void gbc::core::GameboyColor::DrawMapTile(int mapX,
+void GameboyColor::DrawMapTile(int mapX,
                                           int xOffset,
                                           int yOffset,
                                           int tileMapDisplaySelect,
@@ -1366,7 +1368,7 @@ void gbc::core::GameboyColor::DrawMapTile(int mapX,
 	}
 }
 
-void gbc::core::GameboyColor::DrawTile(int x, int y,
+void GameboyColor::DrawTile(int x, int y,
                                        Tile tile,
                                        HorizontalFlip horizontalFlip,
                                        VerticalFlip verticalFlip,

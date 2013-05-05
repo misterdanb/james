@@ -1,14 +1,17 @@
 #include "ClassicRenderer.hpp"
 
-gbc::core::ClassicRenderer::ClassicRenderer()
+using namespace gbc;
+using namespace gbc::core;
+
+ClassicRenderer::ClassicRenderer()
 {
 }
 
-gbc::core::ClassicRenderer::~ClassicRenderer()
+ClassicRenderer::~ClassicRenderer()
 {
 }
 
-void gbc::core::ClassicRenderer::RenderOAMSearch(RenderContext &rc)
+void ClassicRenderer::RenderOAMSearch(RenderContext &rc)
 {
 	rc.lcdMode = LCDMode::SEARCHING_OAM;
 	
@@ -27,7 +30,7 @@ void gbc::core::ClassicRenderer::RenderOAMSearch(RenderContext &rc)
 	UpdateSpriteAttributes(rc);
 }
 
-void gbc::core::ClassicRenderer::RenderTransferData(RenderContext &rc)
+void ClassicRenderer::RenderTransferData(RenderContext &rc)
 {
 	rc.lcdMode = LCDMode::TRANSFERRING_DATA;
 	
@@ -63,7 +66,7 @@ void gbc::core::ClassicRenderer::RenderTransferData(RenderContext &rc)
 	}
 }
 
-void gbc::core::ClassicRenderer::RenderHorizontalBlank(RenderContext &rc)
+void ClassicRenderer::RenderHorizontalBlank(RenderContext &rc)
 {
 	rc.lcdMode = LCDMode::HORIZONTAL_BLANK;
 	
@@ -78,7 +81,7 @@ void gbc::core::ClassicRenderer::RenderHorizontalBlank(RenderContext &rc)
 	}
 }
 
-void gbc::core::ClassicRenderer::RenderVerticalBlank(RenderContext &rc)
+void ClassicRenderer::RenderVerticalBlank(RenderContext &rc)
 {
 	rc.lcdMode = LCDMode::VERTICAL_BLANK;
 	
@@ -107,9 +110,9 @@ void gbc::core::ClassicRenderer::RenderVerticalBlank(RenderContext &rc)
 	}
 }
 
-void gbc::core::ClassicRenderer::DrawSprites(int enabledColors,
-                                             SpriteToBackgroundPriority spriteToBackgroundPriority,
-                                             RenderContext &rc)
+void ClassicRenderer::DrawSprites(int enabledColors,
+                                  SpriteToBackgroundPriority spriteToBackgroundPriority,
+                                  RenderContext &rc)
 {
 	RenderContext::GameboyClassicSpecificRenderContext &rcClassic = rc.gameboyClassicSpecific;
 	
@@ -135,7 +138,7 @@ void gbc::core::ClassicRenderer::DrawSprites(int enabledColors,
 	}
 }
 
-void gbc::core::ClassicRenderer::DrawSprites(int enabledColors,
+void ClassicRenderer::DrawSprites(int enabledColors,
                                              RenderContext &rc)
 {
 	RenderContext::GameboyClassicSpecificRenderContext &rcClassic = rc.gameboyClassicSpecific;
@@ -161,8 +164,8 @@ void gbc::core::ClassicRenderer::DrawSprites(int enabledColors,
 	}
 }
 
-void gbc::core::ClassicRenderer::DrawBackgroundMap(int enabledColors,
-                                                   RenderContext &rc)
+void ClassicRenderer::DrawBackgroundMap(int enabledColors,
+                                        RenderContext &rc)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
@@ -175,8 +178,8 @@ void gbc::core::ClassicRenderer::DrawBackgroundMap(int enabledColors,
 	}
 }
 
-void gbc::core::ClassicRenderer::DrawWindowMap(int enabledColors,
-                                               RenderContext &rc)
+void ClassicRenderer::DrawWindowMap(int enabledColors,
+                                    RenderContext &rc)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
@@ -189,12 +192,12 @@ void gbc::core::ClassicRenderer::DrawWindowMap(int enabledColors,
 	}
 }
 
-void gbc::core::ClassicRenderer::DrawMapTile(int mapX,
-                                             int xOffset,
-                                             int yOffset,
-                                             int tileMapDisplaySelect,
-                                             int enabledColors,
-                                             RenderContext &rc)
+void ClassicRenderer::DrawMapTile(int mapX,
+                                  int xOffset,
+                                  int yOffset,
+                                  int tileMapDisplaySelect,
+                                  int enabledColors,
+                                  RenderContext &rc)
 {
 	RenderContext::GameboyClassicSpecificRenderContext &rcClassic = rc.gameboyClassicSpecific;
 	
@@ -243,14 +246,14 @@ void gbc::core::ClassicRenderer::DrawMapTile(int mapX,
 		     rc);
 }
 
-void gbc::core::ClassicRenderer::DrawTile(int x,
-                                          int y,
-                                          Tile tile,
-                                          HorizontalFlip horizontalFlip,
-                                          VerticalFlip verticalFlip,
-                                          ColorPalette colorPalette,
-                                          int enabledColors,
-                                          RenderContext &rc)
+void ClassicRenderer::DrawTile(int x,
+                               int y,
+                               Tile tile,
+                               HorizontalFlip horizontalFlip,
+                               VerticalFlip verticalFlip,
+                               ColorPalette colorPalette,
+                               int enabledColors,
+                               RenderContext &rc)
 {
 	int tileY = rc.lcdY - y;
 	

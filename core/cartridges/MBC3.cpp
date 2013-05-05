@@ -1,15 +1,19 @@
 #include "MBC3.hpp"
 
-gbc::core::cartridges::MBC3::MBC3(DynamicArray<int> rom)
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cartridges;
+
+MBC3::MBC3(DynamicArray<int> rom)
 	: Cartridge(rom), _ramRtcEnabled(GBC_FALSE), _ramRtcMode(0x00)
 {
 }
 
-gbc::core::cartridges::MBC3::~MBC3()
+MBC3::~MBC3()
 {
 }
 
-int gbc::core::cartridges::MBC3::ReadByte(int address)
+int MBC3::ReadByte(int address)
 {
 	if (address >= 0x0000 && address <= 0x3FFF)
 	{
@@ -43,7 +47,7 @@ int gbc::core::cartridges::MBC3::ReadByte(int address)
 	return 0x00;
 }
 
-void gbc::core::cartridges::MBC3::WriteByte(int address, int value)
+void MBC3::WriteByte(int address, int value)
 {
 	if (address >= 0x0000 && address <= 0x1FFF)
 	{

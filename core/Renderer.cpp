@@ -1,10 +1,13 @@
 #include "Renderer.hpp"
 
-gbc::core::Renderer::~Renderer()
+using namespace gbc;
+using namespace gbc::core;
+
+Renderer::~Renderer()
 {
 }
 
-void gbc::core::Renderer::UpdateTiles(RenderContext &rc)
+void Renderer::UpdateTiles(RenderContext &rc)
 {
 	int lastTile = 0;
 	
@@ -32,7 +35,7 @@ void gbc::core::Renderer::UpdateTiles(RenderContext &rc)
 	}
 }
 
-void gbc::core::Renderer::UpdateBackgroundMapElements(RenderContext &rc)
+void Renderer::UpdateBackgroundMapElements(RenderContext &rc)
 {
 	while (rc.changedTileMapElements.size() > 0)
 	{
@@ -52,7 +55,7 @@ void gbc::core::Renderer::UpdateBackgroundMapElements(RenderContext &rc)
 	}
 }
 
-void gbc::core::Renderer::UpdateTileMapAttributes(RenderContext &rc)
+void Renderer::UpdateTileMapAttributes(RenderContext &rc)
 {
 	RenderContext::GameboyColorSpecificRenderContext &rcColor = rc.gameboyColorSpecific;
 	
@@ -79,7 +82,7 @@ void gbc::core::Renderer::UpdateTileMapAttributes(RenderContext &rc)
 	}
 }
 
-void gbc::core::Renderer::UpdateSpriteAttributes(RenderContext &rc)
+void Renderer::UpdateSpriteAttributes(RenderContext &rc)
 {
 	while (rc.changedSpriteAttributes.size() > 0)
 	{

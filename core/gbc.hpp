@@ -9,28 +9,27 @@
 #include <fstream>
 #include <iomanip>
 #include <type_traits>
-#include <stdarg.h>
 
 //#define DEBUG
 
 #define LOG_LEVEL_2
 
 #ifdef DEBUG
-	#define LOG(str) gbc::Log(std::string("L1> ") + str)
-	#define ERROR(str) gbc::Log(std::string("E1> ") + str)
+	#define LOG(str) Log(std::string("L1> ") + str)
+	#define ERROR(str) Log(std::string("E1> ") + str)
 	
 	#if defined(LOG_LEVEL_2) || defined(LOG_LEVEL_3)
-		#define LOG_L2(str) gbc::Log(std::string("L2> ") + str)
-		#define ERROR_L2(str) gbc::Log(std::string("E2> ") + str)
+		#define LOG_L2(str) Log(std::string("L2> ") + str)
+		#define ERROR_L2(str) Log(std::string("E2> ") + str)
 	#else
 		#define LOG_L2(str)
 		#define ERROR_L2(str)
 	#endif
 	
 	#ifdef LOG_LEVEL_3
-		#define CPU_LOG(str) gbc::LogToFile("cpu.log", str)
-		#define LOG_L3(str) gbc::Log(std::string("L3> ") + str)
-		#define ERROR_L3(str) gbc::Log(std::string("E3> ") + str)
+		#define CPU_LOG(str) LogToFile("cpu.log", str)
+		#define LOG_L3(str) Log(std::string("L3> ") + str)
+		#define ERROR_L3(str) Log(std::string("E3> ") + str)
 	#else
 		#define CPU_LOG(str)
 		#define LOG_L3(str)

@@ -9,7 +9,11 @@
 #include "RomRam.hpp"
 #include "MMM01.hpp"
 
-gbc::core::cartridges::Cartridge::Cartridge(DynamicArray<int> &rom)
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cartridges;
+
+Cartridge::Cartridge(DynamicArray<int> &rom)
 	: _header(rom),
 	  _selectedRomBank(1),
 	  _selectedRamBank(0)
@@ -21,16 +25,16 @@ gbc::core::cartridges::Cartridge::Cartridge(DynamicArray<int> &rom)
 	std::fill(_ram.begin(), _ram.end(), 0x00);
 }
 
-gbc::core::cartridges::Cartridge::~Cartridge()
+Cartridge::~Cartridge()
 {
 }
 
-gbc::core::cartridges::Header gbc::core::cartridges::Cartridge::GetHeader()
+Header Cartridge::GetHeader()
 {
 	return _header;
 }
 
-gbc::core::cartridges::Cartridge *gbc::core::cartridges::Cartridge::Create(DynamicArray<int> rom)
+Cartridge *Cartridge::Create(DynamicArray<int> rom)
 {
 	CartridgeType cartridgeType = CartridgeType(rom[Header::CARTRIDGE_TYPE_ADDRESS]);
 	

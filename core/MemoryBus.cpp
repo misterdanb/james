@@ -1,5 +1,8 @@
 #include "MemoryBus.hpp"
 
-gbc::core::IMemoryBus::~IMemoryBus()
+using namespace gbc;
+using namespace gbc::core;
+
+IMemoryBus::~IMemoryBus()
 {
 }

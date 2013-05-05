@@ -1,15 +1,19 @@
 #include "MBC2.hpp"
 
-gbc::core::cartridges::MBC2::MBC2(DynamicArray<int> rom)
+using namespace gbc;
+using namespace gbc::core;
+using namespace gbc::core::cartridges;
+
+MBC2::MBC2(DynamicArray<int> rom)
 	: Cartridge(rom), _ramEnabled(GBC_FALSE)
 {
 }
 
-gbc::core::cartridges::MBC2::~MBC2()
+MBC2::~MBC2()
 {
 }
 
-int gbc::core::cartridges::MBC2::ReadByte(int address)
+int MBC2::ReadByte(int address)
 {
 	if (address >= 0x0000 && address <= 0x3FFF)
 	{
@@ -36,7 +40,7 @@ int gbc::core::cartridges::MBC2::ReadByte(int address)
 	return 0x00;
 }
 
-void gbc::core::cartridges::MBC2::WriteByte(int address, int value)
+void MBC2::WriteByte(int address, int value)
 {
 	if (address >= 0x0000 && address <= 0x1FFF)
 	{
