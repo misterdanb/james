@@ -120,9 +120,17 @@ void gbc::core::GameboyColor::Initialize()
 	_monochromePalette.colors[0].green = 0x1F;
 	_monochromePalette.colors[0].blue = 0x1F;
 	
-	std::memcpy(_rcClassic.monochromeBackgroundPalette.colors, _monochromePalette.colors, sizeof(ColorPalette));
-	std::memcpy(_rcClassic.monochromeSpritePalette0.colors, _monochromePalette.colors, sizeof(ColorPalette));
-	std::memcpy(_rcClassic.monochromeSpritePalette1.colors, _monochromePalette.colors, sizeof(ColorPalette));
+	std::copy(_monochromePalette.colors.begin(),
+	          _monochromePalette.colors.end(),
+	          _rcClassic.monochromeBackgroundPalette.colors.begin());
+	
+	std::copy(_monochromePalette.colors.begin(),
+	          _monochromePalette.colors.end(),
+	          _rcClassic.monochromeSpritePalette0.colors.begin());
+	
+	std::copy(_monochromePalette.colors.begin(),
+	          _monochromePalette.colors.end(),
+	          _rcClassic.monochromeSpritePalette1.colors.begin());
 }
 
 void gbc::core::GameboyColor::RenderScanline()

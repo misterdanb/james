@@ -94,7 +94,7 @@ void gbc::core::cartridges::MBC1::WriteByte(int address, int value)
 			_selectedRomBank &= 0x1F;
 		}
 	}
-	else if (address >= 0xA000 && address <= 0xBFFFF)
+	else if (address >= 0xA000 && address <= 0xBFFF)
 	{
 		if (address - 0xA000 < _header.ramDimensions.bankSize)
 		{

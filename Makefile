@@ -1,4 +1,4 @@
-CC=g++
+CC=clang++
 
 CFLAGS=-c -std=c++11 -O2
 CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O2

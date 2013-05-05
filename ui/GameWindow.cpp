@@ -143,7 +143,7 @@ void gbc::ui::GameWindow::DrawFrame(core::Frame frame)
 		}
 	}
 	
-	_frame.create(core::Frame::WIDTH, core::Frame::HEIGHT, _rawFrame);
+	_frame.create(core::Frame::WIDTH, core::Frame::HEIGHT, &_rawFrame[0]);
 }
 
 int gbc::ui::GameWindow::GetRight()

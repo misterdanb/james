@@ -33,7 +33,7 @@ namespace gbc
 		private:
 			core::GameboyColor _gbc;
 			
-			sf::Uint8 _rawFrame[core::Frame::WIDTH * core::Frame::HEIGHT * 4];
+			Array<sf::Uint8, core::Frame::WIDTH * core::Frame::HEIGHT * 4> _rawFrame;
 			sf::Image _frame;
 			
 			int _rightPressed;

@@ -179,9 +179,9 @@ namespace gbc
 				
 				int _counter;
 				
-				int _currentOpCodes[LookUpTables::AMOUNT_OF_INSTUCTION_TABLES];
-				int _currentOpLows[LookUpTables::AMOUNT_OF_INSTUCTION_TABLES];
-				int _currentOpHighs[LookUpTables::AMOUNT_OF_INSTUCTION_TABLES];
+				Array<int, LookUpTables::AMOUNT_OF_INSTUCTION_TABLES> _currentOpCodes;
+				Array<int, LookUpTables::AMOUNT_OF_INSTUCTION_TABLES> _currentOpLows;
+				Array<int, LookUpTables::AMOUNT_OF_INSTUCTION_TABLES> _currentOpHighs;
 				
 				State _state;
 				IMemoryBus *_bus;

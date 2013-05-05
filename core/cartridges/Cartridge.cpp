@@ -11,11 +11,12 @@
 
 gbc::core::cartridges::Cartridge::Cartridge(DynamicArray<int> &rom)
 	: _header(rom),
-	  _rom(rom.size()),
-	  _ram(_header.ramDimensions.size),
 	  _selectedRomBank(1),
 	  _selectedRamBank(0)
 {
+	_rom.resize(_header.romDimensions.size);
+	_ram.resize(_header.ramDimensions.size);
+	
 	std::copy(rom.begin(), rom.end(), _rom.begin());
 	std::fill(_ram.begin(), _ram.end(), 0x00);
 }

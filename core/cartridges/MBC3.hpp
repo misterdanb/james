@@ -25,7 +25,7 @@ namespace gbc
 			private:
 				int _ramRtcEnabled;
 				int _ramRtcMode;
-				int _rtc[5];
+				Array<int, 5> _rtc;
 			};
 		}
 	}
