@@ -29,6 +29,7 @@ OBJECTS=core/gbc.o \
 	core/Renderer.o \
 	core/ClassicRenderer.o \
 	core/GameboyColor.o \
+	ui/TileMapWindow.o \
 	ui/GameWindow.o \
 	main.o
 
@@ -55,6 +56,7 @@ OBJECTSDEBUG=core/gbc-debug.o \
 	core/Renderer-debug.o \
 	core/ClassicRenderer-debug.o \
 	core/GameboyColor-debug.o \
+	ui/TileMapWindow-debug.o \
 	ui/GameWindow-debug.o \
 	main-debug.o
 
@@ -71,6 +73,9 @@ main.o: main.cpp
 
 ui/GameWindow.o: ui/GameWindow.cpp
 	$(CC) $(CFLAGS) ui/GameWindow.cpp -o ui/GameWindow.o
+
+ui/TileMapWindow.o: ui/TileMapWindow.cpp
+	$(CC) $(CFLAGS) ui/TileMapWindow.cpp -o ui/TileMapWindow.o
 
 core/GameboyColor.o: core/GameboyColor.cpp
 	$(CC) $(CFLAGS) core/GameboyColor.cpp -o core/GameboyColor.o
@@ -151,6 +156,9 @@ main-debug.o: main.cpp
 
 ui/GameWindow-debug.o: ui/GameWindow.cpp
 	$(CC) $(CFLAGSDEBUG) ui/GameWindow.cpp -o ui/GameWindow-debug.o
+
+ui/TileMapWindow-debug.o: ui/TileMapWindow.cpp
+	$(CC) $(CFLAGSDEBUG) ui/TileMapWindow.cpp -o ui/TileMapWindow-debug.o
 
 core/GameboyColor-debug.o: core/GameboyColor.cpp
 	$(CC) $(CFLAGSDEBUG) core/GameboyColor.cpp -o core/GameboyColor-debug.o

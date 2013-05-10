@@ -10,21 +10,23 @@ namespace gbc
 		class ClassicRenderer : public Renderer
 		{
 		public:
-			ClassicRenderer();
+			ClassicRenderer(RenderContext &);
 			~ClassicRenderer();
 			
-			void RenderOAMSearch(RenderContext &);
-			void RenderTransferData(RenderContext &);
-			void RenderHorizontalBlank(RenderContext &);
-			void RenderVerticalBlank(RenderContext &);
+			void RenderOAMSearch();
+			void RenderTransferData();
+			void RenderHorizontalBlank();
+			void RenderVerticalBlank();
+			
+			Renderer::RenderedTileMap GetRenderedTileMap(int);
 		
 		private:
-			void DrawSprites(int, SpriteToBackgroundPriority, RenderContext &);
-			void DrawSprites(int, RenderContext &);
-			void DrawBackgroundMap(int, RenderContext &);
-			void DrawWindowMap(int, RenderContext &);
-			void DrawMapTile(int, int, int, int, int, RenderContext &);
-			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int, RenderContext &);
+			void DrawSprites(int, SpriteToBackgroundPriority);
+			void DrawSprites(int);
+			void DrawBackgroundMap(int);
+			void DrawWindowMap(int);
+			void DrawMapTile(int, int, int, int, int);
+			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
 		};
 	}
 }

@@ -15,7 +15,7 @@ namespace gbc
 		{
 		public:
 			PixelMap()
-				: Matrix<Color, width, height>()
+				: Matrix<Color, width, height>(), map(_matrixElements)
 			{
 				Color nullColor;
 				
@@ -34,11 +34,9 @@ namespace gbc
 			{
 				return _matrixElements[x][y];
 			}
-			
-			Array2<Color, width, height> &GetMap()
-			{
-				return _matrixElements;
-			}
+		
+		public:
+			Array2<Color, width, height> &map;
 		
 		protected:
 			using Matrix<Color, width, height>::Clear;

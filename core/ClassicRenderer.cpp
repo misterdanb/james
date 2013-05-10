@@ -3,7 +3,8 @@
 using namespace gbc;
 using namespace gbc::core;
 
-ClassicRenderer::ClassicRenderer()
+ClassicRenderer::ClassicRenderer(RenderContext &rc)
+	: Renderer(rc)
 {
 }
 
@@ -11,184 +12,207 @@ ClassicRenderer::~ClassicRenderer()
 {
 }
 
-void ClassicRenderer::RenderOAMSearch(RenderContext &rc)
+void ClassicRenderer::RenderOAMSearch()
 {
-	rc.lcdMode = LCDMode::SEARCHING_OAM;
+	_rc.lcdMode = LCDMode::SEARCHING_OAM;
 	
-	rc.coincidenceFlag = (rc.lcdY == rc.lcdYCompare);
+	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
 	
-	if (rc.oamInterruptEnabled)
+	if (_rc.oamInterruptEnabled)
 	{
-		rc.interruptHandler->SignalLCDStatusInterrupt();
+		_rc.interruptHandler->SignalLCDStatusInterrupt();
 	}
 	
-	if (rc.coincidenceInterruptEnabled && rc.coincidenceFlag)
+	if (_rc.coincidenceInterruptEnabled && _rc.coincidenceFlag)
 	{
-		rc.interruptHandler->SignalLCDStatusInterrupt();
+		_rc.interruptHandler->SignalLCDStatusInterrupt();
 	}
 	
-	UpdateSpriteAttributes(rc);
+	UpdateSpriteAttributes();
 }
 
-void ClassicRenderer::RenderTransferData(RenderContext &rc)
+void ClassicRenderer::RenderTransferData()
 {
-	rc.lcdMode = LCDMode::TRANSFERRING_DATA;
+	_rc.lcdMode = LCDMode::TRANSFERRING_DATA;
 	
-	UpdateTiles(rc);
-	UpdateBackgroundMapElements(rc);
-	UpdateSpriteAttributes(rc);
+	UpdateTiles();
+	UpdateBackgroundMapElements();
+	UpdateSpriteAttributes();
 	
-	if (rc.lcdDisplayEnabled)
+	if (_rc.lcdDisplayEnabled)
 	{
-		if (rc.backgroundDisplayEnabled)
+		if (_rc.backgroundDisplayEnabled)
 		{
-			DrawBackgroundMap(COLOR_0, rc);
+			DrawBackgroundMap(COLOR_0);
 		}
 		
-		if (rc.windowDisplayEnabled)
+		if (_rc.windowDisplayEnabled)
 		{
-			DrawWindowMap(COLOR_0, rc);
+			DrawWindowMap(COLOR_0);
 		}
 		
-		DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND, rc);
+		DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND);
 		
-		if (rc.backgroundDisplayEnabled)
+		if (_rc.backgroundDisplayEnabled)
 		{
-			DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3, rc);
+			DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3);
 		}
 		
-		if (rc.windowDisplayEnabled)
+		if (_rc.windowDisplayEnabled)
 		{
-			DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3, rc);
+			DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3);
 		}
 		
-		DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND, rc);
-	}
-}
-
-void ClassicRenderer::RenderHorizontalBlank(RenderContext &rc)
-{
-	rc.lcdMode = LCDMode::HORIZONTAL_BLANK;
-	
-	if (rc.horizontalBlankInterruptEnabled)
-	{
-		rc.interruptHandler->SignalLCDStatusInterrupt();
-	}
-	
-	if (rc.lcdY < 144)
-	{
-		rc.lcdY++;
+		DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND);
 	}
 }
 
-void ClassicRenderer::RenderVerticalBlank(RenderContext &rc)
+void ClassicRenderer::RenderHorizontalBlank()
 {
-	rc.lcdMode = LCDMode::VERTICAL_BLANK;
+	_rc.lcdMode = LCDMode::HORIZONTAL_BLANK;
 	
-	rc.coincidenceFlag = (rc.lcdY == rc.lcdYCompare);
-	
-	if (rc.coincidenceInterruptEnabled && rc.coincidenceFlag)
+	if (_rc.horizontalBlankInterruptEnabled)
 	{
-		rc.interruptHandler->SignalLCDStatusInterrupt();
+		_rc.interruptHandler->SignalLCDStatusInterrupt();
 	}
 	
-	if (rc.verticalBlankInterruptEnabled && !rc.verticalBlankInterruptAlreadyRequested)
+	if (_rc.lcdY < 144)
 	{
-		rc.interruptHandler->SignalVBlankInterrupt();
-		rc.verticalBlankInterruptAlreadyRequested = GBC_TRUE;
+		_rc.lcdY++;
+	}
+}
+
+void ClassicRenderer::RenderVerticalBlank()
+{
+	_rc.lcdMode = LCDMode::VERTICAL_BLANK;
+	
+	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
+	
+	if (_rc.coincidenceInterruptEnabled && _rc.coincidenceFlag)
+	{
+		_rc.interruptHandler->SignalLCDStatusInterrupt();
 	}
 	
-	if (rc.lcdY >= 144)
+	if (_rc.verticalBlankInterruptEnabled && !_rc.verticalBlankInterruptAlreadyRequested)
 	{
-		rc.lcdY++;
+		_rc.interruptHandler->SignalVBlankInterrupt();
+		_rc.verticalBlankInterruptAlreadyRequested = GBC_TRUE;
 	}
 	
-	if (rc.lcdY > 153)
+	if (_rc.lcdY >= 144)
 	{
-		rc.lcdY = 0;
-		rc.verticalBlankInterruptAlreadyRequested = GBC_FALSE;
+		_rc.lcdY++;
 	}
+	
+	if (_rc.lcdY > 153)
+	{
+		_rc.lcdY = 0;
+		_rc.verticalBlankInterruptAlreadyRequested = GBC_FALSE;
+	}
+}
+
+Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap(int tileMapNumber)
+{
+	// implement this, when you're not as tired as now
+	RenderedTileMap renderedTileMap;
+	
+	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
+	{
+		for (int mapY = 0; mapY < TileMap::HEIGHT; mapY++)
+		{
+			int backgroundMapElement = _rc.tileMaps
+			                           [tileMapNumber].data
+			                           [mapX][mapY];
+			
+			int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
+			                 (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
+			                 (((0x8000 - 0x8000) / 16) + backgroundMapElement);
+			
+			for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
+			{
+				for (int tileY = 0; tileY < Tile::HEIGHT; tileY++)
+				{
+					Color &pixel = renderedTileMap.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
+					pixel = _rcClassic.monochromeBackgroundPalette.colors[_rc.tiles[0][tileNumber].data[tileX][tileY]];
+					
+					pixel.red = ((pixel.red << 3) | (pixel.red >> 2)) & 0xFF,
+					pixel.green = ((pixel.green << 3) | (pixel.green >> 2)) & 0xFF,
+					pixel.blue = ((pixel.blue << 3) | (pixel.blue >> 2)) & 0xFF;
+				}
+			}
+		}
+	}
+	
+	return renderedTileMap;
 }
 
 void ClassicRenderer::DrawSprites(int enabledColors,
-                                  SpriteToBackgroundPriority spriteToBackgroundPriority,
-                                  RenderContext &rc)
+                                  SpriteToBackgroundPriority spriteToBackgroundPriority)
 {
-	RenderContext::GameboyClassicSpecificRenderContext &rcClassic = rc.gameboyClassicSpecific;
-	
 	for (int i = 0; i < 40; i++)
 	{
-		SpriteAttribute spriteAttribute = rc.spriteAttributes[i];
+		SpriteAttribute spriteAttribute = _rc.spriteAttributes[i];
 		
 		if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
 		{
 			ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
-			                            rcClassic.monochromeSpritePalette0 :
-			                            rcClassic.monochromeSpritePalette1;
+			                            _rcClassic.monochromeSpritePalette0 :
+			                            _rcClassic.monochromeSpritePalette1;
 			
 			DrawTile(spriteAttribute.x,
 			         spriteAttribute.y,
-					 rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+					 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 					 spriteAttribute.horizontalFlip,
 					 spriteAttribute.verticalFlip,
 					 colorPalette,
-					 enabledColors,
-					 rc);
+					 enabledColors);
 		}
 	}
 }
 
-void ClassicRenderer::DrawSprites(int enabledColors,
-                                             RenderContext &rc)
+void ClassicRenderer::DrawSprites(int enabledColors)
 {
-	RenderContext::GameboyClassicSpecificRenderContext &rcClassic = rc.gameboyClassicSpecific;
-	
 	for (int i = 0; i < 40; i++)
 	{
-		SpriteAttribute spriteAttribute = rc.spriteAttributes[i];
+		SpriteAttribute spriteAttribute = _rc.spriteAttributes[i];
 		
 		int tileNumber = (0x8000 - 0x8000) + spriteAttribute.tileNumber;
 		
 		ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
-			                        rcClassic.monochromeSpritePalette0 :
-			                        rcClassic.monochromeSpritePalette1;
+			                        _rcClassic.monochromeSpritePalette0 :
+			                        _rcClassic.monochromeSpritePalette1;
 		
 		DrawTile(spriteAttribute.x,
 		         spriteAttribute.y,
-				 rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+				 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 				 spriteAttribute.horizontalFlip,
 				 spriteAttribute.verticalFlip,
 				 colorPalette,
-				 enabledColors,
-				 rc);
+				 enabledColors);
 	}
 }
 
-void ClassicRenderer::DrawBackgroundMap(int enabledColors,
-                                        RenderContext &rc)
+void ClassicRenderer::DrawBackgroundMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
 		DrawMapTile(mapX,
-		            -rc.scrollX,
-		            -rc.scrollY, 
-		            rc.backgroundTileMapDisplaySelect,
-		            enabledColors,
-		            rc);
+		            -_rc.scrollX,
+		            -_rc.scrollY, 
+		            _rc.backgroundTileMapDisplaySelect,
+		            enabledColors);
 	}
 }
 
-void ClassicRenderer::DrawWindowMap(int enabledColors,
-                                    RenderContext &rc)
+void ClassicRenderer::DrawWindowMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
 		DrawMapTile(mapX,
-		            rc.windowX,
-		            rc.windowY,
-		            rc.windowTileMapDisplaySelect,
-		            enabledColors,
-		            rc);
+		            _rc.windowX,
+		            _rc.windowY,
+		            _rc.windowTileMapDisplaySelect,
+		            enabledColors);
 	}
 }
 
@@ -196,16 +220,13 @@ void ClassicRenderer::DrawMapTile(int mapX,
                                   int xOffset,
                                   int yOffset,
                                   int tileMapDisplaySelect,
-                                  int enabledColors,
-                                  RenderContext &rc)
+                                  int enabledColors)
 {
-	RenderContext::GameboyClassicSpecificRenderContext &rcClassic = rc.gameboyClassicSpecific;
-	
 	int x = (mapX * Tile::WIDTH) + xOffset;
-	int y = (rc.lcdY - yOffset) - ((rc.lcdY - yOffset) % Tile::HEIGHT) + yOffset;
+	int y = (_rc.lcdY - yOffset) - ((_rc.lcdY - yOffset) % Tile::HEIGHT) + yOffset;
 	
 	int mapElementX = ((mapX * Tile::WIDTH) - xOffset) / Tile::WIDTH;
-	int mapElementY = (rc.lcdY - yOffset) / Tile::HEIGHT;
+	int mapElementY = (_rc.lcdY - yOffset) / Tile::HEIGHT;
 	
 	if (mapElementX < 0)
 	{
@@ -222,19 +243,19 @@ void ClassicRenderer::DrawMapTile(int mapX,
 	
 	int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 	
-	int backgroundMapElement = rc.tileMaps
+	int backgroundMapElement = _rc.tileMaps
 		                       [tileMapDisplaySelect].data
 		                       [mapElementX][mapElementY];
 	
 	int tileVideoRamBankNumber = 0;
 	
-	int tileNumber = (!rc.backgroundAndWindowTileDataSelect) ?
+	int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
 		             (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
 		             (((0x8000 - 0x8000) / 16) + backgroundMapElement);
 	
-	Tile tile = rc.tiles[tileVideoRamBankNumber][tileNumber];
+	Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
 	
-	ColorPalette colorPalette = rcClassic.monochromeBackgroundPalette;
+	ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
 	
 	DrawTile(x,
 	         y,
@@ -242,8 +263,7 @@ void ClassicRenderer::DrawMapTile(int mapX,
 		     HorizontalFlip::NOT_FLIPPED,
 		     VerticalFlip::NOT_FLIPPED,
 		     colorPalette,
-		     enabledColors,
-		     rc);
+		     enabledColors);
 }
 
 void ClassicRenderer::DrawTile(int x,
@@ -252,10 +272,9 @@ void ClassicRenderer::DrawTile(int x,
                                HorizontalFlip horizontalFlip,
                                VerticalFlip verticalFlip,
                                ColorPalette colorPalette,
-                               int enabledColors,
-                               RenderContext &rc)
+                               int enabledColors)
 {
-	int tileY = rc.lcdY - y;
+	int tileY = _rc.lcdY - y;
 	
 	if (tileY >= 0 && tileY < Tile::HEIGHT)
 	{
@@ -264,7 +283,7 @@ void ClassicRenderer::DrawTile(int x,
 			int scanlinePosition = x + tileX;
 			
 			if (scanlinePosition >= 0 && scanlinePosition < Frame::WIDTH &&
-			    rc.lcdY >= 0 && rc.lcdY < Frame::HEIGHT)
+			    _rc.lcdY >= 0 && _rc.lcdY < Frame::HEIGHT)
 			{
 				int realTileX = tileX;
 				int realTileY = tileY;
@@ -286,7 +305,7 @@ void ClassicRenderer::DrawTile(int x,
 				    ((colorNumber == 2) && (enabledColors & COLOR_2)) ||
 				    ((colorNumber == 3) && (enabledColors & COLOR_3)))
 				{
-					rc.rawFrame[rc.lcdY * Frame::WIDTH + scanlinePosition] = colorPalette.colors[colorNumber];
+					_rc.rawFrame[_rc.lcdY * Frame::WIDTH + scanlinePosition] = colorPalette.colors[colorNumber];
 				}
 			}
 		}

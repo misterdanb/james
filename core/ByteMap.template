@@ -14,7 +14,7 @@ namespace gbc
 		{
 		public:
 			ByteMap()
-				: Matrix<int, width, height>()
+				: Matrix<int, width, height>(), map(_matrixElements)
 			{
 				Clear(0);
 			}
@@ -28,10 +28,8 @@ namespace gbc
 				return _matrixElements[x][y];
 			}
 			
-			Array2<int, width, height> &GetMap()
-			{
-				return _matrixElements;
-			}
+		public:
+			Array2<int, width, height> &map;
 		
 		protected:
 			using Matrix<int, width, height>::Clear;

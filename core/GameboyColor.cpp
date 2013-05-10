@@ -72,6 +72,7 @@ GameboyColor::GameboyColor()
 GameboyColor::~GameboyColor()
 {
 	delete _cartridge;
+	delete _renderer;
 }
 
 void GameboyColor::SetLCD(ILCD *lcd)
@@ -93,13 +94,18 @@ void GameboyColor::SetRom(DynamicArray<int> &rom)
 	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
 	{
-		_renderer = new ClassicRenderer();
+		_renderer = new ClassicRenderer(_rc);
 	}
 }
 
-IInterruptHandler *GameboyColor::GetInterruptHandler()
+IInterruptHandler &GameboyColor::GetInterruptHandler()
 {
-	return &_hybr1s80;
+	return _hybr1s80;
+}
+
+Renderer &GameboyColor::GetRenderer()
+{
+	return (*_renderer);
 }
 
 void GameboyColor::Initialize()
@@ -140,21 +146,21 @@ void GameboyColor::RenderScanline()
 	if (_rc.lcdY < 144)
 	{
 		//DoOAMSearch();
-		_renderer->RenderOAMSearch(_rc);
+		_renderer->RenderOAMSearch();
 		ExecuteMachineClocks(80 * _speedFactor);
 		
 		//DoTransferData();
-		_renderer->RenderTransferData(_rc);
+		_renderer->RenderTransferData();
 		ExecuteMachineClocks(172 * _speedFactor);
 		
 		//DoHBlank();
-		_renderer->RenderHorizontalBlank(_rc);
+		_renderer->RenderHorizontalBlank();
 		ExecuteMachineClocks(204 * _speedFactor);
 	}
 	else
 	{
 		//DoVBlank();
-		_renderer->RenderVerticalBlank(_rc);
+		_renderer->RenderVerticalBlank();
 		ExecuteMachineClocks(456 * _speedFactor);
 	}
 	

@@ -7,6 +7,8 @@
 #include "../core/Joypad.hpp"
 #include "../core/Color.hpp"
 
+#include "TileMapWindow.hpp"
+
 namespace gbc
 {
 	namespace ui
@@ -29,6 +31,9 @@ namespace gbc
 			int GetButtonB();
 			int GetSelect();
 			int GetStart();
+			
+			void ShowTileMap(int);
+			void HideTileMap(int);
 		
 		private:
 			core::GameboyColor _gbc;
@@ -44,6 +49,12 @@ namespace gbc
 			int _buttonBPressed;
 			int _selectPressed;
 			int _startPressed;
+			
+			int _tileMap0WindowVisible;
+			int _tileMap1WindowVisible;
+			
+			TileMapWindow _tileMap0Window;
+			TileMapWindow _tileMap1Window;
 		};
 	}
 }

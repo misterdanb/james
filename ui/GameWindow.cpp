@@ -12,8 +12,15 @@ GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	  _buttonAPressed(GBC_FALSE),
 	  _buttonBPressed(GBC_FALSE),
 	  _selectPressed(GBC_FALSE),
-	  _startPressed(GBC_FALSE)
+	  _startPressed(GBC_FALSE),
+	  _tileMap0WindowVisible(GBC_FALSE),
+	  _tileMap1WindowVisible(GBC_FALSE),
+	  _tileMap0Window(0, _gbc),
+	  _tileMap1Window(1, _gbc)
 {
+	_tileMap0Window.setVisible(GBC_FALSE);
+	_tileMap1Window.setVisible(GBC_FALSE);
+	
 	_gbc.Initialize();
 	_gbc.SetRom(rom);
 	_gbc.SetLCD(this);
@@ -46,7 +53,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			_rightPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -56,7 +63,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			_leftPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -66,7 +73,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
 			_upPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -76,7 +83,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
 			_downPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -86,7 +93,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
 		{
 			_buttonAPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -96,7 +103,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Comma))
 		{
 			_buttonBPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -106,7 +113,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Dash))
 		{
 			_selectPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -116,7 +123,7 @@ void GameWindow::Render()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
 			_startPressed = GBC_TRUE;
-			_gbc.GetInterruptHandler()->SignalJoypadInterrupt();
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 		}
 		else
 		{
@@ -127,6 +134,16 @@ void GameWindow::Render()
 	clear();
 	draw(sprite);
 	display();
+	
+	if (_tileMap0WindowVisible)
+	{
+		_tileMap0Window.Render();
+	}
+	
+	if (_tileMap1WindowVisible)
+	{
+		_tileMap1Window.Render();
+	}
 }
 
 void GameWindow::DrawFrame(core::Frame frame)
@@ -187,4 +204,35 @@ int GameWindow::GetSelect()
 int GameWindow::GetStart()
 {
 	return _startPressed;
+}
+
+void GameWindow::ShowTileMap(int tileMapNumber)
+{
+	if (tileMapNumber == 0)
+	{
+		_tileMap0WindowVisible = GBC_TRUE;
+		_tileMap0Window.setVisible(_tileMap0WindowVisible);
+	}
+	else if (tileMapNumber == 1)
+	{
+		_tileMap1WindowVisible = GBC_TRUE;
+		_tileMap1Window.setVisible(_tileMap1WindowVisible);
+	}
+}
+
+void GameWindow::HideTileMap(int tileMapNumber)
+{
+	if (tileMapNumber == 0)
+	{
+		_tileMap0WindowVisible = GBC_FALSE;
+		_tileMap0Window.setVisible(_tileMap0WindowVisible);
+	}
+	else if (tileMapNumber == 1)
+	{
+		_tileMap1WindowVisible = GBC_FALSE;
+		_tileMap1Window.setVisible(_tileMap1WindowVisible);
+	}
+	
+	_tileMap1Window.setVisible(false);
+	_tileMap0Window.setVisible(false);
 }
