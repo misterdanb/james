@@ -225,7 +225,14 @@ void ClassicRenderer::DrawMapTile(int mapX,
 	int x = (mapX * Tile::WIDTH) + xOffset;
 	int y = (_rc.lcdY - yOffset) - ((_rc.lcdY - yOffset) % Tile::HEIGHT) + yOffset;
 	
-	int mapElementX = ((mapX * Tile::WIDTH) - xOffset) / Tile::WIDTH;
+	if (x < 0)
+	{
+		x += TileMap::WIDTH * Tile::WIDTH; // IAW: 256, eeyup
+	}
+	
+	x %= TileMap::WIDTH * Tile::WIDTH;
+	
+	int mapElementX = mapX;
 	int mapElementY = (_rc.lcdY - yOffset) / Tile::HEIGHT;
 	
 	if (mapElementX < 0)
