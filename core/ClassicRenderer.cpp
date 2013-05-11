@@ -216,12 +216,25 @@ void ClassicRenderer::DrawWindowMap(int enabledColors)
 	}
 }
 
+/* DrawMapTile
+ * Draws a Tile of a TileMap
+ * mapX:                 the x position of the tile in the map
+ * xOffset:              x position of the visible screen area on the map
+ * yOffset:              y position of the visible screen area on the map
+ * tileMapDisplaySelect: selects the Tilemap
+ * enabledColors:        whether we draw with colors or not
+ */
+
 void ClassicRenderer::DrawMapTile(int mapX,
                                   int xOffset,
                                   int yOffset,
                                   int tileMapDisplaySelect,
                                   int enabledColors)
 {
+	/*NOTE: xOffset <= 0 when called from DrawBackgroundMap
+	 *              >= 0 when called from DrawWindowMap
+	 */
+
 	int x = (mapX * Tile::WIDTH) + xOffset;
 	int y = (_rc.lcdY - yOffset) - ((_rc.lcdY - yOffset) % Tile::HEIGHT) + yOffset;
 	
@@ -235,20 +248,12 @@ void ClassicRenderer::DrawMapTile(int mapX,
 	int mapElementX = mapX;
 	int mapElementY = (_rc.lcdY - yOffset) / Tile::HEIGHT;
 	
-	if (mapElementX < 0)
-	{
-		mapElementX += TileMap::WIDTH;
-	}
-	
 	if (mapElementY < 0)
 	{
 		mapElementY += TileMap::HEIGHT;
 	}
 	
-	mapElementX %= TileMap::WIDTH;
 	mapElementY %= TileMap::HEIGHT;
-	
-	int mapElementNumber = (mapElementY * TileMap::WIDTH) + mapElementX;
 	
 	int backgroundMapElement = _rc.tileMaps
 		                       [tileMapDisplaySelect].data
