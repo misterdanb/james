@@ -113,7 +113,6 @@ void ClassicRenderer::RenderVerticalBlank()
 
 Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap(int tileMapNumber)
 {
-	// implement this, when you're not as tired as now
 	RenderedTileMap renderedTileMap;
 	
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
