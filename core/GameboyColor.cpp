@@ -163,6 +163,14 @@ void GameboyColor::RenderScanline()
 		_renderer->RenderVerticalBlank();
 		ExecuteMachineClocks(456 * _speedFactor);
 	}
+}
+
+void GameboyColor::RenderFrame()
+{
+	for (int i = 0; i < 154; i++)
+	{	
+		RenderScanline();
+	}
 	
 	if (_lcd)
 	{
@@ -171,14 +179,6 @@ void GameboyColor::RenderScanline()
 	else
 	{
 		ERROR("GameboyColor: No LCD set.");
-	}
-}
-
-void GameboyColor::RenderFrame()
-{
-	for (int i = 0; i < 154; i++)
-	{	
-		RenderScanline();
 	}
 }
 
@@ -270,6 +270,7 @@ int GameboyColor::ReadByte(int address)
 	{
 		switch (address)
 		{
+			//case 0xFF00: return 0xFF;
 			case 0xFF00:
 				// joypad
 				return ((!(_directionKeysSelected ? _joypad->GetRight() : _joypad->GetButtonA())) ? 0b00000001 : 0b00000000) |

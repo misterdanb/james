@@ -15,15 +15,15 @@ MBC1::~MBC1()
 
 int MBC1::ReadByte(int address)
 {
-	if (address >= 0x0000 && address <= 0x3FFF) 
+	if (address <= 0x3FFF) 
 	{
 		return _rom[address];
 	}
-	else if (address >= 0x4000 && address <= 0x7FFF)
+	else if (address <= 0x7FFF)
 	{
 		return _rom[_selectedRomBank * _header.romDimensions.bankSize + address - 0x4000];
 	}
-	else if (address >= 0xA000 && address <= 0xBFFF)
+	else if (address <= 0xBFFF)
 	{
 		if (_ramEnabled)
 		{
@@ -42,11 +42,11 @@ int MBC1::ReadByte(int address)
 
 void MBC1::WriteByte(int address, int value)
 {
-	if (address >= 0x0000 && address <= 0x1FFF)
+	if (address <= 0x1FFF)
 	{
 		_ramEnabled = (value & 0x0F) == 0x0A;
 	}
-	else if (address >= 0x2000 && address <= 0x3FFF)
+	else if (address <= 0x3FFF)
 	{
 		if (value == 0x00)
 		{
@@ -60,7 +60,7 @@ void MBC1::WriteByte(int address, int value)
 		
 		//if (_romBank >= _header.RomBanks) _romBank = _header.RomBanks - 1;
 	}
-	else if (address >= 0x4000 && address <= 0x5FFF)
+	else if (address <= 0x5FFF)
 	{
 		if (_romRamMode == 0x00)
 		{
@@ -85,7 +85,7 @@ void MBC1::WriteByte(int address, int value)
 			_selectedRamBank = value & 0x03;
 		}
 	}
-	else if (address >= 0x6000 && address <= 0x7FFF)
+	else if (address <= 0x7FFF)
 	{
 		_romRamMode = value & 0x01;
 		
@@ -98,7 +98,7 @@ void MBC1::WriteByte(int address, int value)
 			_selectedRomBank &= 0x1F;
 		}
 	}
-	else if (address >= 0xA000 && address <= 0xBFFF)
+	else if (address <= 0xBFFF)
 	{
 		if (address - 0xA000 < _header.ramDimensions.bankSize)
 		{
