@@ -2,6 +2,7 @@
 #define _ClassicRenderer_hpp_
 
 #include "Renderer.hpp"
+#include "Vector2.template"
 
 namespace gbc
 {
@@ -25,8 +26,9 @@ namespace gbc
 			void DrawSprites(int);
 			void DrawBackgroundMap(int);
 			void DrawWindowMap(int);
-			void DrawMapTile(int, int, int, int, int);
-			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
+			void DrawBackgroundMapTile(int, int);
+			void DrawWindowMapTile(int, int);
+			void DrawTile(Vector2<int>, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
 		};
 	}
 }

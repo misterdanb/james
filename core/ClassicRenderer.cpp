@@ -132,6 +132,7 @@ Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap(int tileMapNumber)
 				for (int tileY = 0; tileY < Tile::HEIGHT; tileY++)
 				{
 					Color &pixel = renderedTileMap.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
+					
 					pixel = _rcClassic.monochromeBackgroundPalette.colors[_rc.tiles[0][tileNumber].data[tileX][tileY]];
 					
 					pixel.red = ((pixel.red << 3) | (pixel.red >> 2)) & 0xFF,
@@ -158,8 +159,7 @@ void ClassicRenderer::DrawSprites(int enabledColors,
 			                            _rcClassic.monochromeSpritePalette0 :
 			                            _rcClassic.monochromeSpritePalette1;
 			
-			DrawTile(spriteAttribute.x,
-			         spriteAttribute.y,
+			DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
 					 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 					 spriteAttribute.horizontalFlip,
 					 spriteAttribute.verticalFlip,
@@ -181,8 +181,7 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 			                        _rcClassic.monochromeSpritePalette0 :
 			                        _rcClassic.monochromeSpritePalette1;
 		
-		DrawTile(spriteAttribute.x,
-		         spriteAttribute.y,
+		DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
 				 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
 				 spriteAttribute.horizontalFlip,
 				 spriteAttribute.verticalFlip,
@@ -195,11 +194,7 @@ void ClassicRenderer::DrawBackgroundMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		DrawMapTile(mapX,
-		            -_rc.scrollX,
-		            -_rc.scrollY, 
-		            _rc.backgroundTileMapDisplaySelect,
-		            enabledColors);
+		DrawBackgroundMapTile(mapX, enabledColors);
 	}
 }
 
@@ -207,45 +202,31 @@ void ClassicRenderer::DrawWindowMap(int enabledColors)
 {
 	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
 	{
-		DrawMapTile(mapX,
-		            _rc.windowX,
-		            _rc.windowY,
-		            _rc.windowTileMapDisplaySelect,
-		            enabledColors);
+		DrawWindowMapTile(mapX, enabledColors);
 	}
 }
 
-/* DrawMapTile
+/* DrawBackgroundMapTile
  * Draws a Tile of a TileMap
+ * 
  * mapX:                 the x position of the tile in the map
- * xOffset:              x position of the visible screen area on the map
- * yOffset:              y position of the visible screen area on the map
- * tileMapDisplaySelect: selects the Tilemap
  * enabledColors:        whether we draw with colors or not
  */
 
-void ClassicRenderer::DrawMapTile(int mapX,
-                                  int xOffset,
-                                  int yOffset,
-                                  int tileMapDisplaySelect,
-                                  int enabledColors)
+void ClassicRenderer::DrawBackgroundMapTile(int mapX, int enabledColors)
 {
-	/*NOTE: xOffset <= 0 when called from DrawBackgroundMap
-	 *              >= 0 when called from DrawWindowMap
-	 */
-
-	int x = (mapX * Tile::WIDTH) + xOffset;
-	int y = (_rc.lcdY - yOffset) - ((_rc.lcdY - yOffset) % Tile::HEIGHT) + yOffset;
+	Vector2<int> position((mapX * Tile::WIDTH) - _rc.scrollX,
+	                      _rc.lcdY - ((_rc.lcdY + _rc.scrollY) % Tile::HEIGHT));
 	
-	if (x < 0)
+	if (position.x < -8)
 	{
-		x += TileMap::WIDTH * Tile::WIDTH; // IAW: 256, eeyup
+		position.x += TileMap::WIDTH * Tile::WIDTH; // IAW: 256, eeyup
 	}
 	
-	x %= TileMap::WIDTH * Tile::WIDTH;
+	position.x %= TileMap::WIDTH * Tile::WIDTH;
 	
 	int mapElementX = mapX;
-	int mapElementY = (_rc.lcdY - yOffset) / Tile::HEIGHT;
+	int mapElementY = (_rc.lcdY + _rc.scrollY) / Tile::HEIGHT;
 	
 	if (mapElementY < 0)
 	{
@@ -255,7 +236,7 @@ void ClassicRenderer::DrawMapTile(int mapX,
 	mapElementY %= TileMap::HEIGHT;
 	
 	int backgroundMapElement = _rc.tileMaps
-		                       [tileMapDisplaySelect].data
+		                       [_rc.backgroundTileMapDisplaySelect].data
 		                       [mapElementX][mapElementY];
 	
 	int tileVideoRamBankNumber = 0;
@@ -268,8 +249,7 @@ void ClassicRenderer::DrawMapTile(int mapX,
 	
 	ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
 	
-	DrawTile(x,
-	         y,
+	DrawTile(position,
 		     tile,
 		     HorizontalFlip::NOT_FLIPPED,
 		     VerticalFlip::NOT_FLIPPED,
@@ -277,21 +257,60 @@ void ClassicRenderer::DrawMapTile(int mapX,
 		     enabledColors);
 }
 
-void ClassicRenderer::DrawTile(int x,
-                               int y,
+/* DrawWindowMapTile
+ * Draws a Tile of a TileMap
+ * 
+ * mapX:                 the x position of the tile in the map
+ * enabledColors:        whether we draw with colors or not
+ */
+
+void ClassicRenderer::DrawWindowMapTile(int mapX, int enabledColors)
+{
+	Vector2<int> position((mapX * Tile::WIDTH) + _rc.windowX,
+	                      _rc.lcdY - ((_rc.lcdY - _rc.windowY) % Tile::HEIGHT));
+	
+	int mapElementX = mapX;
+	int mapElementY = (_rc.lcdY - _rc.windowY) / Tile::HEIGHT;
+	
+	if (mapElementX < 20 && mapElementY < 17)
+	{
+		int backgroundMapElement = _rc.tileMaps
+								   [_rc.windowTileMapDisplaySelect].data
+								   [mapElementX][mapElementY];
+		
+		int tileVideoRamBankNumber = 0;
+		
+		int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
+						 (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
+						 (((0x8000 - 0x8000) / 16) + backgroundMapElement);
+		
+		Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
+		
+		ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
+		
+		DrawTile(position,
+				 tile,
+				 HorizontalFlip::NOT_FLIPPED,
+				 VerticalFlip::NOT_FLIPPED,
+				 colorPalette,
+				 enabledColors);
+	}
+}
+
+void ClassicRenderer::DrawTile(Vector2<int> position,
                                Tile tile,
                                HorizontalFlip horizontalFlip,
                                VerticalFlip verticalFlip,
                                ColorPalette colorPalette,
                                int enabledColors)
 {
-	int tileY = _rc.lcdY - y;
+	int tileY = _rc.lcdY - position.y;
 	
 	if (tileY >= 0 && tileY < Tile::HEIGHT)
 	{
 		for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
 		{
-			int scanlinePosition = x + tileX;
+			int scanlinePosition = position.x + tileX;
 			
 			if (scanlinePosition >= 0 && scanlinePosition < Frame::WIDTH &&
 			    _rc.lcdY >= 0 && _rc.lcdY < Frame::HEIGHT)

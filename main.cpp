@@ -8,26 +8,6 @@
 
 int main(int argc, char *argv[])
 {
-	gbc::core::Vector2<float> a(1.2, 2.3);
-	gbc::core::RenderContext rc;
-	rc.tiles[0][0].data[0][0] = 123;
-	gbc::core::Tile test = rc.tiles[0][0];
-	std::cout << "tile " << test.data[0][0] << std::endl;
-	std::cout << "(" << a.x << ", " << a.y << ")" << std::endl;
-	
-	/*typedef std::chrono::high_resolution_clock Clock;
-	typedef std::chrono::milliseconds milliseconds;
-	
-	Clock::time_point t0 = Clock::now();
-	
-	gbc::core::GameboyColor myGBC = gbc::core::GameboyColor();
-	myGBC.Initialize();
-	
-	Clock::time_point t1 = Clock::now();
-	
-	milliseconds ms = std::chrono::duration_cast<milliseconds>(t1 - t0);
-	std::cout << ms.count() << "ms\n";*/
-	
 	if (argc != 2) return -1;
 	
 	std::string path(argv[1]);
@@ -49,10 +29,6 @@ int main(int argc, char *argv[])
 		}
 		
 		file.close();
-		
-		/*gbc::core::GameboyColor gbc;
-		gbc.SetRom(arrayRom, rom.size());
-		gbc.RenderFrame();*/
 		
 		gbc::ui::GameWindow window(160, 144, rom);
 		
