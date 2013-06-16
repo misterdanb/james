@@ -33,6 +33,43 @@ Header Cartridge::GetHeader()
 	return _header;
 }
 
+void Cartridge::SaveRamDumpToFile()
+{
+	std::string path = ToString(_header.newTitle) + std::string(".battery");
+	std::ofstream file(path, std::ios::out | std::ofstream::binary);
+	
+	DynamicArray<char> ramToSave;
+	
+	ramToSave.resize(_ram.size());
+		
+	std::copy(_ram.begin(),
+			  _ram.end(),
+			  ramToSave.begin());
+	
+	std::copy(_ram.begin(),
+	          _ram.end(),
+	          std::ostreambuf_iterator<char>(file));
+}
+
+void Cartridge::LoadRamDumpFromFile()
+{
+	std::string path = ToString(_header.newTitle) + std::string(".battery");
+	std::ifstream file(path, std::ios::in | std::ifstream::binary);
+	
+	if (file.is_open() && file.good())
+	{
+		DynamicArray<char> loadedRam;
+		
+		std::copy(std::istream_iterator<char>(file),
+				  std::istream_iterator<char>(),
+				  std::back_inserter(loadedRam));
+		
+		std::copy(loadedRam.begin(),
+		          loadedRam.end(),
+		          _ram.begin());
+	}
+}
+
 Cartridge *Cartridge::Create(DynamicArray<int> rom)
 {
 	CartridgeType cartridgeType = CartridgeType(rom[Header::CARTRIDGE_TYPE_ADDRESS]);

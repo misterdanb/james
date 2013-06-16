@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <memory>
 #include <cstring>
+#include <iterator>
 #include <algorithm>
 
 #include "BaseTypes.hpp"
@@ -129,7 +130,10 @@ namespace gbc
 		
 		for (int &i : array)
 		{
-			string += (char) i;
+			if (i != 0)
+			{
+				string += (char) i;
+			}
 		}
 		
 		return string;

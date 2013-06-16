@@ -48,6 +48,10 @@ void GameWindow::Render()
 	{
 		if (event.type == sf::Event::Closed)
 		{
+			_gbc.Finalize();
+			
+			LOG("Exiting James");
+			
 			close();
 		}
 		

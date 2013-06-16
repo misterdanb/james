@@ -22,6 +22,9 @@ namespace gbc
 				
 				Header GetHeader();
 				
+				void SaveRamDumpToFile();
+				void LoadRamDumpFromFile();
+				
 				virtual int ReadByte(int) = GBC_NULL;
 				virtual void WriteByte(int, int) = GBC_NULL;
 				

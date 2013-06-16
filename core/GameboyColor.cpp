@@ -84,6 +84,7 @@ void GameboyColor::SetRom(DynamicArray<int> &rom)
 	LOG_L2("Loading cartridge");
 	
 	_cartridge = Cartridge::Create(rom);
+	_cartridge->LoadRamDumpFromFile();
 	
 	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
@@ -133,6 +134,11 @@ void GameboyColor::Initialize()
 	std::copy(_monochromePalette.colors.begin(),
 	          _monochromePalette.colors.end(),
 	          _rcClassic.monochromeSpritePalette1.colors.begin());
+}
+
+void GameboyColor::Finalize()
+{
+	_cartridge->SaveRamDumpToFile();
 }
 
 void GameboyColor::RenderScanline()
