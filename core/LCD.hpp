@@ -17,7 +17,7 @@ namespace gbc
 		public:
 			virtual ~ILCD();
 			
-			virtual void DrawFrame(Frame) = GBC_NULL;
+			virtual void DrawFrame(Frame &) = GBC_NULL;
 		};
 	}
 }

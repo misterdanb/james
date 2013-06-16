@@ -1,8 +1,5 @@
 #include "Renderer.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-
 Renderer::Renderer(RenderContext &rc)
 	: _rc(rc), _rcClassic(rc.gameboyClassicSpecific), _rcColor(rc.gameboyColorSpecific)
 {
@@ -16,10 +13,10 @@ void Renderer::UpdateTiles()
 {
 	int lastTile = 0;
 	
-	while (_rc.changedTiles.size() > 0)
+	while (!_rc.changedTiles.empty())
 	{
-		int videoRamBank = _rc.changedTiles.back()[0];
-		int tileNumber = _rc.changedTiles.back()[1];
+		int videoRamBank = _rc.changedTiles.front().first;
+		int tileNumber = _rc.changedTiles.front().second;
 		int videoRamAddress = tileNumber * 0x10;
 		
 		for (int y = 0; y < Tile::HEIGHT; y++)
@@ -30,22 +27,20 @@ void Renderer::UpdateTiles()
 			for (int x = 0; x < Tile::WIDTH; x++)
 			{
 				_rc.tiles[videoRamBank][tileNumber].data[x][y] = (((colorNumbersHigh << 1) >> (7 - x)) & 0b10) |
-				                                                ((colorNumbersLow >> (7 - x)) & 0b01);
+				                                                 ((colorNumbersLow >> (7 - x)) & 0b01);
 			}
 		}
 		
-		delete[] _rc.changedTiles.back();
-		
-		_rc.changedTiles.pop_back();
+		_rc.changedTiles.pop_front();
 	}
 }
 
 void Renderer::UpdateBackgroundMapElements()
 {
-	while (_rc.changedTileMapElements.size() > 0)
+	while (!_rc.changedTileMapElements.empty())
 	{
-		int mapNumber = _rc.changedTileMapElements.back()[0];
-		int mapElementNumber = _rc.changedTileMapElements.back()[1];
+		int mapNumber = _rc.changedTileMapElements.front().first;
+		int mapElementNumber = _rc.changedTileMapElements.front().second;
 		
 		int mapElementX = mapElementNumber % TileMap::WIDTH;
 		int mapElementY = mapElementNumber / TileMap::WIDTH;
@@ -54,18 +49,16 @@ void Renderer::UpdateBackgroundMapElements()
 		                                                                         (0x9800 - 0x8000 + mapElementNumber) :
 		                                                                         (0x9C00 - 0x8000 + mapElementNumber)];
 		
-		delete[] _rc.changedTileMapElements.back();
-		
-		_rc.changedTileMapElements.pop_back();
+		_rc.changedTileMapElements.pop_front();
 	}
 }
 
 void Renderer::UpdateTileMapAttributes()
 {
-	while (_rcColor.changedTileMapAttributes.size() > 0)
+	while (!_rcColor.changedTileMapAttributes.empty())
 	{
-		int mapNumber = _rcColor.changedTileMapAttributes.back()[0];
-		int mapElementNumber = _rcColor.changedTileMapAttributes.back()[1];
+		int mapNumber = _rcColor.changedTileMapAttributes.front().first;
+		int mapElementNumber = _rcColor.changedTileMapAttributes.front().second;
 		
 		int tileMapAttribute = _rc.videoRam[1][(mapNumber == 0) ?
 		                       (0x9800 + mapElementNumber) :
@@ -79,17 +72,15 @@ void Renderer::UpdateTileMapAttributes()
 		tileMapAttributeToChange.verticalFlip = VerticalFlip((tileMapAttribute >> 6) & 0x01);
 		tileMapAttributeToChange.backgroundToOAMPriority = BackgroundToOAMPriority((tileMapAttribute >> 7) & 0x01);
 		
-		delete[] _rcColor.changedTileMapAttributes.back();
-		
-		_rcColor.changedTileMapAttributes.pop_back();
+		_rcColor.changedTileMapAttributes.pop_front();
 	}
 }
 
 void Renderer::UpdateSpriteAttributes()
 {
-	while (_rc.changedSpriteAttributes.size() > 0)
+	while (!_rc.changedSpriteAttributes.empty())
 	{
-		int spriteAttributeNumber = _rc.changedSpriteAttributes.back();
+		int spriteAttributeNumber = _rc.changedSpriteAttributes.front();
 		int oamAddress = spriteAttributeNumber * 4;
 		
 		int spriteAttributeFlags = _rc.oam[oamAddress + 3];
@@ -107,6 +98,6 @@ void Renderer::UpdateSpriteAttributes()
 		spriteAttributeToChange.verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
 		spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);
 		
-		_rc.changedSpriteAttributes.pop_back();
+		_rc.changedSpriteAttributes.pop_front();
 	}
 }

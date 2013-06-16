@@ -1,8 +1,5 @@
 #include "ClassicRenderer.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-
 ClassicRenderer::ClassicRenderer(RenderContext &rc)
 	: Renderer(rc)
 {
@@ -46,10 +43,10 @@ void ClassicRenderer::RenderTransferData()
 			DrawBackgroundMap(COLOR_0);
 		}
 		
-		if (_rc.windowDisplayEnabled)
+		/*if (_rc.windowDisplayEnabled)
 		{
 			DrawWindowMap(COLOR_0);
-		}
+		}*/
 		
 		DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND);
 		
@@ -60,7 +57,7 @@ void ClassicRenderer::RenderTransferData()
 		
 		if (_rc.windowDisplayEnabled)
 		{
-			DrawWindowMap(COLOR_1 | COLOR_2 | COLOR_3);
+			DrawWindowMap(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3);
 		}
 		
 		DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND);
@@ -131,7 +128,7 @@ Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap(int tileMapNumber)
 			{
 				for (int tileY = 0; tileY < Tile::HEIGHT; tileY++)
 				{
-					Color &pixel = renderedTileMap.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
+					Color<int> &pixel = renderedTileMap.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
 					
 					pixel = _rcClassic.monochromeBackgroundPalette.colors[_rc.tiles[0][tileNumber].data[tileX][tileY]];
 					
@@ -149,44 +146,101 @@ Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap(int tileMapNumber)
 void ClassicRenderer::DrawSprites(int enabledColors,
                                   SpriteToBackgroundPriority spriteToBackgroundPriority)
 {
-	for (int i = 0; i < 40; i++)
+	int drawnSprites = 0;
+	
+	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
-		SpriteAttribute spriteAttribute = _rc.spriteAttributes[i];
-		
-		if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
+		// only draw visible sprites
+		if ((spriteAttribute.x != -8)  &&
+		    (_rc.lcdY >= spriteAttribute.y) &&
+		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
+		    (drawnSprites < 10)) // max 10 sprites per scanline
 		{
-			ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
-			                            _rcClassic.monochromeSpritePalette0 :
-			                            _rcClassic.monochromeSpritePalette1;
-			
-			DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-					 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
-					 spriteAttribute.horizontalFlip,
-					 spriteAttribute.verticalFlip,
-					 colorPalette,
-					 enabledColors);
+			if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
+			{
+				ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
+				                            _rcClassic.monochromeSpritePalette0 :
+				                            _rcClassic.monochromeSpritePalette1;
+				
+				if (_rc.spriteSize == 0)
+				{
+					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
+					         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+					         spriteAttribute.horizontalFlip,
+					         spriteAttribute.verticalFlip,
+					         colorPalette,
+					         enabledColors);
+				}
+				else if (_rc.spriteSize == 1)
+				{
+					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
+					         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber & 0xFE],
+					         spriteAttribute.horizontalFlip,
+					         spriteAttribute.verticalFlip,
+					         colorPalette,
+					         enabledColors);
+					
+					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y + 8),
+					         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber | 0x01],
+					         spriteAttribute.horizontalFlip,
+					         spriteAttribute.verticalFlip,
+					         colorPalette,
+					         enabledColors);
+				}
+				
+				drawnSprites++;
+			}
 		}
 	}
 }
 
 void ClassicRenderer::DrawSprites(int enabledColors)
 {
-	for (int i = 0; i < 40; i++)
+	// find a better name than counter
+	int drawnSprites = 0;
+	
+	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
-		SpriteAttribute spriteAttribute = _rc.spriteAttributes[i];
-		
-		int tileNumber = (0x8000 - 0x8000) + spriteAttribute.tileNumber;
-		
-		ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
-			                        _rcClassic.monochromeSpritePalette0 :
-			                        _rcClassic.monochromeSpritePalette1;
-		
-		DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-				 _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
-				 spriteAttribute.horizontalFlip,
-				 spriteAttribute.verticalFlip,
-				 colorPalette,
-				 enabledColors);
+		// only draw visible sprites
+		if ((spriteAttribute.x != -8)  &&
+		    (_rc.lcdY >= spriteAttribute.y) &&
+		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
+		    (drawnSprites < 10)) // max 10 sprites per scanline
+		{
+			int tileNumber = (0x8000 - 0x8000) + spriteAttribute.tileNumber;
+			
+			ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
+										_rcClassic.monochromeSpritePalette0 :
+										_rcClassic.monochromeSpritePalette1;
+			
+			if (_rc.spriteSize == 0)
+			{
+				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
+				         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
+				         spriteAttribute.horizontalFlip,
+				         spriteAttribute.verticalFlip,
+				         colorPalette,
+				         enabledColors);
+			}
+			else if (_rc.spriteSize == 1)
+			{
+				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
+				         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber & 0xFE],
+				         spriteAttribute.horizontalFlip,
+				         spriteAttribute.verticalFlip,
+				         colorPalette,
+				         enabledColors);
+				
+				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y + 8),
+				         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber | 0x01],
+				         spriteAttribute.horizontalFlip,
+				         spriteAttribute.verticalFlip,
+				         colorPalette,
+				         enabledColors);
+			}
+			
+			drawnSprites++;
+		}
 	}
 }
 
@@ -200,9 +254,12 @@ void ClassicRenderer::DrawBackgroundMap(int enabledColors)
 
 void ClassicRenderer::DrawWindowMap(int enabledColors)
 {
-	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
+	if (_rc.lcdY >= _rc.windowY)
 	{
-		DrawWindowMapTile(mapX, enabledColors);
+		for (int mapX = 0; mapX < Frame::WIDTH / Tile::WIDTH; mapX++)
+		{
+			DrawWindowMapTile(mapX, enabledColors);
+		}
 	}
 }
 
@@ -272,17 +329,17 @@ void ClassicRenderer::DrawWindowMapTile(int mapX, int enabledColors)
 	int mapElementX = mapX;
 	int mapElementY = (_rc.lcdY - _rc.windowY) / Tile::HEIGHT;
 	
-	if (mapElementX < 20 && mapElementY < 17)
+	if (mapElementX < Frame::WIDTH / Tile::WIDTH && mapElementY < Frame::HEIGHT / Tile::HEIGHT)
 	{
-		int backgroundMapElement = _rc.tileMaps
+		int windowMapElement = _rc.tileMaps
 								   [_rc.windowTileMapDisplaySelect].data
 								   [mapElementX][mapElementY];
 		
 		int tileVideoRamBankNumber = 0;
 		
 		int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
-						 (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
-						 (((0x8000 - 0x8000) / 16) + backgroundMapElement);
+						 (((0x9000 - 0x8000) / 16) + GetSignedValue(windowMapElement)) :
+						 (((0x8000 - 0x8000) / 16) + windowMapElement);
 		
 		Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
 		

@@ -1,8 +1,11 @@
 #ifndef _ClassicRenderer_hpp_
 #define _ClassicRenderer_hpp_
 
+#include "gbc.hpp"
 #include "Renderer.hpp"
-#include "Vector2.template"
+
+using namespace gbc;
+using namespace gbc::core;
 
 namespace gbc
 {

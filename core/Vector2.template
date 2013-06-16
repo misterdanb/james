@@ -21,7 +21,8 @@ namespace gbc
 			~Vector2()
 			{
 			}
-			
+		
+		public:
 			T &x;
 			T &y;
 		

@@ -16,9 +16,9 @@ namespace gbc
 			int spriteColorPaletteNumber = 0;
 			int tileVideoRamBankNumber = 0;
 			int spriteMonochromePaletteNumber = 0;
-			HorizontalFlip horizontalFlip = HorizontalFlip(0);
-			VerticalFlip verticalFlip = VerticalFlip(0);
-			SpriteToBackgroundPriority spriteToBackgroundPriority = SpriteToBackgroundPriority(0);
+			HorizontalFlip horizontalFlip = HorizontalFlip::NOT_FLIPPED;
+			VerticalFlip verticalFlip = VerticalFlip::NOT_FLIPPED;
+			SpriteToBackgroundPriority spriteToBackgroundPriority = SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND;
 		};
 	}
 }

@@ -1,9 +1,9 @@
-#ifndef _Map_template_
-#define _Map_template_
+#ifndef _Matrix_template_
+#define _Matrix_template_
 
 #include <array>
 
-#include "gbc.hpp"
+#include "BaseTypes.hpp"
 
 namespace gbc
 {

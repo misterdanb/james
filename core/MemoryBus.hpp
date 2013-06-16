@@ -3,6 +3,9 @@
 
 #include "gbc.hpp"
 
+using namespace gbc;
+using namespace gbc::core;
+
 namespace gbc
 {
 	namespace core

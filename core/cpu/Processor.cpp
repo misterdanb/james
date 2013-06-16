@@ -20,7 +20,7 @@ void Processor::SetMemoryBus(IMemoryBus *bus)
 
 void Processor::Step()
 {
-	if (_state.ticks > 0)
+	if (_state.ticks) // <=> > 0
 	{
 		_state.ticks--;
 	}

@@ -1,14 +1,11 @@
 #include "Frame.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-
 Frame::Frame()
 	: PixelMap<WIDTH, HEIGHT>(), data(_matrixElements)
 {
 }
 
-Frame::Frame(Color gameboyColors[])
+Frame::Frame(Color<int> gameboyColors[])
 	: PixelMap<WIDTH, HEIGHT>(), data(_matrixElements)
 {
 	for (int y = 0; y < HEIGHT; y++)

@@ -21,7 +21,7 @@ int MBC3::ReadByte(int address)
 	}
 	else if (address >= 0x4000 && address <= 0x7FFF)
 	{
-		return _rom[_selectedRomBank * _header.romDimensions.bankSize + address];
+		return _rom[_selectedRomBank * _header.romDimensions.bankSize + address - 0x4000];
 	}
 	else if (address >= 0xA000 && address <= 0xBFFF)
 	{
@@ -29,7 +29,7 @@ int MBC3::ReadByte(int address)
 		{
 			if (_ramRtcMode >= 0x00 && _ramRtcMode <= 0x03)
 			{
-				return _ram[_selectedRamBank * _header.ramDimensions.bankSize + address];
+				return _ram[_selectedRamBank * _header.ramDimensions.bankSize + address - 0xA000];
 			}
 			else if (_ramRtcMode >= 0x08 && _ramRtcMode <= 0x0C)
 			{
@@ -51,25 +51,26 @@ void MBC3::WriteByte(int address, int value)
 {
 	if (address >= 0x0000 && address <= 0x1FFF)
 	{
-		_ramRtcEnabled = GBC_FALSE; // not sure what to implement here oO
+		_ramRtcEnabled = (value & 0x0F) == 0x0A;
 	}
 	else if (address >= 0x2000 && address <= 0x3FFF)
 	{
-		if (value == 0x00)
+		_selectedRomBank = (value & 0x7F);
+		
+		if (_selectedRomBank == 0x00)
 		{
 			_selectedRomBank = 0x01;
 		}
-		else
-		{
-			_selectedRomBank &= 0x80;
-			_selectedRomBank |= (value & 0x7F);
-		}
+		
+		_selectedRomBank %= _header.romDimensions.banks;
 	}
 	else if (address >= 0x4000 && address <= 0x5FFF)
 	{
 		if (value >= 0x00 && value <= 0x03)
 		{
 			_selectedRamBank = value & 0xFF;
+			_selectedRamBank %= _header.ramDimensions.banks;
+			
 			_ramRtcMode = value;
 		}
 		else if (value >= 0x08 && value <= 0x0C)
@@ -85,7 +86,14 @@ void MBC3::WriteByte(int address, int value)
 	{
 		if (_ramRtcEnabled)
 		{
-			_ram[_selectedRamBank * _header.ramDimensions.bankSize + address] = value;
+			if (_ramRtcMode >= 0x00 && _ramRtcMode <= 0x03)
+			{
+				_ram[_selectedRamBank * _header.ramDimensions.bankSize + address - 0xA000] = value;
+			}
+			else if (_ramRtcMode >= 0x08 && _ramRtcMode <= 0x0C)
+			{
+				// rtc register thing
+			}
 		}
 	}
 	else

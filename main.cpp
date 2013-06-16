@@ -2,20 +2,16 @@
 #include <fstream>	
 #include <chrono>
 #include <unistd.h>
+#include "core/gbc.hpp"
 #include "core/GameboyColor.hpp"
 #include "ui/GameWindow.hpp"
-#include "core/Vector2.template"
 
 int main(int argc, char *argv[])
 {
 	if (argc != 2) return -1;
 	
 	std::string path(argv[1]);
-	
-	std::cout << path << std::endl << std::endl;
-	
 	std::vector<int> rom;
-	
 	std::ifstream file(path, std::ios::in | std::ios::binary);
 	
 	if (file.is_open())

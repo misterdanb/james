@@ -1,7 +1,6 @@
 CC=g++
-
-CFLAGS=-c -std=c++11 -O2
-CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O2
+CFLAGS=-c -std=c++11 -O23
+CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg -O23
 	
 LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system
 LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -pg

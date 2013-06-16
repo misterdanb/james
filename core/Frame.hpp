@@ -1,7 +1,10 @@
 #ifndef _Frame_hpp_
 #define _Frame_hpp_
 
-#include "PixelMap.template"
+#include "gbc.hpp"
+
+using namespace gbc;
+using namespace gbc::core;
 
 namespace gbc
 {
@@ -13,11 +16,11 @@ namespace gbc
 			static const int WIDTH = 160;
 			static const int HEIGHT = 144;
 			
-			typedef Array2<Color, WIDTH, HEIGHT> FrameArray2;
+			typedef Array2<Color<int>, WIDTH, HEIGHT> FrameArray2;
 		
 		public:
 			Frame();
-			Frame(Color[]);
+			Frame(Color<int>[]);
 			~Frame();
 		
 		public:

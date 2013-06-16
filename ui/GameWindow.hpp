@@ -5,7 +5,7 @@
 #include "../core/GameboyColor.hpp"
 #include "../core/LCD.hpp"
 #include "../core/Joypad.hpp"
-#include "../core/Color.hpp"
+#include "../core/Color.template"
 
 #include "TileMapWindow.hpp"
 
@@ -13,7 +13,9 @@ namespace gbc
 {
 	namespace ui
 	{
-		class GameWindow : public sf::RenderWindow, public core::ILCD, public core::IJoypad
+		using namespace core;
+		
+		class GameWindow : public sf::RenderWindow, public ILCD, public IJoypad
 		{
 		public:
 			GameWindow(int, int, DynamicArray<int> &);
@@ -21,7 +23,7 @@ namespace gbc
 			
 			void Render();
 			
-			void DrawFrame(core::Frame);
+			void DrawFrame(Frame &);
 			
 			int GetRight();
 			int GetLeft();
@@ -38,7 +40,7 @@ namespace gbc
 		private:
 			core::GameboyColor _gbc;
 			
-			Array<sf::Uint8, core::Frame::WIDTH * core::Frame::HEIGHT * 4> _rawFrame;
+			Array<sf::Uint8, Frame::WIDTH * Frame::HEIGHT * 4> _rawFrame;
 			sf::Image _frame;
 			
 			int _rightPressed;

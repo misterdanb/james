@@ -1,7 +1,10 @@
 #ifndef _Tile_hpp_
 #define _Tile_hpp_
 
-#include "ByteMap.template"
+#include "gbc.hpp"
+
+using namespace gbc;
+using namespace gbc::core;
 
 namespace gbc
 {

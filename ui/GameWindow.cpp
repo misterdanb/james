@@ -1,6 +1,7 @@
 #include "GameWindow.hpp"
 
 using namespace gbc;
+using namespace gbc::core;
 using namespace gbc::ui;
 
 GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
@@ -23,8 +24,8 @@ GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	
 	_gbc.Initialize();
 	_gbc.SetRom(rom);
-	_gbc.SetLCD(this);
-	_gbc.SetJoypad(this);
+	_gbc.SetLCD(*this);
+	_gbc.SetJoypad(*this);
 }
 
 GameWindow::~GameWindow()
@@ -146,15 +147,15 @@ void GameWindow::Render()
 	}
 }
 
-void GameWindow::DrawFrame(core::Frame frame)
+void GameWindow::DrawFrame(Frame &frame)
 {
 	core::Frame::FrameArray2 &rawMap = frame.data;
 	
-	for (int y = 0; y < core::Frame::HEIGHT; y++)
+	for (int y = 0; y < Frame::HEIGHT; y++)
 	{
-		for (int x = 0; x < core::Frame::WIDTH; x++)
+		for (int x = 0; x < Frame::WIDTH; x++)
 		{
-			int pixelIndex = y * core::Frame::WIDTH + x;
+			int pixelIndex = y * Frame::WIDTH + x;
 			
 			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[x][y].red);
 			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[x][y].green);
@@ -163,7 +164,7 @@ void GameWindow::DrawFrame(core::Frame frame)
 		}
 	}
 	
-	_frame.create(core::Frame::WIDTH, core::Frame::HEIGHT, &_rawFrame[0]);
+	_frame.create(Frame::WIDTH, Frame::HEIGHT, &_rawFrame[0]);
 }
 
 int GameWindow::GetRight()

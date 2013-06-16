@@ -4,20 +4,20 @@
 #include <cstring>
 
 #include "Matrix.template"
-#include "Color.hpp"
+#include "Color.template"
 
 namespace gbc
 {
 	namespace core
 	{
 		template<int width, int height>
-		class PixelMap : public Matrix<Color, width, height>
+		class PixelMap : public Matrix<Color<int>, width, height>
 		{
 		public:
 			PixelMap()
-				: Matrix<Color, width, height>(), map(_matrixElements)
+				: Matrix<Color<int>, width, height>(), map(_matrixElements)
 			{
-				Color nullColor;
+				Color<int> nullColor;
 				
 				nullColor.red = 0;
 				nullColor.green = 0;
@@ -30,18 +30,19 @@ namespace gbc
 			{
 			}
 			
-			Color GetPixel(int x, int y)
+			Color<int> GetPixel(int x, int y)
 			{
 				return _matrixElements[x][y];
 			}
 		
 		public:
-			Array2<Color, width, height> &map;
+			Array2<Color<int>, width, height> &map;
 		
 		protected:
-			using Matrix<Color, width, height>::Clear;
-			
-			using Matrix<Color, width, height>::_matrixElements;
+			using Matrix<Color<int>, width, height>::Clear;
+		
+		protected:
+			using Matrix<Color<int>, width, height>::_matrixElements;
 		};
 	}
 }

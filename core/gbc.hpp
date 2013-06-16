@@ -1,5 +1,5 @@
-#ifndef _GBC_hpp_
-#define _GBC_hpp_
+#ifndef _gbc_hpp_
+#define _gbc_hpp_
 
 #include <iostream>
 #include <string>
@@ -9,8 +9,19 @@
 #include <fstream>
 #include <iomanip>
 #include <type_traits>
+#include <memory>
+#include <cstring>
+#include <algorithm>
 
-//#define DEBUG
+#include "BaseTypes.hpp"
+#include "Color.template"
+#include "PixelMap.template"
+#include "ByteMap.template"
+#include "Matrix.template"
+#include "Vector.template"
+#include "Vector2.template"
+
+#define DEBUG
 
 #define LOG_LEVEL_2
 
@@ -51,24 +62,15 @@
 
 namespace gbc
 {
-	// templates
-	template<class T, int size>
-	using Array = std::array<T, size>;
+	// forward declaration for used namespaces
+	namespace core
+	{
+		namespace cpu {}
+		namespace cartridges {}
+	}
 	
-	template<class T, int width, int height>
-	using Array2 = std::array<std::array<T, height>, width>;
-	
-	template<class T, int width, int height, int depth>
-	using Array3 = std::array<std::array<std::array<T, depth>, height>, width>;
-	
-	template<class T>
-	using DynamicArray = std::vector<T>;
-	
-	template<class T>
-	using DynamicArray2 = std::vector<std::vector<T>>;
-	
-	template<class T>
-	using DynamicArray3 = std::vector<std::vector<std::vector<T>>>;
+	using namespace std;
+	using namespace core;
 	
 	// consts
 	const int GBC_FALSE = 0;

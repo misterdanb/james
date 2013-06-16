@@ -10,7 +10,6 @@
 #include "MMM01.hpp"
 
 using namespace gbc;
-using namespace gbc::core;
 using namespace gbc::core::cartridges;
 
 Cartridge::Cartridge(DynamicArray<int> &rom)

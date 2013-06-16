@@ -54,7 +54,7 @@ namespace gbc
 			IInterruptHandler *interruptHandler;
 			
 			// current scanline
-			Color rawFrame[Frame::WIDTH * Frame::HEIGHT];
+			Color<int> rawFrame[Frame::WIDTH * Frame::HEIGHT];
 			
 			// interrupt requests
 			int verticalBlankInterruptAlreadyRequested;
@@ -94,15 +94,15 @@ namespace gbc
 			
 			// tile data
 			Tile tiles[2][384] = { { Tile(), }, }; // test
-			std::vector<int *> changedTiles;
+			Queue<Pair<int, int>> changedTiles;
 			
 			// background map elements
 			TileMap tileMaps[2];
-			std::vector<int *> changedTileMapElements;
+			Queue<Pair<int, int>> changedTileMapElements;
 			
 			// sprite attributes
 			SpriteAttribute spriteAttributes[40];
-			std::vector<int> changedSpriteAttributes;
+			Queue<int> changedSpriteAttributes;
 			
 			struct GameboyClassicSpecificRenderContext
 			{
@@ -116,7 +116,7 @@ namespace gbc
 			{
 				// background map attributes
 				TileMapAttribute tileMapAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
-				std::vector<int *> changedTileMapAttributes;
+				Queue<Pair<int, int>>changedTileMapAttributes;
 				
 				// lcd color palettes
 				ColorPalette colorBackgroundPalettes[8];

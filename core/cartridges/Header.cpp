@@ -1,7 +1,6 @@
 #include "Header.hpp"
 
 using namespace gbc;
-using namespace gbc::core;
 using namespace gbc::core::cartridges;
 
 Header::Header(DynamicArray<int> &rom)

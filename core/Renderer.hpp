@@ -1,10 +1,12 @@
 #ifndef _Renderer_hpp_
 #define _Renderer_hpp_
 
-#include <vector>
-
+#include "gbc.hpp"
 #include "RenderContext.hpp"
 #include "Frame.hpp"
+
+using namespace gbc;
+using namespace gbc::core;
 
 namespace gbc
 {

@@ -1,10 +1,5 @@
 #include "GameboyColor.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace cpu;
-using namespace cartridges;
-
 GameboyColor::GameboyColor()
 	: _joypad(NULL),
 	  _directionKeysSelected(0),
@@ -71,25 +66,24 @@ GameboyColor::GameboyColor()
 
 GameboyColor::~GameboyColor()
 {
-	delete _cartridge;
 	delete _renderer;
 }
 
-void GameboyColor::SetLCD(ILCD *lcd)
+void GameboyColor::SetLCD(ILCD &lcd)
 {
-	_lcd = lcd;
+	_lcd = &lcd;
 }
 
-void GameboyColor::SetJoypad(IJoypad *joypad)
+void GameboyColor::SetJoypad(IJoypad &joypad)
 {
-	_joypad = joypad;
+	_joypad = &joypad;
 }
 
 void GameboyColor::SetRom(DynamicArray<int> &rom)
 {
 	LOG_L2("Loading cartridge");
 	
-	_cartridge = cartridges::Cartridge::Create(rom);
+	_cartridge = Cartridge::Create(rom);
 	
 	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
@@ -174,7 +168,9 @@ void GameboyColor::RenderFrame()
 	
 	if (_lcd)
 	{
-		_lcd->DrawFrame(Frame(_rc.rawFrame));
+		Frame renderedFrame(_rc.rawFrame);
+		
+		_lcd->DrawFrame(renderedFrame);
 	}
 	else
 	{
@@ -228,7 +224,7 @@ void GameboyColor::ExecuteMachineClocks(int clocks)
 int GameboyColor::ReadByte(int address)
 {
 	// das geht eleganter...
-	address &= 0xFFFF;
+	address = address & 0xFFFF;
 	
 	if (address <= 0x7FFF)
 	{
@@ -328,83 +324,50 @@ void GameboyColor::WriteByte(int address, int value)
 	}
 	else if (address <= 0x9FFF)
 	{
-		if (address <= 0x97FF)
+		//if (_rc.lcdMode != LCDMode::TRANSFERRING_DATA)
 		{
-			int *changedTile = new int[2];
-			
-			changedTile[0] = _rc.selectedVideoRamBank;
-			changedTile[1] = ((address - 0x8000) >> 4) & 0x0FFF;
-			
-			int isAlreadyInList = GBC_FALSE;
-				
-			for (int i = 0; i < _rc.changedTiles.size(); i++)
+			if (address <= 0x97FF)
 			{
-				if (changedTile[0] == _rc.changedTiles[i][0] &&
-				    changedTile[1] == _rc.changedTiles[i][1])
+				Pair<int, int> changedTile(_rc.selectedVideoRamBank,
+										   ((address - 0x8000) >> 4) & 0x0FFF);
+				
+				if (!std::binary_search(_rc.changedTiles.begin(),
+										_rc.changedTiles.end(),
+										changedTile))
 				{
-					isAlreadyInList = GBC_TRUE;
-					break;
-				}
-			}
-			
-			if (!isAlreadyInList)
-			{
-				_rc.changedTiles.push_back(changedTile);
-			}
-		}
-		else
-		{
-			if (_rc.selectedVideoRamBank == 0)
-			{
-				int *changedBackgroundMapElement = new int[2];
-				
-				changedBackgroundMapElement[0] = (address <= 0x9BFF) ? 0 : 1;
-				changedBackgroundMapElement[1] = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
-				
-				int isAlreadyInList = GBC_FALSE;
-				
-				for (int i = 0; i < _rc.changedTileMapElements.size(); i++)
-				{
-					if (changedBackgroundMapElement[0] == _rc.changedTileMapElements[i][0] &&
-					    changedBackgroundMapElement[1] == _rc.changedTileMapElements[i][1])
-					{
-						isAlreadyInList = GBC_TRUE;
-						break;
-					}
-				}
-				
-				if (!isAlreadyInList)
-				{
-					_rc.changedTileMapElements.push_back(changedBackgroundMapElement);
+					_rc.changedTiles.push_back(changedTile);
 				}
 			}
 			else
 			{
-				int *changedTileMapAttribute = new int[2];
-				
-				changedTileMapAttribute[0] = (address <= 0x9BFF) ? 0 : 1;
-				changedTileMapAttribute[1] = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
-				
-				int isAlreadyInList = GBC_FALSE;
-				
-				for (int i = 0; i < _rcColor.changedTileMapAttributes.size(); i++)
+				if (_rc.selectedVideoRamBank == 0)
 				{
-					if (changedTileMapAttribute[0] == _rcColor.changedTileMapAttributes[i][0] &&
-					    changedTileMapAttribute[1] == _rcColor.changedTileMapAttributes[i][1])
+					Pair<int, int> changedBackgroundMapElement((address <= 0x9BFF) ? 0 : 1,
+															   (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00));
+					
+					if (!std::binary_search(_rc.changedTileMapElements.begin(),
+											_rc.changedTileMapElements.end(),
+											changedBackgroundMapElement))
 					{
-						isAlreadyInList = GBC_TRUE;
-						break;
+						_rc.changedTileMapElements.push_back(changedBackgroundMapElement);
 					}
 				}
-				
-				if (!isAlreadyInList)
+				else
 				{
-					_rcColor.changedTileMapAttributes.push_back(changedTileMapAttribute);
+					Pair<int, int> changedTileMapAttribute((address <= 0x9BFF) ? 0 : 1,
+														   (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00));
+					
+					if (!std::binary_search(_rcColor.changedTileMapAttributes.begin(),
+											_rcColor.changedTileMapAttributes.end(),
+											changedTileMapAttribute))
+					{
+						_rcColor.changedTileMapAttributes.push_back(changedTileMapAttribute);
+					}
 				}
 			}
+			
+			_rc.videoRam[_rc.selectedVideoRamBank][address - 0x8000] = value;
 		}
-		
-		_rc.videoRam[_rc.selectedVideoRamBank][address - 0x8000] = value;
 	}
 	else if (address <= 0xBFFF)
 	{
@@ -428,25 +391,20 @@ void GameboyColor::WriteByte(int address, int value)
 	}
 	else if (address <= 0xFE9F)
 	{
-		int changedSpriteAttribute = (address - 0xFE00) >> 2;
-		
-		int isAlreadyInList = GBC_FALSE;
-		
-		for (int i = 0; i < _rc.changedSpriteAttributes.size(); i++)
+		if (_rc.lcdMode != LCDMode::SEARCHING_OAM &&
+		    _rc.lcdMode != LCDMode::TRANSFERRING_DATA)
 		{
-			if (changedSpriteAttribute == _rc.changedSpriteAttributes[i])
+			int changedSpriteAttribute = (address - 0xFE00) >> 2; // <=> * 4
+			
+			if (!std::binary_search(_rc.changedSpriteAttributes.begin(),
+									_rc.changedSpriteAttributes.end(),
+									changedSpriteAttribute))
 			{
-				isAlreadyInList = GBC_TRUE;
-				break;
+				_rc.changedSpriteAttributes.push_back(changedSpriteAttribute);
 			}
+			
+			_rc.oam[address - 0xFE00] = value;
 		}
-		
-		if (!isAlreadyInList)
-		{
-			_rc.changedSpriteAttributes.push_back(changedSpriteAttribute);
-		}
-		
-		_rc.oam[address - 0xFE00] = value;
 	}
 	else if (address <= 0xFEFF)
 	{

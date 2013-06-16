@@ -1,23 +1,22 @@
 #ifndef _ColorPalette_hpp_
 #define _ColorPalette_hpp_
 
-#include "Vector.template"
-#include "Color.hpp"
+#include "gbc.hpp"
 
 namespace gbc
 {
 	namespace core
 	{
-		class ColorPalette : public Vector<Color, 4>
+		class ColorPalette : public Vector<Color<int>, 4>
 		{
 		public:
 			static const int COLOR_PALETTE_SIZE = 4;
 			
-			typedef Array<Color, COLOR_PALETTE_SIZE> ColorPaletteArray;
+			typedef Array<Color<int>, COLOR_PALETTE_SIZE> ColorPaletteArray;
 		
 		public:
 			ColorPalette()
-				: Vector<Color, COLOR_PALETTE_SIZE>(), colors(_vectorElements)
+				: Vector<Color<int>, COLOR_PALETTE_SIZE>(), colors(_vectorElements)
 			{
 			}
 			
@@ -29,7 +28,7 @@ namespace gbc
 			ColorPaletteArray &colors;
 		
 		protected:
-			using Vector<Color, COLOR_PALETTE_SIZE>::_vectorElements;
+			using Vector<Color<int>, COLOR_PALETTE_SIZE>::_vectorElements;
 		};
 	}
 }
