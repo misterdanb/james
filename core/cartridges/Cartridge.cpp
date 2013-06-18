@@ -35,38 +35,57 @@ Header Cartridge::GetHeader()
 
 void Cartridge::SaveRamDumpToFile()
 {
-	std::string path = ToString(_header.newTitle) + std::string(".battery");
-	std::ofstream file(path, std::ios::out | std::ofstream::binary);
+	std::string path = ToHex(_header.globalChecksum[0]) +
+	                   ToHex(_header.globalChecksum[1]) +
+	                   std::string(".battery");
 	
-	DynamicArray<char> ramToSave;
+	std::ofstream file(path, std::ios::binary);
 	
-	ramToSave.resize(_ram.size());
+	if (file.is_open() && !file.bad())
+	{
+		DynamicArray<char> outRam(_ram.begin(), _ram.end());
 		
-	std::copy(_ram.begin(),
-			  _ram.end(),
-			  ramToSave.begin());
-	
-	std::copy(_ram.begin(),
-	          _ram.end(),
-	          std::ostreambuf_iterator<char>(file));
+		file.write(&outRam[0], _header.ramDimensions.size);
+		file.close();
+		
+		LOG("Saved cartridge ram battery");
+	}
+	else
+	{
+		ERROR("Failed to save cartridge ram battery");
+	}
 }
 
 void Cartridge::LoadRamDumpFromFile()
 {
-	std::string path = ToString(_header.newTitle) + std::string(".battery");
-	std::ifstream file(path, std::ios::in | std::ifstream::binary);
+	std::string path = ToHex(_header.globalChecksum[0]) +
+	                   ToHex(_header.globalChecksum[1]) +
+	                   std::string(".battery");
 	
-	if (file.is_open() && file.good())
+	std::ifstream file(path, std::ios::binary);
+	
+	/*LOG(std::string("open: ") + (file.is_open() ? "true" : "false"));
+	LOG(std::string("good: ") + (file.good() ? "true" : "false"));
+	LOG(std::string("bad:  ") + (file.bad() ? "true" : "false"));
+	LOG(std::string("fail: ") + (file.fail() ? "true" : "false"));
+	LOG(std::string("eof:  ") + (file.eof() ? "true" : "false"));*/
+	
+	if (file.is_open() && !file.bad())
 	{
-		DynamicArray<char> loadedRam;
+		DynamicArray<char> inRam;
 		
-		std::copy(std::istream_iterator<char>(file),
-				  std::istream_iterator<char>(),
-				  std::back_inserter(loadedRam));
+		inRam.resize(_header.ramDimensions.size);
 		
-		std::copy(loadedRam.begin(),
-		          loadedRam.end(),
-		          _ram.begin());
+		file.read(&inRam[0], _header.ramDimensions.size);
+		file.close();
+		
+		_ram = DynamicArray<int>(inRam.begin(), inRam.end());
+		
+		LOG("Loaded cartridge ram battery");
+	}
+	else
+	{
+		ERROR("Failed to load cartridge ram battery");
 	}
 }
 
@@ -151,13 +170,12 @@ Cartridge *Cartridge::Create(DynamicArray<int> rom)
 		
 		default: break;
 	}
-
-#ifdef DEBUG
+	
 	Header createdHeader = createdCartridge->GetHeader();
 	
 	std::ostringstream oss;
 	
-	oss << "Loaded cartridge" << std::endl;
+	oss << "Created cartridge" << std::endl;
 	oss << "\tEntry point: " << ToHex(createdHeader.entryPoint[0]) << " ";
 	oss <<                      ToHex(createdHeader.entryPoint[1]) << " ";
 	oss <<                      ToHex(createdHeader.entryPoint[2]) << " ";
@@ -179,8 +197,7 @@ Cartridge *Cartridge::Create(DynamicArray<int> rom)
 	oss << "\tGlobal checksum: " << ToHex(createdHeader.globalChecksum[0]) << " ";
 	oss <<                          ToHex(createdHeader.globalChecksum[1]) << std::endl;
 	
-	LOG_L2(oss.str());
-#endif
+	LOG(oss.str());
 	
 	return createdCartridge;
 }

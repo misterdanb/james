@@ -147,6 +147,7 @@ void ClassicRenderer::DrawSprites(int enabledColors,
                                   SpriteToBackgroundPriority spriteToBackgroundPriority)
 {
 	int drawnSprites = 0;
+	int hardCodedSpriteLimit = 40;
 	
 	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
@@ -154,7 +155,7 @@ void ClassicRenderer::DrawSprites(int enabledColors,
 		if ((spriteAttribute.x != -8)  &&
 		    (_rc.lcdY >= spriteAttribute.y) &&
 		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
-		    (drawnSprites < 10)) // max 10 sprites per scanline
+		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
 		{
 			if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
 			{
@@ -198,6 +199,7 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 {
 	// find a better name than counter
 	int drawnSprites = 0;
+	int hardCodedSpriteLimit = 40;
 	
 	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
@@ -205,7 +207,7 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 		if ((spriteAttribute.x != -8)  &&
 		    (_rc.lcdY >= spriteAttribute.y) &&
 		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
-		    (drawnSprites < 10)) // max 10 sprites per scanline
+		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
 		{
 			int tileNumber = (0x8000 - 0x8000) + spriteAttribute.tileNumber;
 			

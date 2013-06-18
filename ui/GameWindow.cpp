@@ -55,6 +55,12 @@ void GameWindow::Render()
 			close();
 		}
 		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::R) &&
+		    sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+		{
+			_gbc.Reset();
+		}
+		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			_rightPressed = GBC_TRUE;

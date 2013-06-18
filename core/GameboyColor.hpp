@@ -46,6 +46,8 @@ namespace gbc
 			void Initialize();
 			void Finalize();
 			
+			void Reset();
+			
 			void RenderScanline();
 			void RenderFrame();
 			

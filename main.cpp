@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
 			
 			float currentTime = clock.getElapsedTime().asSeconds();
 			float fps = frames / currentTime;
-			//lastTime = currentTime;
 			
 			std::cout << fps << std::endl;
 			

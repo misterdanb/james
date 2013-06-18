@@ -32,6 +32,8 @@ namespace gbc
 		
 		template<class T, class U>
 		using Pair = std::pair<T, U>;
+		
+		typedef unsigned char byte;
 	}
 }
 

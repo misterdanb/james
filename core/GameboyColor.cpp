@@ -16,20 +16,6 @@ GameboyColor::GameboyColor()
 	  _colorBackgroundPaletteIndexAutoIncrement(0),
 	  _colorSpritePaletteIndexAutoIncrement(0)
 {
-	for (Array<int, RenderContext::VIDEO_RAM_BANK_SIZE> &videoRamBank : _rc.videoRam)
-	{
-		std::fill(videoRamBank.begin(), videoRamBank.end(), 0x00);
-	}
-	
-	for (Array<int, RenderContext::WORK_RAM_BANK_SIZE> &workRamBank : _rc.workRam)
-	{
-		std::fill(workRamBank.begin(), workRamBank.end(), 0x00);
-	}
-	
-	std::fill(_rc.oam.begin(), _rc.oam.end(), 0x00);
-	std::fill(_rc.ioPorts.begin(), _rc.ioPorts.end(), 0x00);
-	std::fill(_rc.highRam.begin(), _rc.highRam.end(), 0x00);
-	
 	_rc.memoryBus = this;
 	_rc.interruptHandler = &_hybr1s80;
 	
@@ -81,15 +67,17 @@ void GameboyColor::SetJoypad(IJoypad &joypad)
 
 void GameboyColor::SetRom(DynamicArray<int> &rom)
 {
-	LOG_L2("Loading cartridge");
-	
 	_cartridge = Cartridge::Create(rom);
 	_cartridge->LoadRamDumpFromFile();
+	
+	LOG("Loaded cartridge");
 	
 	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
 	{
 		_renderer = new ClassicRenderer(_rc);
+		
+		LOG("Using Gameboy Classic rendering method");
 	}
 }
 
@@ -105,10 +93,11 @@ Renderer &GameboyColor::GetRenderer()
 
 void GameboyColor::Initialize()
 {
-	LOG_L2("Initializing Gameboy Color emulation");
+	LOG("Initializing Gameboy Color emulation");
 	
 	_hybr1s80.SetMemoryBus(this);
-	_hybr1s80.PowerUp();
+	
+	Reset();
 	
 	_monochromePalette.colors[3].red = 0x00;
 	_monochromePalette.colors[3].green = 0x00;
@@ -138,7 +127,28 @@ void GameboyColor::Initialize()
 
 void GameboyColor::Finalize()
 {
+	LOG("Finalizing Gameboy Color emulation");
+	
 	_cartridge->SaveRamDumpToFile();
+}
+
+void GameboyColor::Reset()
+{
+	for (Array<int, RenderContext::VIDEO_RAM_BANK_SIZE> &videoRamBank : _rc.videoRam)
+	{
+		std::fill(videoRamBank.begin(), videoRamBank.end(), 0x00);
+	}
+	
+	for (Array<int, RenderContext::WORK_RAM_BANK_SIZE> &workRamBank : _rc.workRam)
+	{
+		std::fill(workRamBank.begin(), workRamBank.end(), 0x00);
+	}
+	
+	std::fill(_rc.oam.begin(), _rc.oam.end(), 0x00);
+	std::fill(_rc.ioPorts.begin(), _rc.ioPorts.end(), 0x00);
+	std::fill(_rc.highRam.begin(), _rc.highRam.end(), 0x00);
+	
+	_hybr1s80.PowerUp();
 }
 
 void GameboyColor::RenderScanline()
@@ -180,7 +190,7 @@ void GameboyColor::RenderFrame()
 	}
 	else
 	{
-		ERROR("GameboyColor: No LCD set.");
+		ERROR("Unable to draw a frame: No LCD set.");
 	}
 }
 
@@ -788,6 +798,6 @@ void GameboyColor::WriteByte(int address, int value)
 	}
 	else
 	{
-		LOG(std::string("MemoryMap: Address out of range: ") + ToHex(address));
+		ERROR(std::string("MemoryMap: Address out of range: ") + ToHex(address));
 	}
 }
