@@ -1,0 +1,10 @@
+#ifndef _core_namespace_
+#define _core_namespace_
+
+/*
+ * namespace description
+ */
+
+namepace _core = gbc::core;
+
+#endif

@@ -37,7 +37,7 @@ void Cartridge::SaveRamDumpToFile()
 {
 	std::string path = ToHex(_header.globalChecksum[0]) +
 	                   ToHex(_header.globalChecksum[1]) +
-	                   std::string(".battery");
+	                   std::string(".battery\0");
 	
 	std::ofstream file(path, std::ios::binary);
 	
@@ -60,7 +60,7 @@ void Cartridge::LoadRamDumpFromFile()
 {
 	std::string path = ToHex(_header.globalChecksum[0]) +
 	                   ToHex(_header.globalChecksum[1]) +
-	                   std::string(".battery");
+	                   std::string(".battery\0");
 	
 	std::ifstream file(path, std::ios::binary);
 	

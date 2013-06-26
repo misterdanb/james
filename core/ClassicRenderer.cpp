@@ -152,7 +152,10 @@ void ClassicRenderer::DrawSprites(int enabledColors,
 	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
 		// only draw visible sprites
-		if ((spriteAttribute.x != -8)  &&
+		if ((spriteAttribute.x != -8) &&
+		    (spriteAttribute.y != -16) &&
+		    (spriteAttribute.x < 168) &&
+		    (spriteAttribute.y < 160) &&
 		    (_rc.lcdY >= spriteAttribute.y) &&
 		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
 		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
@@ -204,7 +207,10 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
 		// only draw visible sprites
-		if ((spriteAttribute.x != -8)  &&
+		if ((spriteAttribute.x != -8) &&
+		    (spriteAttribute.y != -16) &&
+		    (spriteAttribute.x < 168) &&
+		    (spriteAttribute.y < 160) &&
 		    (_rc.lcdY >= spriteAttribute.y) &&
 		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
 		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline

@@ -1,0 +1,10 @@
+#ifndef _gbc_namespace_
+#define _gbc_namespace_
+
+/*
+ * namespace description
+ */
+
+namepace _gbc = gbc;
+
+#endif

@@ -1,0 +1,10 @@
+#ifndef _cartridges_namespace_
+#define _cartridges_namespace_
+
+/*
+ * namespace description
+ */
+
+namespace _cartridges = gbc::core::cartridges;
+
+#endif

@@ -9,6 +9,7 @@ GameboyColor::GameboyColor()
 	  _forceClassicGameboy(GBC_TRUE),
 	  _hybr1s80(),
 	  _speedFactor(1),
+	  _pendingClocks(0),
 	  _timerClockFrequency(1024), // or something...
 	  _timerStopped(GBC_TRUE),
 	  _deviderCounter(0),
@@ -196,44 +197,45 @@ void GameboyColor::RenderFrame()
 
 void GameboyColor::ExecuteMachineClocks(int clocks)
 {
-	for (int i = 0; i < clocks * 4; i++)
+	_pendingClocks += clocks;
+	
+	while (_pendingClocks >= CLOCK_SPEED)
 	{
-		// make a cpu step
-		_hybr1s80.Step();
+		_pendingClocks -= CLOCK_SPEED;
 		
-		// make a timer step
-		if (_deviderCounter >= 256)
-		{
-			_rc.ioPorts[0xFF04 - 0xFF00]++;
-			_deviderCounter = 0;
-		}
-		else
-		{
-			_deviderCounter++;
-		}
+		_hybr1s80.Execute(CLOCK_SPEED * 4);
+		UpdateTimer(CLOCK_SPEED * 4);
+	}
+}
+
+void GameboyColor::UpdateTimer(int clocks)
+{
+	// make a timer step
+	if (!_timerStopped)
+	{
+		_timerCounter += clocks;
 		
-		if (GetBit(_rc.ioPorts[0xFF07 - 0xFF00], 2))
+		if (_timerCounter >= _timerClockFrequency)
 		{
-			if (_timerCounter >= _timerClockFrequency)
+			_rc.ioPorts[0xFF05 - 0xFF00] += _timerCounter / _timerClockFrequency;
+			
+			if (_rc.ioPorts[0xFF05 - 0xFF00] > 0xFF)
 			{
-				if (_rc.ioPorts[0xFF05 - 0xFF00] + 1 >= 0xFF)
-				{
-					_rc.ioPorts[0xFF05 - 0xFF00] = _rc.ioPorts[0xFF06  - 0xFF00];
-					
-					_rc.interruptHandler->SignalTimerInterrupt();
-				}
-				else
-				{
-					_rc.ioPorts[0xFF05 - 0xFF00]++;
-				}
+				_rc.ioPorts[0xFF05 - 0xFF00] = _rc.ioPorts[0xFF06  - 0xFF00];
 				
-				_timerCounter = 0;
+				_rc.interruptHandler->SignalTimerInterrupt();
 			}
-			else
-			{
-				_timerCounter++;
-			}
+			
+			_timerCounter %= _timerClockFrequency;
 		}
+	}
+	
+	_deviderCounter += clocks;
+		
+	if (_deviderCounter > 0xFF)
+	{
+		_rc.ioPorts[0xFF04 - 0xFF00] += _deviderCounter / 256;
+		_deviderCounter %= 256;
 	}
 }
 
@@ -480,7 +482,7 @@ void GameboyColor::WriteByte(int address, int value)
 					case 0x03: _timerClockFrequency = 256; break;
 				}
 				
-				_timerStopped = GetBit(value, 2);
+				_timerStopped = !GetBit(value, 2);
 				
 				break;
 			

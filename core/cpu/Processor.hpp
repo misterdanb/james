@@ -29,6 +29,7 @@ namespace gbc
 				void SetMemoryBus(IMemoryBus *);
 				
 				void Step();
+				void Execute(int);
 				
 				void ExecuteInstruction();
 				void ExecuteInterrupt();

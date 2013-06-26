@@ -1,0 +1,10 @@
+#ifndef _ui_namespace_
+#define _ui_namespace_
+
+/*
+ * namespace description
+ */
+
+namepace _ui = gbc::ui;
+
+#endif

@@ -33,6 +33,10 @@ namespace gbc
 		class GameboyColor : public IMemoryBus
 		{
 		public:
+			// clock speed over 256 will cause timer inaccuracies
+			static const int CLOCK_SPEED = 256;
+			
+		public:
 			GameboyColor();
 			~GameboyColor();
 			
@@ -52,29 +56,10 @@ namespace gbc
 			void RenderFrame();
 			
 			void ExecuteMachineClocks(int);
+			void UpdateTimer(int);
 			
 			int ReadByte(int);
 			void WriteByte(int, int);
-			
-		private:
-			void DoOAMSearch();
-			void DoTransferData();
-			void DoHBlank();
-			void DoVBlank();
-			
-			void UpdateTiles();
-			void UpdateBackgroundMapElements();
-			void UpdateTileMapAttributes();
-			void UpdateSpriteAttributes();
-			
-			void DrawSprites(int, SpriteToBackgroundPriority);
-			void DrawSprites(int);
-			void DrawBackgroundMap(int, BackgroundToOAMPriority);
-			void DrawBackgroundMap(int);
-			void DrawWindowMap(int, BackgroundToOAMPriority);
-			void DrawWindowMap(int);
-			void DrawMapTile(int, int, int, int, int, PlatformSupport);
-			void DrawTile(int, int, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
 			
 			// lcd
 			ILCD *_lcd;
@@ -92,6 +77,7 @@ namespace gbc
 			// processor
 			Processor _hybr1s80;
 			int _speedFactor;
+			int _pendingClocks;
 			
 			// timer
 			int _timerClockFrequency;

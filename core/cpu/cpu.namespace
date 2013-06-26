@@ -1,0 +1,10 @@
+#ifndef _cpu_namespace_
+#define _cpu_namespace_
+
+/*
+ * namespace description
+ */
+
+namespace _cpu = gbc::core::cpu;
+
+#endif
