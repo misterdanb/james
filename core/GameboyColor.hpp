@@ -45,10 +45,18 @@ namespace gbc
 			void SetRom(DynamicArray<int> &);
 			
 			IInterruptHandler &GetInterruptHandler();
+			Processor &GetProcessor();
 			Renderer &GetRenderer();
+			
+			TileMap::TileMapArray2 &GetTileMap(int);
 			
 			void Initialize();
 			void Finalize();
+			
+			void Start();
+			void Pause();
+			
+			bool IsPaused();
 			
 			void Reset();
 			
@@ -60,6 +68,11 @@ namespace gbc
 			
 			int ReadByte(int);
 			void WriteByte(int, int);
+		
+		private:
+			// emulation state
+			bool _paused;
+			int _pendingClocks;
 			
 			// lcd
 			ILCD *_lcd;
@@ -77,7 +90,6 @@ namespace gbc
 			// processor
 			Processor _hybr1s80;
 			int _speedFactor;
-			int _pendingClocks;
 			
 			// timer
 			int _timerClockFrequency;

@@ -24,6 +24,18 @@ namespace gbc
 		
 		return ToUpper(oss.str());
 	}
+	
+	std::string ToFixedHex(int decimal, int length)
+	{
+		std::ostringstream oss;
+		
+		oss.width(length);
+		oss.fill('0');
+		
+		oss << std::fixed << std::hex << decimal;
+		
+		return ToUpper(oss.str());
+	}
 
 	std::string ToDec(int decimal)
 	{
@@ -32,6 +44,18 @@ namespace gbc
 		oss << std::dec << decimal;
 		
 		return oss.str();
+	}
+	
+	std::string ToFixedDec(int decimal, int length)
+	{
+		std::ostringstream oss;
+		
+		oss.width(length);
+		oss.fill('0');
+		
+		oss << std::fixed << std::dec << decimal;
+		
+		return ToUpper(oss.str());
 	}
 
 	std::string ToUpper(std::string string)

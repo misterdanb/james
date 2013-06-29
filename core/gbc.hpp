@@ -140,7 +140,9 @@ namespace gbc
 	}
 	
 	std::string ToHex(int);
+	std::string ToFixedHex(int, int);
 	std::string ToDec(int);
+	std::string ToFixedDec(int, int);
 	
 	std::string ToUpper(std::string);
 }

@@ -1,7 +1,8 @@
 #include "GameboyColor.hpp"
 
 GameboyColor::GameboyColor()
-	: _joypad(NULL),
+	: _paused(true),
+	  _joypad(NULL),
 	  _directionKeysSelected(0),
 	  _buttonKeysSelected(1),
 	  _lcd(NULL),
@@ -87,9 +88,19 @@ IInterruptHandler &GameboyColor::GetInterruptHandler()
 	return _hybr1s80;
 }
 
+Processor &GameboyColor::GetProcessor()
+{
+	return _hybr1s80;
+}
+
 Renderer &GameboyColor::GetRenderer()
 {
 	return (*_renderer);
+}
+
+TileMap::TileMapArray2 &GameboyColor::GetTileMap(int tileMapNumber)
+{
+	return _rc.tileMaps[tileMapNumber].data;
 }
 
 void GameboyColor::Initialize()
@@ -133,6 +144,25 @@ void GameboyColor::Finalize()
 	_cartridge->SaveRamDumpToFile();
 }
 
+void GameboyColor::Start()
+{
+	_paused = false;
+	
+	LOG("Started emulation");
+}
+
+void GameboyColor::Pause()
+{
+	_paused = true;
+	
+	LOG("Paused emulation");
+}
+
+bool GameboyColor::IsPaused()
+{
+	return _paused;
+}
+
 void GameboyColor::Reset()
 {
 	for (Array<int, RenderContext::VIDEO_RAM_BANK_SIZE> &videoRamBank : _rc.videoRam)
@@ -153,7 +183,7 @@ void GameboyColor::Reset()
 }
 
 void GameboyColor::RenderScanline()
-{
+{		
 	if (_rc.lcdY < 144)
 	{
 		//DoOAMSearch();
@@ -178,9 +208,12 @@ void GameboyColor::RenderScanline()
 
 void GameboyColor::RenderFrame()
 {
-	for (int i = 0; i < 154; i++)
-	{	
-		RenderScanline();
+	if (!_paused)
+	{
+		for (int i = 0; i < 154; i++)
+		{
+			RenderScanline();
+		}
 	}
 	
 	if (_lcd)
@@ -235,6 +268,8 @@ void GameboyColor::UpdateTimer(int clocks)
 	if (_deviderCounter > 0xFF)
 	{
 		_rc.ioPorts[0xFF04 - 0xFF00] += _deviderCounter / 256;
+		_rc.ioPorts[0xFF04 - 0xFF00] &= 0xFF;
+		
 		_deviderCounter %= 256;
 	}
 }
@@ -619,7 +654,13 @@ void GameboyColor::WriteByte(int address, int value)
 			case 0xFF4F:
 				// vram bank
 				_rc.ioPorts[address - 0xFF00] = value;
-				_rc.selectedVideoRamBank = value & 0x01;
+				
+				// TODO: make different checks, that are based on the users wishes
+				if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+				    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
+				{
+					_rc.selectedVideoRamBank = value & 0x01;
+				}
 				
 				break;
 			
