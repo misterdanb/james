@@ -201,86 +201,86 @@ void GameWindow::Render()
 					std::cout << std::endl;
 				}
 			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			{
-				_rightPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_rightPressed = GBC_FALSE;
-			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			{
-				_leftPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_leftPressed = GBC_FALSE;
-			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-			{
-				_upPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_upPressed = GBC_FALSE;
-			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-			{
-				_downPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_downPressed = GBC_FALSE;
-			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
-			{
-				_buttonAPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_buttonAPressed = GBC_FALSE;
-			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Comma))
-			{
-				_buttonBPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_buttonBPressed = GBC_FALSE;
-			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Dash))
-			{
-				_selectPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_selectPressed = GBC_FALSE;
-			}
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-			{
-				_startPressed = GBC_TRUE;
-				_gbc.GetInterruptHandler().SignalJoypadInterrupt();
-			}
-			else
-			{
-				_startPressed = GBC_FALSE;
-			}
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			_rightPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_rightPressed = GBC_FALSE;
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			_leftPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_leftPressed = GBC_FALSE;
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			_upPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_upPressed = GBC_FALSE;
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			_downPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_downPressed = GBC_FALSE;
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
+		{
+			_buttonAPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_buttonAPressed = GBC_FALSE;
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Comma))
+		{
+			_buttonBPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_buttonBPressed = GBC_FALSE;
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Dash))
+		{
+			_selectPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_selectPressed = GBC_FALSE;
+		}
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			_startPressed = GBC_TRUE;
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		else
+		{
+			_startPressed = GBC_FALSE;
 		}
 	}
 	
