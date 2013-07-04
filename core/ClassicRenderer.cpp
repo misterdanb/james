@@ -162,7 +162,7 @@ void ClassicRenderer::DrawSprites(int enabledColors,
 		{
 			if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
 			{
-				ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
+				ColorPalette colorPalette = spriteAttribute.monochromePaletteNumber == 0 ?
 				                            _rcClassic.monochromeSpritePalette0 :
 				                            _rcClassic.monochromeSpritePalette1;
 				
@@ -217,7 +217,7 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 		{
 			int tileNumber = (0x8000 - 0x8000) + spriteAttribute.tileNumber;
 			
-			ColorPalette colorPalette = spriteAttribute.spriteMonochromePaletteNumber == 0 ?
+			ColorPalette colorPalette = spriteAttribute.monochromePaletteNumber == 0 ?
 										_rcClassic.monochromeSpritePalette0 :
 										_rcClassic.monochromeSpritePalette1;
 			

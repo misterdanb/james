@@ -91,9 +91,9 @@ void Renderer::UpdateSpriteAttributes()
 		spriteAttributeToChange.x = _rc.oam[oamAddress + 1] - 8;
 		spriteAttributeToChange.tileNumber = _rc.oam[oamAddress + 2];
 		
-		spriteAttributeToChange.spriteColorPaletteNumber = spriteAttributeFlags & 0x07;
+		spriteAttributeToChange.colorPaletteNumber = spriteAttributeFlags & 0x07;
 		spriteAttributeToChange.tileVideoRamBankNumber = (spriteAttributeFlags >> 3) & 0x01;
-		spriteAttributeToChange.spriteMonochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
+		spriteAttributeToChange.monochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
 		spriteAttributeToChange.horizontalFlip = HorizontalFlip((spriteAttributeFlags >> 5) & 0x01);
 		spriteAttributeToChange.verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
 		spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);

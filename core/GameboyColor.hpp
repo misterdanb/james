@@ -49,6 +49,7 @@ namespace gbc
 			Renderer &GetRenderer();
 			
 			TileMap::TileMapArray2 &GetTileMap(int);
+			SpriteAttribute &GetSpriteAttribute(int);
 			
 			void Initialize();
 			void Finalize();

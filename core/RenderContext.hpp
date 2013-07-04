@@ -101,7 +101,7 @@ namespace gbc
 			Queue<Pair<int, int>> changedTileMapElements;
 			
 			// sprite attributes
-			SpriteAttribute spriteAttributes[40];
+			Array<SpriteAttribute, 40> spriteAttributes;
 			Queue<int> changedSpriteAttributes;
 			
 			struct GameboyClassicSpecificRenderContext

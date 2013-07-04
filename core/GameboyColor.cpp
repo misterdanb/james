@@ -103,6 +103,11 @@ TileMap::TileMapArray2 &GameboyColor::GetTileMap(int tileMapNumber)
 	return _rc.tileMaps[tileMapNumber].data;
 }
 
+SpriteAttribute &GameboyColor::GetSpriteAttribute(int spriteAttributeNumber)
+{
+	return _rc.spriteAttributes[spriteAttributeNumber];
+}
+
 void GameboyColor::Initialize()
 {
 	LOG("Initializing Gameboy Color emulation");
@@ -453,10 +458,26 @@ void GameboyColor::WriteByte(int address, int value)
 									_rc.changedSpriteAttributes.end(),
 									changedSpriteAttribute))
 			{
-				_rc.changedSpriteAttributes.push_back(changedSpriteAttribute);
+				//_rc.changedSpriteAttributes.push_back(changedSpriteAttribute);
 			}
 			
 			_rc.oam[address - 0xFE00] = value;
+			
+			int oamAddress = changedSpriteAttribute * 4;
+			int spriteAttributeFlags = _rc.oam[oamAddress + 3];
+			
+			SpriteAttribute &spriteAttributeToChange = _rc.spriteAttributes[changedSpriteAttribute];
+			
+			spriteAttributeToChange.y = _rc.oam[oamAddress] - 16;
+			spriteAttributeToChange.x = _rc.oam[oamAddress + 1] - 8;
+			spriteAttributeToChange.tileNumber = _rc.oam[oamAddress + 2];
+			
+			spriteAttributeToChange.colorPaletteNumber = spriteAttributeFlags & 0x07;
+			spriteAttributeToChange.tileVideoRamBankNumber = (spriteAttributeFlags >> 3) & 0x01;
+			spriteAttributeToChange.monochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
+			spriteAttributeToChange.horizontalFlip = HorizontalFlip((spriteAttributeFlags >> 5) & 0x01);
+			spriteAttributeToChange.verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
+			spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);
 		}
 	}
 	else if (address <= 0xFEFF)

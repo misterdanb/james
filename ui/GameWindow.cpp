@@ -200,6 +200,30 @@ void GameWindow::Render()
 					
 					std::cout << std::endl;
 				}
+				
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+				{
+					LOG("Current sprite attributes");
+					
+					std::cout << std::endl;
+					
+					for (int i = 0; i < 40; i++)
+					{
+						core::SpriteAttribute spriteAttribute = _gbc.GetSpriteAttribute(i);
+						
+						std::cout << "\t Y = " << spriteAttribute.y << std::endl;
+						std::cout << "\t X = " << spriteAttribute.x << std::endl;
+						std::cout << "\t Tile number = " << spriteAttribute.tileNumber << std::endl;
+						std::cout << "\t Color palette number = " << spriteAttribute.colorPaletteNumber << std::endl;
+						std::cout << "\t Tile video ram bank number = " << spriteAttribute.tileVideoRamBankNumber << std::endl;
+						std::cout << "\t Monochrome palette number = " << spriteAttribute.monochromePaletteNumber << std::endl;
+						std::cout << "\t Horizontal flip = " << GetEnumValue(spriteAttribute.horizontalFlip) << std::endl;
+						std::cout << "\t Vertical flip = " << GetEnumValue(spriteAttribute.verticalFlip) << std::endl;
+						std::cout << "\t Sprite to background priority = " << GetEnumValue(spriteAttribute.spriteToBackgroundPriority) << std::endl;
+						
+						std::cout << std::endl;
+					}
+				}
 			}
 		}
 		
