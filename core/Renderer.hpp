@@ -28,11 +28,6 @@ namespace gbc
 			Renderer(RenderContext &);
 			virtual ~Renderer();
 			
-			void UpdateTiles();
-			void UpdateBackgroundMapElements();
-			void UpdateTileMapAttributes();
-			void UpdateSpriteAttributes();
-			
 			virtual void RenderOAMSearch() = GBC_NULL;
 			virtual void RenderTransferData() = GBC_NULL;
 			virtual void RenderHorizontalBlank() = GBC_NULL;

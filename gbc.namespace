@@ -5,6 +5,6 @@
  * namespace description
  */
 
-namepace _gbc = gbc;
+namespace _gbc = gbc;
 
 #endif

@@ -5,6 +5,6 @@
  * namespace description
  */
 
-namepace _ui = gbc::ui;
+namespace _ui = gbc::ui;
 
 #endif

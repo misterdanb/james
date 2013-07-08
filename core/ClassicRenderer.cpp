@@ -24,17 +24,11 @@ void ClassicRenderer::RenderOAMSearch()
 	{
 		_rc.interruptHandler->SignalLCDStatusInterrupt();
 	}
-	
-	UpdateSpriteAttributes();
 }
 
 void ClassicRenderer::RenderTransferData()
 {
 	_rc.lcdMode = LCDMode::TRANSFERRING_DATA;
-	
-	UpdateTiles();
-	UpdateBackgroundMapElements();
-	UpdateSpriteAttributes();
 	
 	if (_rc.lcdDisplayEnabled)
 	{

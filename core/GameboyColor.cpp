@@ -192,6 +192,7 @@ void GameboyColor::RenderScanline()
 	if (_rc.lcdY < 144)
 	{
 		//DoOAMSearch();
+		// set lcd mode here and test if sprites work
 		_renderer->RenderOAMSearch();
 		ExecuteMachineClocks(80 * _speedFactor);
 		
@@ -384,47 +385,74 @@ void GameboyColor::WriteByte(int address, int value)
 	{
 		//if (_rc.lcdMode != LCDMode::TRANSFERRING_DATA)
 		{
+			_rc.videoRam[_rc.selectedVideoRamBank][address - 0x8000] = value;
+			
 			if (address <= 0x97FF)
 			{
-				Pair<int, int> changedTile(_rc.selectedVideoRamBank,
-										   ((address - 0x8000) >> 4) & 0x0FFF);
+				int tileRamPartAddress = (address - 0x8000) & 0xFFF0;
+				int tileNumber = tileRamPartAddress >> 4;
+				int y = (address % 0x10) / 2;
 				
-				if (!std::binary_search(_rc.changedTiles.begin(),
-										_rc.changedTiles.end(),
-										changedTile))
+				Tile &tileToChange = _rc.tiles[_rc.selectedVideoRamBank][tileNumber];
+				
+				int colorNumbersLow = _rc.videoRam[_rc.selectedVideoRamBank][tileRamPartAddress + y * 2];
+				int colorNumbersHigh = _rc.videoRam[_rc.selectedVideoRamBank][tileRamPartAddress + y * 2 + 1];
+				
+				switch (address % 2)
 				{
-					_rc.changedTiles.push_back(changedTile);
+					case 0:
+						for (int x = 0; x < Tile::WIDTH; x++)
+						{
+							tileToChange.data[x][y] &= 0b10;
+							tileToChange.data[x][y] |= (colorNumbersLow >> (7 - x)) & 0b01;
+						}
+						
+						break;
+					
+					case 1:
+						for (int x = 0; x < Tile::WIDTH; x++)
+						{
+							tileToChange.data[x][y] &= 0b01;
+							tileToChange.data[x][y] |= ((colorNumbersHigh << 1) >> (7 - x)) & 0b10;
+						}
+						
+						break;
 				}
 			}
 			else
 			{
 				if (_rc.selectedVideoRamBank == 0)
 				{
-					Pair<int, int> changedBackgroundMapElement((address <= 0x9BFF) ? 0 : 1,
-															   (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00));
+					int mapNumber = (address <= 0x9BFF) ? 0 : 1;
+					int mapElementNumber = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
 					
-					if (!std::binary_search(_rc.changedTileMapElements.begin(),
-											_rc.changedTileMapElements.end(),
-											changedBackgroundMapElement))
-					{
-						_rc.changedTileMapElements.push_back(changedBackgroundMapElement);
-					}
+					int mapElementX = mapElementNumber % TileMap::WIDTH;
+					int mapElementY = mapElementNumber / TileMap::WIDTH;
+					
+					TileMap &tileMap = _rc.tileMaps[mapNumber];
+					
+					tileMap.data[mapElementX][mapElementY] = _rc.videoRam[0][(mapNumber == 0) ?
+																			 (0x9800 - 0x8000 + mapElementNumber) :
+																			 (0x9C00 - 0x8000 + mapElementNumber)];
 				}
 				else
 				{
-					Pair<int, int> changedTileMapAttribute((address <= 0x9BFF) ? 0 : 1,
-														   (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00));
+					int mapNumber = (address <= 0x9BFF) ? 0 : 1;
+					int mapElementNumber = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
 					
-					if (!std::binary_search(_rcColor.changedTileMapAttributes.begin(),
-											_rcColor.changedTileMapAttributes.end(),
-											changedTileMapAttribute))
-					{
-						_rcColor.changedTileMapAttributes.push_back(changedTileMapAttribute);
-					}
+					int tileMapAttribute = _rc.videoRam[1][(mapNumber == 0) ?
+										                   (0x9800 + mapElementNumber) :
+										                   (0x9C00 + mapElementNumber)];
+					
+					TileMapAttribute &tileMapAttributeToChange = _rcColor.tileMapAttributes[mapNumber][mapElementNumber];
+					
+					tileMapAttributeToChange.backgroundColorPaletteNumber = tileMapAttribute & 0x07;
+					tileMapAttributeToChange.tileVideoRamBankNumber = (tileMapAttribute >> 3) & 0x01;
+					tileMapAttributeToChange.horizontalFlip = HorizontalFlip((tileMapAttribute >> 5) & 0x01);
+					tileMapAttributeToChange.verticalFlip = VerticalFlip((tileMapAttribute >> 6) & 0x01);
+					tileMapAttributeToChange.backgroundToOAMPriority = BackgroundToOAMPriority((tileMapAttribute >> 7) & 0x01);
 				}
 			}
-			
-			_rc.videoRam[_rc.selectedVideoRamBank][address - 0x8000] = value;
 		}
 	}
 	else if (address <= 0xBFFF)
@@ -452,32 +480,36 @@ void GameboyColor::WriteByte(int address, int value)
 		if (_rc.lcdMode != LCDMode::SEARCHING_OAM &&
 		    _rc.lcdMode != LCDMode::TRANSFERRING_DATA)
 		{
-			int changedSpriteAttribute = (address - 0xFE00) >> 2; // <=> * 4
-			
-			if (!std::binary_search(_rc.changedSpriteAttributes.begin(),
-									_rc.changedSpriteAttributes.end(),
-									changedSpriteAttribute))
-			{
-				//_rc.changedSpriteAttributes.push_back(changedSpriteAttribute);
-			}
-			
 			_rc.oam[address - 0xFE00] = value;
 			
-			int oamAddress = changedSpriteAttribute * 4;
+			int oamAddress = (address - 0xFE00) & 0xFC;
 			int spriteAttributeFlags = _rc.oam[oamAddress + 3];
 			
-			SpriteAttribute &spriteAttributeToChange = _rc.spriteAttributes[changedSpriteAttribute];
+			SpriteAttribute &spriteAttributeToChange = _rc.spriteAttributes[oamAddress >> 2];
 			
-			spriteAttributeToChange.y = _rc.oam[oamAddress] - 16;
-			spriteAttributeToChange.x = _rc.oam[oamAddress + 1] - 8;
-			spriteAttributeToChange.tileNumber = _rc.oam[oamAddress + 2];
-			
-			spriteAttributeToChange.colorPaletteNumber = spriteAttributeFlags & 0x07;
-			spriteAttributeToChange.tileVideoRamBankNumber = (spriteAttributeFlags >> 3) & 0x01;
-			spriteAttributeToChange.monochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
-			spriteAttributeToChange.horizontalFlip = HorizontalFlip((spriteAttributeFlags >> 5) & 0x01);
-			spriteAttributeToChange.verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
-			spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);
+			switch (address % 4)
+			{
+				case 0:
+					spriteAttributeToChange.y = _rc.oam[oamAddress] - 16;
+					break;
+				
+				case 1:
+					spriteAttributeToChange.x = _rc.oam[oamAddress + 1] - 8;
+					break;
+				
+				case 2:
+					spriteAttributeToChange.tileNumber = _rc.oam[oamAddress + 2];
+					break;
+				
+				case 3:
+					spriteAttributeToChange.colorPaletteNumber = spriteAttributeFlags & 0x07;
+					spriteAttributeToChange.tileVideoRamBankNumber = (spriteAttributeFlags >> 3) & 0x01;
+					spriteAttributeToChange.monochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
+					spriteAttributeToChange.horizontalFlip = HorizontalFlip((spriteAttributeFlags >> 5) & 0x01);
+					spriteAttributeToChange.verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
+					spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);
+					break;
+			}
 		}
 	}
 	else if (address <= 0xFEFF)

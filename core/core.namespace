@@ -5,6 +5,6 @@
  * namespace description
  */
 
-namepace _core = gbc::core;
+namespace _core = gbc::core;
 
 #endif

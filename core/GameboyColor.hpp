@@ -34,7 +34,7 @@ namespace gbc
 		{
 		public:
 			// clock speed over 256 will cause timer inaccuracies
-			static const int CLOCK_SPEED = 256;
+			static const int CLOCK_SPEED = 1;
 			
 		public:
 			GameboyColor();
