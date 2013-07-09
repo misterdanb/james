@@ -55,6 +55,7 @@ GameboyColor::GameboyColor()
 GameboyColor::~GameboyColor()
 {
 	delete _renderer;
+	delete _cartridge;
 }
 
 void GameboyColor::SetLCD(ILCD &lcd)
