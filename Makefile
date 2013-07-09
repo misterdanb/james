@@ -1,9 +1,10 @@
-CC=g++
-CFLAGS=-c -std=c++11 -O3
-CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg
+CC=clang++
+
+CFLAGS=-c -std=c++11 -O2 -stdlib=libc++
+CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -g -stdlib=libc++
 	
-LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system
-LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -pg
+LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lc++
+LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -g -lc++
 
 OBJECTS=core/gbc.o \
 	core/MemoryBus.o \
