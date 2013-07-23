@@ -231,98 +231,43 @@ void GameWindow::Render()
 					
 					std::cout << std::endl;
 					
-					for (int i = 0; i < 0x10000; i++)
-					{
-						if ((i % 0x0100) == 0)
-						{
-							std::cout << std::endl << std::endl;;
-							
-							std::cout << ToFixedHex((i >> 8) & 0xFF, 2) << "** |";
-							
-							for (int j = 0; j < 0x10; j++)
-							{
-								std::cout << " " << ToFixedHex((i >> 8) & 0xFF, 2) << "*" << ToFixedHex(j, 1);
-							}
-							
-							std::cout << std::endl;
-							
-							std::cout << "------";
-							
-							for (int j = 0; j < 0x10; j++)
-							{
-								std::cout << "-----";
-							}
-						}
-						
-						if ((i % 0x10) == 0)
-						{
-							std::cout << std::endl << ToFixedHex((i >> 4) & 0xFFF, 3) << "* |";
-						}
-						
-						std::cout << "   " << ToFixedHex(_gbc.ReadByte(i), 2);
-					}
-					
-					std::cout << std::endl << std::endl;
+					throwMem();
 				}
 				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 				{
 					LOG("Current cpu registers");
 					
-					core::cpu::State state = _gbc.GetProcessor().GetState();
-					
-					std::cout << "\tA = 0x" << ToFixedHex(state.a, 2) << std::endl;
-					std::cout << "\tF = 0x" << ToFixedHex(state.f, 2) << std::endl;
-					std::cout << "\tB = 0x" << ToFixedHex(state.b, 2) << std::endl;
-					std::cout << "\tC = 0x" << ToFixedHex(state.c, 2) << std::endl;
-					std::cout << "\tD = 0x" << ToFixedHex(state.d, 2) << std::endl;
-					std::cout << "\tE = 0x" << ToFixedHex(state.e, 2) << std::endl;
-					std::cout << "\tH = 0x" << ToFixedHex(state.h, 2) << std::endl;
-					std::cout << "\tL = 0x" << ToFixedHex(state.l, 2) << std::endl;
-					std::cout << "\tSP = 0x" << ToFixedHex(state.pc, 2) << std::endl;
-					std::cout << "\tPC = 0x" << ToFixedHex(state.sp, 2) << std::endl;
-					std::cout << "\tIME = " << std::boolalpha << bool(state.interruptsEnabled) << std::endl;
-					std::cout << "\tStopped = " << std::boolalpha << bool(state.stopped) << std::endl;
-					std::cout << "\tHalted = " << std::boolalpha << bool(state.halted) << std::endl;
-					
-					std::cout << std::endl;
+					throwRegs();
 				}
 				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 				{
 					LOG("Current sprite attributes");
-					
-					std::cout << std::endl;
-					
-					for (int i = 0; i < 40; i++)
-					{
-						core::SpriteAttribute spriteAttribute = _gbc.GetSpriteAttribute(i);
-						
-						std::cout << "\t Y = " << spriteAttribute.y << std::endl;
-						std::cout << "\t X = " << spriteAttribute.x << std::endl;
-						std::cout << "\t Tile number = " << spriteAttribute.tileNumber << std::endl;
-						std::cout << "\t Color palette number = " << spriteAttribute.colorPaletteNumber << std::endl;
-						std::cout << "\t Tile video ram bank number = " << spriteAttribute.tileVideoRamBankNumber << std::endl;
-						std::cout << "\t Monochrome palette number = " << spriteAttribute.monochromePaletteNumber << std::endl;
-						std::cout << "\t Horizontal flip = " << GetEnumValue(spriteAttribute.horizontalFlip) << std::endl;
-						std::cout << "\t Vertical flip = " << GetEnumValue(spriteAttribute.verticalFlip) << std::endl;
-						std::cout << "\t Sprite to background priority = " << GetEnumValue(spriteAttribute.spriteToBackgroundPriority) << std::endl;
-						
-						std::cout << std::endl;
-					}
+				
+					throwSprAttr();
 				}
 			}
 		}
-		
-		_rightPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);		
-		_leftPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
-		_upPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-		_downPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
-		_buttonAPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Period);
-		_buttonBPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Comma);
-		_selectPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Dash);
-		_startPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
-		_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+		int IRQ_mark = 0;
+		if ((_rightPressed   = sf::Keyboard::isKeyPressed(sf::Keyboard::Right)))
+			IRQ_mark++;
+		if ((_leftPressed    = sf::Keyboard::isKeyPressed(sf::Keyboard::Left)))
+                        IRQ_mark++;
+		if ((_upPressed      = sf::Keyboard::isKeyPressed(sf::Keyboard::Up)))
+			IRQ_mark++;
+		if ((_downPressed    = sf::Keyboard::isKeyPressed(sf::Keyboard::Down)))
+		        IRQ_mark++;
+		if ((_buttonAPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Period)))
+		        IRQ_mark++;
+		if ((_buttonBPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Comma)))
+		        IRQ_mark++;
+		if ((_selectPressed  = sf::Keyboard::isKeyPressed(sf::Keyboard::Dash)))
+		        IRQ_mark++;
+		if ((_startPressed   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space)))
+		        IRQ_mark++;
+		if (IRQ_mark)
+			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
 	}
 	
 	clear();
