@@ -38,6 +38,11 @@ namespace gbc
 			void HideTileMap(int);
 		
 		private:
+			void throwTilemaps();
+			void throwMem();
+			void throwRegs();
+			void throwSprAttr();
+			
 			core::GameboyColor _gbc;
 			
 			Array<sf::Uint8, Frame::WIDTH * Frame::HEIGHT * 4> _rawFrame;
