@@ -38,8 +38,6 @@ int main(int argc, char *argv[])
 			gbc::ui::GameWindow window(160, 144, rom);
 			
 			sf::Clock clock;
-			float lastTime = 0;
-			float frames = 0;
 			
 			window.ShowTileMap(0);
 			window.ShowTileMap(1);
