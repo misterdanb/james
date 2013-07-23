@@ -142,7 +142,6 @@ void ClassicRenderer::DrawSprites(int enabledColors,
 {
 	int drawnSprites = 0;
 	int hardCodedSpriteLimit = 40;
-	
 	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
 		// only draw visible sprites
@@ -172,14 +171,14 @@ void ClassicRenderer::DrawSprites(int enabledColors,
 				else if (_rc.spriteSize == 1)
 				{
 					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-					         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber & 0xFE],
+					         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber & 0xFE)],
 					         spriteAttribute.horizontalFlip,
 					         spriteAttribute.verticalFlip,
 					         colorPalette,
 					         enabledColors);
 					
 					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y + 8),
-					         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber | 0x01],
+					         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber | 0x01)],
 					         spriteAttribute.horizontalFlip,
 					         spriteAttribute.verticalFlip,
 					         colorPalette,
@@ -209,8 +208,6 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
 		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
 		{
-			int tileNumber = (0x8000 - 0x8000) + spriteAttribute.tileNumber;
-			
 			ColorPalette colorPalette = spriteAttribute.monochromePaletteNumber == 0 ?
 										_rcClassic.monochromeSpritePalette0 :
 										_rcClassic.monochromeSpritePalette1;
@@ -227,14 +224,14 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 			else if (_rc.spriteSize == 1)
 			{
 				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-				         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber & 0xFE],
+				         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber & 0xFE)],
 				         spriteAttribute.horizontalFlip,
 				         spriteAttribute.verticalFlip,
 				         colorPalette,
 				         enabledColors);
 				
 				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y + 8),
-				         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber | 0x01],
+				         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber | 0x01)],
 				         spriteAttribute.horizontalFlip,
 				         spriteAttribute.verticalFlip,
 				         colorPalette,
