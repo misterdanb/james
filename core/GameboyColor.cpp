@@ -2,15 +2,15 @@
 
 GameboyColor::GameboyColor()
 	: _paused(true),
+	  _pendingClocks(0),
+	  _lcd(NULL),
 	  _joypad(NULL),
 	  _directionKeysSelected(0),
 	  _buttonKeysSelected(1),
-	  _lcd(NULL),
 	  _cartridge(NULL),
 	  _forceClassicGameboy(GBC_TRUE),
 	  _hybr1s80(),
 	  _speedFactor(1),
-	  _pendingClocks(0),
 	  _timerClockFrequency(1024), // or something...
 	  _timerStopped(GBC_TRUE),
 	  _deviderCounter(0),
