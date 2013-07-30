@@ -5,7 +5,7 @@ using namespace gbc::core;
 using namespace gbc::core::cpu;
 
 Processor::Processor()
-	: _counter(0), _state(), _bus(NULL)
+	: _counter(0), _currentOpCodes(), _currentOpLows(),_currentOpHighs(), _state(), _bus(NULL)
 {
 }
 
