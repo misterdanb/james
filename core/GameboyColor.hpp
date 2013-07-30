@@ -71,6 +71,8 @@ namespace gbc
 			void WriteByte(int, int);
 		
 		private:
+			GameboyColor(GameboyColor &);
+			GameboyColor & operator=(GameboyColor &);
 			// emulation state
 			bool _paused;
 			int _pendingClocks;
