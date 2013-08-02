@@ -5,7 +5,9 @@ using namespace gbc::core;
 using namespace gbc::core::cartridges;
 
 MBC5::MBC5(DynamicArray<int> rom)
-	: Cartridge(rom)
+	: Cartridge(rom),
+	  _ramEnabled(),
+	  _romRamMode()
 {
 }
 

@@ -13,11 +13,12 @@ RomRam::~RomRam()
 {
 }
 
-int RomRam::ReadByte(int address)
+int RomRam::ReadByte(int)
 {
 	return 0;
 }
 
-void RomRam::WriteByte(int address, int value)
+void RomRam::WriteByte(int, int)
 {
+	return;
 }

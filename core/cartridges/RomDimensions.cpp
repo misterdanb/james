@@ -5,6 +5,7 @@ using namespace gbc::core;
 using namespace gbc::core::cartridges;
 
 RomDimensions::RomDimensions(int romDimensionsIdentifier)
+: size(), banks(), bankSize()
 {
 	switch (romDimensionsIdentifier)
 	{

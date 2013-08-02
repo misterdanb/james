@@ -4,15 +4,22 @@ using namespace gbc;
 using namespace gbc::core::cartridges;
 
 Header::Header(DynamicArray<int> &rom)
-	: platformSupport(PlatformSupport(rom[PLATFORM_SUPPORT_ADDRESS])),
+	: entryPoint(),
+	  nintendoLogo(),
+	  oldTitle(),
+	  newTitle(),
+	  manufacturerCode(),
+	  platformSupport(PlatformSupport(rom[PLATFORM_SUPPORT_ADDRESS])),
+	  newLicenseeCode(),
 	  superGameboyFlag(rom[SUPER_GAMEBOY_FLAG_ADDRESS]),
-	  cartridgeType(CartridgeType(rom[CARTRIDGE_TYPE_ADDRESS])), 
+	  cartridgeType(CartridgeType(rom[CARTRIDGE_TYPE_ADDRESS])),
 	  romDimensions(rom[ROM_DIMENSIONS_ADDRESS]),
 	  ramDimensions(rom[RAM_DIMENSIONS_ADDRESS]),
 	  destinationCode(DestinationCode(rom[DESTINATION_CODE_ADDRESS])),
 	  oldLicenseeCode(rom[OLD_LICENSEE_CODE_ADDRESS]),
 	  romVersionNumber(rom[ROM_VERSION_NUMBER_ADDRESS]),
-	  headerChecksum(rom[HEADER_CHECKSUM_ADDRESS])
+	  headerChecksum(rom[HEADER_CHECKSUM_ADDRESS]),
+	  globalChecksum()
 {
 	std::copy(rom.begin() + ENTRY_POINT_ADDRESS,
 	          rom.begin() + ENTRY_POINT_ADDRESS + ENTRY_POINT_LENGTH,

@@ -13,7 +13,9 @@ using namespace gbc;
 using namespace gbc::core::cartridges;
 
 Cartridge::Cartridge(DynamicArray<int> &rom)
-	: _header(rom),
+	: _rom(),
+	  _ram(),
+	  _header(rom),
 	  _selectedRomBank(1),
 	  _selectedRamBank(0)
 {

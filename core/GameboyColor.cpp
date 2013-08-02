@@ -15,8 +15,11 @@ GameboyColor::GameboyColor()
 	  _timerStopped(GBC_TRUE),
 	  _deviderCounter(0),
 	  _timerCounter(0),
+	  _monochromePalette(),
 	  _colorBackgroundPaletteIndexAutoIncrement(0),
-	  _colorSpritePaletteIndexAutoIncrement(0)
+	  _colorSpritePaletteIndexAutoIncrement(0),
+	  _renderer(),
+	  _rc()
 {
 	_rc.memoryBus = this;
 	_rc.interruptHandler = &_hybr1s80;

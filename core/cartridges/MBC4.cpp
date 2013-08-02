@@ -13,11 +13,12 @@ MBC4::~MBC4()
 {
 }
 
-int MBC4::ReadByte(int address)
+int MBC4::ReadByte(int)
 {
 	return 0;
 }
 
-void MBC4::WriteByte(int address, int value)
+void MBC4::WriteByte(int, int)
 {
+	return;
 }
