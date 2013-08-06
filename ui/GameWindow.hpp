@@ -56,12 +56,13 @@ namespace gbc
 			int _buttonBPressed;
 			int _selectPressed;
 			int _startPressed;
-			
+#ifdef DEBUG			
 			int _tileMap0WindowVisible;
 			int _tileMap1WindowVisible;
 			
 			TileMapWindow _tileMap0Window;
 			TileMapWindow _tileMap1Window;
+#endif
 		};
 	}
 }

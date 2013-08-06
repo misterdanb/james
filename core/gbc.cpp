@@ -64,9 +64,10 @@ namespace gbc
 		
 		for (unsigned int i = 0; i < string.size(); i++)
 		{
-			int temp = std::toupper(string[i]);
-			std::string tmp = std::to_string(temp);
-			result[i] = *(tmp.c_str());
+			result[i] = (char) std::toupper(string[i]);
+//			int temp = std::toupper(string[i]);
+//			std::string tmp = std::to_string(temp);
+//			result[i] = *(tmp.c_str());
 		}
 		
 		return result;

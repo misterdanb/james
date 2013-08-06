@@ -16,14 +16,18 @@ GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	  _buttonAPressed(GBC_FALSE),
 	  _buttonBPressed(GBC_FALSE),
 	  _selectPressed(GBC_FALSE),
-	  _startPressed(GBC_FALSE),
-	  _tileMap0WindowVisible(GBC_FALSE),
+	  _startPressed(GBC_FALSE)
+#ifdef DEBUG
+	  ,_tileMap0WindowVisible(GBC_FALSE),
 	  _tileMap1WindowVisible(GBC_FALSE),
 	  _tileMap0Window(0, _gbc),
 	  _tileMap1Window(1, _gbc)
+#endif
 {
+#ifdef DEBUG
 	_tileMap0Window.setVisible(GBC_FALSE);
 	_tileMap1Window.setVisible(GBC_FALSE);
+#endif
 	
 	_gbc.Initialize();
 	_gbc.SetRom(rom);
@@ -277,6 +281,7 @@ void GameWindow::Render()
 	draw(sprite);
 	display();
 	
+#ifdef DEBUG
 	if (_tileMap0WindowVisible)
 	{
 		_tileMap0Window.Render();
@@ -286,6 +291,7 @@ void GameWindow::Render()
 	{
 		_tileMap1Window.Render();
 	}
+#endif
 }
 
 void GameWindow::DrawFrame(Frame &frame)
@@ -348,6 +354,7 @@ int GameWindow::GetStart()
 	return _startPressed;
 }
 
+#ifdef DEBUG
 void GameWindow::ShowTileMap(int tileMapNumber)
 {
 	if (tileMapNumber == 0)
@@ -378,3 +385,4 @@ void GameWindow::HideTileMap(int tileMapNumber)
 	_tileMap1Window.setVisible(false);
 	_tileMap0Window.setVisible(false);
 }
+#endif
