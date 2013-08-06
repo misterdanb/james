@@ -356,9 +356,10 @@ int GameboyColor::ReadByte(int address)
 			case 0xFF70:
 				// wram bank
 				return _rc.selectedWorkRamBank;
+			default:
+				return _rc.ioPorts[address - 0xFF00];
 		}
 		
-		return _rc.ioPorts[address - 0xFF00];
 	}
 	else if (address <= 0xFFFE)
 	{
@@ -420,6 +421,8 @@ void GameboyColor::WriteByte(int address, int value)
 							tileToChange.data[x][y] |= ((colorNumbersHigh << 1) >> (7 - x)) & 2;
 						}
 						
+						break;
+					default:
 						break;
 				}
 			}
@@ -513,6 +516,8 @@ void GameboyColor::WriteByte(int address, int value)
 					spriteAttributeToChange.verticalFlip = VerticalFlip((spriteAttributeFlags >> 6) & 0x01);
 					spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeFlags >> 7) & 0x01);
 					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -572,6 +577,7 @@ void GameboyColor::WriteByte(int address, int value)
 					case 0x01: _timerClockFrequency = 16; break;
 					case 0x02: _timerClockFrequency = 64; break;
 					case 0x03: _timerClockFrequency = 256; break;
+					default: break;
 				}
 				
 				_timerStopped = !GetBit(value, 2);
