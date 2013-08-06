@@ -109,8 +109,8 @@ namespace gbc
 			
 			RenderContext _rc;
 			
-			RenderContext::GameboyClassicSpecificRenderContext &_rcClassic = _rc.gameboyClassicSpecific;
-			RenderContext::GameboyColorSpecificRenderContext &_rcColor = _rc.gameboyColorSpecific;
+			GameboyClassicSpecificRenderContext &_rcClassic = _rc.gameboyClassicSpecific;
+			GameboyColorSpecificRenderContext &_rcColor = _rc.gameboyColorSpecific;
 		};
 	}
 }

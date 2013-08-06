@@ -28,6 +28,7 @@ OBJECTS=core/gbc.o \
 	core/Renderer.o \
 	core/ClassicRenderer.o \
 	core/GameboyColor.o \
+	core/RenderContext.o \
 	ui/TileMapWindow.o \
 	ui/GameWindow.o \
 	main.o
@@ -54,6 +55,7 @@ OBJECTSDEBUG=core/gbc-debug.o \
 	core/Joypad-debug.o \
 	core/Renderer-debug.o \
 	core/ClassicRenderer-debug.o \
+	core/RenderContext-debug.o \
 	core/GameboyColor-debug.o \
 	ui/TileMapWindow-debug.o \
 	ui/GameWindow-debug.o \
@@ -81,6 +83,9 @@ core/GameboyColor.o: core/GameboyColor.cpp
 
 core/ClassicRenderer.o: core/ClassicRenderer.cpp
 	$(CC) $(CFLAGS) core/ClassicRenderer.cpp -o core/ClassicRenderer.o
+
+core/RenderContext.o: core/RenderContext.cpp
+	$(CC) $(CFLAGS) core/RenderContext.cpp -o core/RenderContext.o
 
 core/Renderer.o: core/Renderer.cpp
 	$(CC) $(CFLAGS) core/Renderer.cpp -o core/Renderer.o
@@ -164,6 +169,9 @@ core/GameboyColor-debug.o: core/GameboyColor.cpp
 
 core/ClassicRenderer-debug.o: core/ClassicRenderer.cpp
 	$(CC) $(CFLAGSDEBUG) core/ClassicRenderer.cpp -o core/ClassicRenderer-debug.o
+
+core/RenderContext-debug.o: core/RenderContext.cpp
+	$(CC) $(CFLAGSDEBUG) core/RenderContext.cpp -o core/RenderContext-debug.o
 
 core/Renderer-debug.o: core/Renderer.cpp
 	$(CC) $(CFLAGSDEBUG) core/Renderer.cpp -o core/Renderer-debug.o

@@ -6,6 +6,9 @@ using namespace gbc::ui;
 
 GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	: sf::RenderWindow(sf::VideoMode(width, height), "GBC"),
+	  _gbc(),
+	  _rawFrame(),
+	  _frame(),
 	  _rightPressed(GBC_FALSE),
 	  _leftPressed(GBC_FALSE),
 	  _upPressed(GBC_FALSE),
