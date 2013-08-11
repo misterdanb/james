@@ -5,6 +5,6 @@
  * namespace description
  */
 
-namespace _cpu = gbc::core::cpu;
+namespace _cpu = james::core::cpu;
 
 #endif

@@ -3,7 +3,7 @@
 
 #include "SpriteToBackgroundPriority.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

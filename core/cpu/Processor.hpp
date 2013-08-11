@@ -1,14 +1,14 @@
 #ifndef _Processor_hpp_
 #define _Processor_hpp_
 
-#include "../gbc.hpp"
+#include "../James.hpp"
 #include "../MemoryBus.hpp"
-#include "State.hpp"
 #include "../InterruptHandler.hpp"
+#include "State.hpp"
 #include "InstructionTable.hpp"
 #include "LookUpTables.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{
@@ -41,6 +41,11 @@ namespace gbc
 				void SignalTimerInterrupt();
 				void SignalSerialInterrupt();
 				void SignalJoypadInterrupt();
+				
+				void StartRecording(std::string);
+				void StopRecording();
+				
+				bool IsRecording();
 				
 				void SetState(State state);
 				State GetState();
@@ -177,7 +182,8 @@ namespace gbc
 				void SET_X_R(int, int &);
 				void SET_X_AA(int, int, int);
 				/* END INSTRUCTIONS */
-				
+			
+			private:
 				int _counter;
 				
 				Array<int, LookUpTables::AMOUNT_OF_INSTUCTION_TABLES> _currentOpCodes;
@@ -186,6 +192,10 @@ namespace gbc
 				
 				State _state;
 				IMemoryBus *_bus;
+			
+			private:
+				bool _recording;
+				std::string _recordingPath;
 			};
 		}
 	}

@@ -1,7 +1,7 @@
 #include "Tile.hpp"
 
 Tile::Tile()
-	: ByteMap(WIDTH, HEIGHT), data(_matrixElements)
+	: ByteMap<WIDTH, HEIGHT>(), data(_matrixElements)
 {
 }
 

@@ -1,7 +1,7 @@
 #ifndef _VerticalFlip_hpp_
 #define _VerticalFlip_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

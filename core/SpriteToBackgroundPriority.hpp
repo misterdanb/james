@@ -1,7 +1,7 @@
 #ifndef _SpriteToBackgroundPriority_hpp_
 #define _SpriteToBackgroundPriority_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

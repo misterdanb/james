@@ -1,7 +1,7 @@
 #ifndef _Header_hpp_
 #define _Header_hpp_
 
-#include "../gbc.hpp"
+#include "../James.hpp"
 
 #include <cstring>
 #include <algorithm>
@@ -11,7 +11,7 @@
 #include "RamDimensions.hpp"
 #include "DestinationCode.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

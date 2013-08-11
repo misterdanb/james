@@ -1,8 +1,8 @@
 #include "RamDimensions.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace gbc::core::cartridges;
+using namespace james;
+using namespace james::core;
+using namespace james::core::cartridges;
 
 RamDimensions::RamDimensions(int ramDimensionsIdentifier)
 {

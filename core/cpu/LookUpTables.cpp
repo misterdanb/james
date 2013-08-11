@@ -1,8 +1,8 @@
 #include "LookUpTables.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace gbc::core::cpu;
+using namespace james;
+using namespace james::core;
+using namespace james::core::cpu;
 
 const Array2<int, LookUpTables::AMOUNT_OF_INSTUCTION_TABLES, LookUpTables::INSTRUCTION_TABLE_SIZE> LookUpTables::INSTRUCTION_CYCLES =
 {

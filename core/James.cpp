@@ -1,6 +1,6 @@
-#include "gbc.hpp"
+#include "James.hpp"
 
-namespace gbc
+namespace james
 {
 	void Log(std::string log)
 	{

@@ -1,9 +1,9 @@
 #ifndef _TileMap_hpp_
 #define _TileMap_hpp_
 
-#include "gbc.hpp"
+#include "James.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

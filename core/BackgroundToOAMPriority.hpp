@@ -1,7 +1,7 @@
 #ifndef _BackgroundToOAMPriority_hpp_
 #define _BackgroundToOAMPriority_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

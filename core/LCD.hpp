@@ -1,10 +1,10 @@
 #ifndef _LCD_hpp_
 #define _LCD_hpp_
 
-#include "gbc.hpp"
+#include "James.hpp"
 #include "Frame.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

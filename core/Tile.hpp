@@ -1,12 +1,12 @@
 #ifndef _Tile_hpp_
 #define _Tile_hpp_
 
-#include "gbc.hpp"
+#include "James.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
+using namespace james;
+using namespace james::core;
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{
@@ -19,14 +19,8 @@ namespace gbc
 			typedef Array2<int, WIDTH, HEIGHT> TileArray2;
 		
 		public:
-			Tile()
-				: ByteMap<WIDTH, HEIGHT>(), data(_matrixElements)
-			{
-			}
-			
-			~Tile()
-			{
-			}
+			Tile();
+			~Tile();
 		
 		public:
 			TileArray2 &data;

@@ -1,7 +1,7 @@
 #include "Joypad.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
+using namespace james;
+using namespace james::core;
 
 IJoypad::~IJoypad()
 {

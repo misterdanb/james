@@ -5,9 +5,9 @@
 #include "../core/GameboyColor.hpp"
 #include "../core/Color.template"
 
-namespace gbc
+namespace james
 {
-	namespace ui
+	namespace sfml
 	{
 		using namespace core;
 		

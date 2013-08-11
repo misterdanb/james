@@ -1,8 +1,8 @@
 #include "MBC2.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace gbc::core::cartridges;
+using namespace james;
+using namespace james::core;
+using namespace james::core::cartridges;
 
 MBC2::MBC2(DynamicArray<int> rom)
 	: Cartridge(rom), _ramEnabled(GBC_FALSE)

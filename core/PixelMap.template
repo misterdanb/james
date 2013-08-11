@@ -6,7 +6,7 @@
 #include "Matrix.template"
 #include "Color.template"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

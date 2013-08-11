@@ -7,7 +7,7 @@
  * To be implemented
  */
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

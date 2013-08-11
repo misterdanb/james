@@ -1,8 +1,8 @@
 #include "MBC3.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace gbc::core::cartridges;
+using namespace james;
+using namespace james::core;
+using namespace james::core::cartridges;
 
 MBC3::MBC3(DynamicArray<int> rom)
 	: Cartridge(rom), _ramRtcEnabled(GBC_FALSE), _ramRtcMode(0x00)

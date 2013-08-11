@@ -291,8 +291,10 @@ void ClassicRenderer::DrawBackgroundMapTile(int mapX, int enabledColors)
 	{
 		mapElementY += TileMap::HEIGHT;
 	}
-	
-	mapElementY %= TileMap::HEIGHT;
+	else
+	{
+		mapElementY %= TileMap::HEIGHT;
+	}
 	
 	int backgroundMapElement = _rc.tileMaps
 		                       [_rc.backgroundTileMapDisplaySelect].data

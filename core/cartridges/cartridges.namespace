@@ -5,6 +5,6 @@
  * namespace description
  */
 
-namespace _cartridges = gbc::core::cartridges;
+namespace _cartridges = james::core::cartridges;
 
 #endif

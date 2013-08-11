@@ -1,7 +1,7 @@
 #ifndef _DestinationCode_hpp_
 #define _DestinationCode_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

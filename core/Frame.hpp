@@ -1,12 +1,12 @@
 #ifndef _Frame_hpp_
 #define _Frame_hpp_
 
-#include "gbc.hpp"
+#include "James.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
+using namespace james;
+using namespace james::core;
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

@@ -1,0 +1,10 @@
+#ifndef _sfml_namespace_
+#define _sfml_namespace_
+
+/*
+ * namespace description
+ */
+
+namespace _sfml = gbc::sfml;
+
+#endif

@@ -1,13 +1,13 @@
 #ifndef _ClassicRenderer_hpp_
 #define _ClassicRenderer_hpp_
 
-#include "gbc.hpp"
+#include "James.hpp"
 #include "Renderer.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
+using namespace james;
+using namespace james::core;
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

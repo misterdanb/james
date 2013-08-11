@@ -1,11 +1,15 @@
 #include "Processor.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace gbc::core::cpu;
+using namespace james;
+using namespace james::core;
+using namespace james::core::cpu;
 
 Processor::Processor()
-	: _counter(0), _state(), _bus(NULL)
+	: _counter(0),
+	  _state(),
+	  _bus(NULL),
+	  _recording(false),
+	  _recordingPath("")
 {
 }
 
@@ -56,27 +60,30 @@ void Processor::ExecuteInstruction()
 	{
 		FetchInstruction(InstructionTable::DEFAULT);
 		
-		/*std::ostringstream oss;
-		
-		oss << "COUNTER=" << ToDec(_counter) << ", "
-		    << "OP_CODE=" << ToHex(GET_OP_CODE()) << ", "
-		    << "OP_LOW=" << ToHex(GET_OP_LOW()) << ", "
-		    << "OP_HIGH=" << ToHex(GetOpHigh(InstructionTable::DEFAULT)) << ", "
-		    << "A=" << ToHex(_state.a) << ", "
-		    << "F=" << ToHex(_state.f) << ", "
-		    << "B=" << ToHex(_state.b) << ", "
-		    << "C=" << ToHex(_state.c) << ", "
-		    << "D=" << ToHex(_state.d) << ", "
-		    << "E=" << ToHex(_state.e) << ", "
-		    << "H=" << ToHex(_state.h) << ", "
-		    << "L=" << ToHex(_state.l) << ", "
-		    << "(HL)=" << ToHex(_bus->ReadByte(JoinBytes(_state.h, _state.l))) << ", "
-		    << "PC=" << ToHex(_state.pc) << ", "
-		    << "SP=" << ToHex(_state.sp) << ", "
-		    << "POP_LOW=" << ToHex(_bus->ReadByte(_state.sp)) << ", "
-		    << "POP_HIGH=" << ToHex(_bus->ReadByte(_state.sp + 1));
-		
-		CPU_LOG(oss.str());*/
+		if (_recording)
+		{
+			std::ostringstream oss;
+			
+			oss << "COUNTER=" << ToFixedDec(_counter, 12) << " | "
+				<< "OP_CODE=" << ToFixedHex(GetOpCode(InstructionTable::DEFAULT), 2) << " | "
+				<< "OP_LOW=" << ToFixedHex(GetOpLow(InstructionTable::DEFAULT), 2) << " | "
+				<< "OP_HIGH=" << ToFixedHex(GetOpHigh(InstructionTable::DEFAULT), 2) << " | "
+				<< "A=" << ToFixedHex(_state.a, 2) << " | "
+				<< "F=" << ToFixedHex(_state.f, 2) << " | "
+				<< "B=" << ToFixedHex(_state.b, 2) << " | "
+				<< "C=" << ToFixedHex(_state.c, 2) << " | "
+				<< "D=" << ToFixedHex(_state.d, 2) << " | "
+				<< "E=" << ToFixedHex(_state.e, 2) << " | "
+				<< "H=" << ToFixedHex(_state.h, 2) << " | "
+				<< "L=" << ToFixedHex(_state.l, 2) << " | "
+				<< "(HL)=" << ToFixedHex(_bus->ReadByte(JoinBytes(_state.h, _state.l)), 2) << " | "
+				<< "PC=" << ToFixedHex(_state.pc, 4) << " | "
+				<< "SP=" << ToFixedHex(_state.sp, 4) << " | "
+				<< "POP_LOW=" << ToFixedHex(_bus->ReadByte(_state.sp), 2) << " | "
+				<< "POP_HIGH=" << ToFixedHex(_bus->ReadByte(_state.sp + 1), 2);
+			
+			LogToFile(_recordingPath, oss.str());
+		}
 		
 		_counter++;
 		
@@ -612,12 +619,10 @@ void Processor::ExecuteInterrupt()
 {
 	if (_state.interruptsEnabled || _state.halted)
 	{
-		int verticalBlankInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
-		                                                                VERTICAL_BLANK_INTERRUPT_ENABLE_BIT) &&
-		                                          GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-		                                                                VERTICAL_BLANK_INTERRUPT_REQUEST_BIT);
+		int interruptsToBePerformed = _bus->ReadByte(INTERRUPT_ENABLE_ADDRESS) &
+		                              _bus->ReadByte(INTERRUPT_REQUEST_ADDRESS);
 		
-		if (verticalBlankInterruptToBePerformed)
+		if (interruptsToBePerformed & (1 << VERTICAL_BLANK_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
@@ -627,7 +632,7 @@ void Processor::ExecuteInterrupt()
 			_state.pc = VERTICAL_BLANK_INTERRUPT_VECTOR;
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         VERTICAL_BLANK_INTERRUPT_REQUEST_BIT,
+			                                         VERTICAL_BLANK_INTERRUPT_BIT_NUMBER,
 			                                         GBC_FALSE);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
@@ -640,13 +645,7 @@ void Processor::ExecuteInterrupt()
 			
 			return;
 		}
-		
-		int lcdStatusInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
-		                                                            LCD_STATUS_INTERRUPT_ENABLE_BIT) &&
-		                                      GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-		                                                            LCD_STATUS_INTERRUPT_REQUEST_BIT);
-		
-		if (lcdStatusInterruptToBePerformed)
+		else if (interruptsToBePerformed & (1 << LCD_STATUS_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
@@ -656,8 +655,8 @@ void Processor::ExecuteInterrupt()
 			_state.pc = LCD_STATUS_INTERRUPT_VECTOR;
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         LCD_STATUS_INTERRUPT_REQUEST_BIT,
-			                                         GBC_FALSE);
+			                                                        LCD_STATUS_INTERRUPT_BIT_NUMBER,
+			                                                        GBC_FALSE);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
@@ -669,13 +668,7 @@ void Processor::ExecuteInterrupt()
 			
 			return;
 		}
-		
-		int timerInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
-		                                                        TIMER_INTERRUPT_ENABLE_BIT) &&
-		                                  GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-		                                                        TIMER_INTERRUPT_REQUEST_BIT);
-		
-		if (timerInterruptToBePerformed)
+		else if (interruptsToBePerformed & (1 << TIMER_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
@@ -685,8 +678,8 @@ void Processor::ExecuteInterrupt()
 			_state.pc = TIMER_INTERRUPT_VECTOR;
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         TIMER_INTERRUPT_REQUEST_BIT,
-			                                         GBC_FALSE);
+			                                                        TIMER_INTERRUPT_BIT_NUMBER,
+			                                                        GBC_FALSE);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
@@ -698,13 +691,7 @@ void Processor::ExecuteInterrupt()
 			
 			return;
 		}
-		
-		int serialInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
-		                                                         SERIAL_INTERRUPT_ENABLE_BIT) &&
-		                                   GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-		                                                         SERIAL_INTERRUPT_REQUEST_BIT);
-		
-		if (serialInterruptToBePerformed)
+		else if (interruptsToBePerformed & (1 << SERIAL_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
@@ -714,7 +701,7 @@ void Processor::ExecuteInterrupt()
 			_state.pc = SERIAL_INTERRUPT_VECTOR;
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         SERIAL_INTERRUPT_REQUEST_BIT,
+			                                         SERIAL_INTERRUPT_BIT_NUMBER,
 			                                         GBC_FALSE);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
@@ -724,16 +711,8 @@ void Processor::ExecuteInterrupt()
 			_state.halted = GBC_FALSE;
 			
 			_state.ticks += 16;
-			
-			return;
 		}
-		
-		int joypadInterruptToBePerformed = GetBit(_bus->ReadByte(INTERRUPT_ENABLE_ADDRESS),
-		                                                         JOYPAD_INTERRUPT_ENABLE_BIT) &&
-		                                   GetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-		                                                         JOYPAD_INTERRUPT_REQUEST_BIT);
-		
-		if (joypadInterruptToBePerformed)
+		else if (interruptsToBePerformed & (1 << JOYPAD_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
@@ -743,7 +722,7 @@ void Processor::ExecuteInterrupt()
 			_state.pc = JOYPAD_INTERRUPT_VECTOR;
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         JOYPAD_INTERRUPT_REQUEST_BIT,
+			                                         JOYPAD_INTERRUPT_BIT_NUMBER,
 			                                         GBC_FALSE);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
@@ -753,8 +732,6 @@ void Processor::ExecuteInterrupt()
 			_state.halted = GBC_FALSE;
 			
 			_state.ticks += 16;
-			
-			return;
 		}
 	}
 }
@@ -813,7 +790,7 @@ void Processor::PowerUp()
 void Processor::SignalVBlankInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        VERTICAL_BLANK_INTERRUPT_REQUEST_BIT,
+	                                                        VERTICAL_BLANK_INTERRUPT_BIT_NUMBER,
 	                                                        GBC_TRUE);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
@@ -822,7 +799,7 @@ void Processor::SignalVBlankInterrupt()
 void Processor::SignalLCDStatusInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        LCD_STATUS_INTERRUPT_REQUEST_BIT,
+	                                                        LCD_STATUS_INTERRUPT_BIT_NUMBER,
 	                                                        GBC_TRUE);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
@@ -831,7 +808,7 @@ void Processor::SignalLCDStatusInterrupt()
 void Processor::SignalTimerInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        TIMER_INTERRUPT_REQUEST_BIT,
+	                                                        TIMER_INTERRUPT_BIT_NUMBER,
 	                                                        GBC_TRUE);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
@@ -840,7 +817,7 @@ void Processor::SignalTimerInterrupt()
 void Processor::SignalSerialInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        SERIAL_INTERRUPT_REQUEST_BIT,
+	                                                        SERIAL_INTERRUPT_BIT_NUMBER,
 	                                                        GBC_TRUE);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
@@ -849,10 +826,26 @@ void Processor::SignalSerialInterrupt()
 void Processor::SignalJoypadInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        JOYPAD_INTERRUPT_REQUEST_BIT,
+	                                                        JOYPAD_INTERRUPT_BIT_NUMBER,
 	                                                        GBC_TRUE);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+}
+
+void Processor::StartRecording(std::string path)
+{
+	_recording = true;
+	_recordingPath = path;
+}
+
+void Processor::StopRecording()
+{
+	_recording = false;
+}
+
+bool Processor::IsRecording()
+{
+	return _recording;
 }
 
 void Processor::SetState(State state)
@@ -871,7 +864,7 @@ int Processor::GetCounter()
 }
 
 // helper methods
-inline void Processor::FetchInstruction(InstructionTable instructionTable)
+void Processor::FetchInstruction(InstructionTable instructionTable)
 {
 	if (instructionTable == InstructionTable::DEFAULT)
 	{

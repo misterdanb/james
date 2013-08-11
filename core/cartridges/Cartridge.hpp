@@ -4,11 +4,11 @@
 #include <cstring>
 #include <algorithm>
 
-#include "../gbc.hpp"
+#include "../James.hpp"
 #include "../MemoryBus.hpp"
 #include "Header.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

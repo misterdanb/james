@@ -1,7 +1,7 @@
 #ifndef _State_hpp_
 #define _State_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{
