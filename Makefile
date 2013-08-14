@@ -1,10 +1,16 @@
 CC=g++-4.8.1
 CFLAGS=-c -std=c++11 -O3
-CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -pg
+CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -p -g
 	
 LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lc++
 LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -g -lc++
 
+CFLAGS=-c -std=c++11 -O2 -stdlib=libc++
+CFLAGSDEBUG=-c -Wall -Wextra -std=c++11 -g -stdlib=libc++
+	
+LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lc++
+LDFLAGSDEBUG=-lsfml-graphics -lsfml-window -lsfml-system -g -lc++
+	
 OBJECTS=core/gbc.o \
 	core/MemoryBus.o \
 	core/InterruptHandler.o \
