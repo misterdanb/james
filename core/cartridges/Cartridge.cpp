@@ -19,8 +19,8 @@ Cartridge::Cartridge(DynamicArray<int> &rom)
 	  _selectedRomBank(1),
 	  _selectedRamBank(0)
 {
-	_rom.resize(_header.romDimensions.size);
-	_ram.resize(_header.ramDimensions.size);
+	_rom.resize(_header.romDimensions.size + 1);
+	_ram.resize(_header.ramDimensions.size + 1);
 	
 	std::copy(rom.begin(), rom.end(), _rom.begin());
 	std::fill(_ram.begin(), _ram.end(), 0x00);
