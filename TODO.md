@@ -4,4 +4,4 @@
   an own Memory class
 
 * Move the raw data preprocessing into the corresponding classes such
-  as the tile data sorting into the Tile clasa
+  as the tile data sorting into the Tile class
