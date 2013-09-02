@@ -19,8 +19,8 @@ GameWindow::GameWindow(int width, int height, std::string rom)
 #ifdef DEBUG
 	  ,_tileMap0WindowVisible(GBC_FALSE),
 	  _tileMap1WindowVisible(GBC_FALSE),
-	  _tileMap0Window(0, _gbc),
-	  _tileMap1Window(1, _gbc)
+	  _tileMap0Window(0, GetDevice()),
+	  _tileMap1Window(1, GetDevice())
 #endif
 {
 #ifdef DEBUG
