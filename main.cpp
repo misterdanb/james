@@ -13,9 +13,11 @@ int main(int argc, char *argv[])
 	if (std::string(argv[1]) == std::string("help"))
 	{
 		std::cout << "Ctrl + P: Pause/Start" << std::endl
+		          << "Ctrl + Z: Start/Stop recording cpu instructions" << std::endl
 		          << "Ctrl + M: Read a single register" << std::endl
 		          << "Ctrl + D: Dump the whole memory" << std::endl
-		          << "Ctrl + A: Dump the processor state" << std::endl;
+		          << "Ctrl + A: Dump the processor state" << std::endl
+		          << "Ctrl + S: Dump the sprite attributes" << std::endl;
 	}
 	else
 	{

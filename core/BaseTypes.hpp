@@ -5,7 +5,7 @@
 #include <vector>
 #include <queue>
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

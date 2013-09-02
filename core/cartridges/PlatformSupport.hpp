@@ -1,7 +1,7 @@
 #ifndef _PlatformSupport_hpp_
 #define _PlatformSupport_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

@@ -1,7 +1,7 @@
 #ifndef _InstructionTable_hpp_
 #define _InstructionTable_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

@@ -5,7 +5,7 @@
 #include "VerticalFlip.hpp"
 #include "BackgroundToOAMPriority.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

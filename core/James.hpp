@@ -22,8 +22,6 @@
 #include "Vector.template"
 #include "Vector2.template"
 
-#define DEBUG
-
 #define LOG_LEVEL_2
 
 #ifdef DEBUG
@@ -61,7 +59,7 @@
 
 #define GBC_NULL 0
 
-namespace gbc
+namespace james
 {
 	// forward declaration for used namespaces
 	namespace core

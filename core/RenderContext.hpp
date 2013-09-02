@@ -1,8 +1,7 @@
 #ifndef _RenderContext_hpp_
 #define _RenderContext_hpp_
 
-#include <vector>
-#include "gbc.hpp"
+#include "James.hpp"
 #include "MemoryBus.hpp"
 #include "InterruptHandler.hpp"
 #include "Tile.hpp"
@@ -14,7 +13,7 @@
 #include "SpriteAttribute.hpp"
 #include "ColorPalette.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

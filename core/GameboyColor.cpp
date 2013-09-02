@@ -195,22 +195,17 @@ void GameboyColor::RenderScanline()
 {		
 	if (_rc.lcdY < 144)
 	{
-		//DoOAMSearch();
-		// set lcd mode here and test if sprites work
 		_renderer->RenderOAMSearch();
 		ExecuteMachineClocks(80 * _speedFactor);
 		
-		//DoTransferData();
 		_renderer->RenderTransferData();
 		ExecuteMachineClocks(172 * _speedFactor);
 		
-		//DoHBlank();
 		_renderer->RenderHorizontalBlank();
 		ExecuteMachineClocks(204 * _speedFactor);
 	}
 	else
 	{
-		//DoVBlank();
 		_renderer->RenderVerticalBlank();
 		ExecuteMachineClocks(456 * _speedFactor);
 	}
@@ -251,12 +246,11 @@ void GameboyColor::ExecuteMachineClocks(int clocks)
 	}
 }
 
-void GameboyColor::UpdateTimer(int clocks)
+void GameboyColor::UpdateTimer(int ticks)
 {
-	// make a timer step
 	if (!_timerStopped)
 	{
-		_timerCounter += clocks;
+		_timerCounter += ticks;
 		
 		if (_timerCounter >= _timerClockFrequency)
 		{
@@ -273,7 +267,7 @@ void GameboyColor::UpdateTimer(int clocks)
 		}
 	}
 	
-	_deviderCounter += clocks;
+	_deviderCounter += ticks;
 		
 	if (_deviderCounter > 0xFF)
 	{
@@ -284,7 +278,7 @@ void GameboyColor::UpdateTimer(int clocks)
 	}
 }
 
-int GameboyColor::ReadByte(int address)
+inline int GameboyColor::ReadByte(int address)
 {
 	// das geht eleganter...
 	address = address & 0xFFFF;
@@ -376,7 +370,7 @@ int GameboyColor::ReadByte(int address)
 	return 0x00;
 }
 
-void GameboyColor::WriteByte(int address, int value)
+inline void GameboyColor::WriteByte(int address, int value)
 {
 	// das geht eleganter...
 	address &= 0xFFFF;
@@ -896,11 +890,11 @@ void GameboyColor::WriteByte(int address, int value)
 		// interrupt enable
 		_rc.interruptEnableRegister = value;
 		
-		_rc.verticalBlankInterruptEnabled = GetBit(value, IInterruptHandler::VERTICAL_BLANK_INTERRUPT_ENABLE_BIT);
-		_rc.lcdStatusInterruptEnabled = GetBit(value, IInterruptHandler::LCD_STATUS_INTERRUPT_ENABLE_BIT);
-		_rc.timerInterruptEnabled = GetBit(value, IInterruptHandler::TIMER_INTERRUPT_ENABLE_BIT);
-		_rc.serialInterruptEnabled = GetBit(value, IInterruptHandler::SERIAL_INTERRUPT_ENABLE_BIT);
-		_rc.joypadInterruptEnabled = GetBit(value, IInterruptHandler::JOYPAD_INTERRUPT_ENABLE_BIT);
+		_rc.verticalBlankInterruptEnabled = GetBit(value, IInterruptHandler::VERTICAL_BLANK_INTERRUPT_BIT_NUMBER);
+		_rc.lcdStatusInterruptEnabled = GetBit(value, IInterruptHandler::LCD_STATUS_INTERRUPT_BIT_NUMBER);
+		_rc.timerInterruptEnabled = GetBit(value, IInterruptHandler::TIMER_INTERRUPT_BIT_NUMBER);
+		_rc.serialInterruptEnabled = GetBit(value, IInterruptHandler::SERIAL_INTERRUPT_BIT_NUMBER);
+		_rc.joypadInterruptEnabled = GetBit(value, IInterruptHandler::JOYPAD_INTERRUPT_BIT_NUMBER);
 	}
 	else
 	{

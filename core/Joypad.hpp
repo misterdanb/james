@@ -1,9 +1,9 @@
 #ifndef _Joypad_hpp_
 #define _Joypad_hpp_
 
-#include "gbc.hpp"
+#include "James.hpp"
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

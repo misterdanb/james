@@ -1,7 +1,7 @@
 #ifndef _LCDMode_hpp_
 #define _LCDMode_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

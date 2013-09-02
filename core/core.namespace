@@ -5,6 +5,6 @@
  * namespace description
  */
 
-namespace _core = gbc::core;
+namespace _core = james::core;
 
 #endif

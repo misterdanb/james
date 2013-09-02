@@ -1,7 +1,7 @@
 #ifndef _RomDimensions_hpp_
 #define _RomDimensions_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

@@ -1,7 +1,8 @@
 #include "Header.hpp"
 
-using namespace gbc;
-using namespace gbc::core::cartridges;
+using namespace james;
+using namespace james::core;
+using namespace james::core::cartridges;
 
 Header::Header(DynamicArray<int> &rom)
 	: entryPoint(),

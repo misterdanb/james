@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include "gbc.hpp"
+#include "James.hpp"
 #include "LCD.hpp"
 #include "Joypad.hpp"
 #include "cartridges/Cartridge.hpp"
@@ -21,12 +21,12 @@
 #include "RenderContext.hpp"
 #include "ClassicRenderer.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace gbc::core::cpu;
-using namespace gbc::core::cartridges;
+using namespace james;
+using namespace james::core;
+using namespace james::core::cpu;
+using namespace james::core::cartridges;
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

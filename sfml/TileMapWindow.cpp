@@ -1,7 +1,7 @@
 #include "TileMapWindow.hpp"
 
-using namespace gbc;
-using namespace gbc::ui;
+using namespace james;
+using namespace james::sfml;
 
 TileMapWindow::TileMapWindow(int tileMapNumber, core::GameboyColor &gbc)
 	: sf::RenderWindow(sf::VideoMode(core::TileMap::WIDTH * core::Tile::WIDTH,

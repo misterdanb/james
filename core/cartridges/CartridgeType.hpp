@@ -1,7 +1,7 @@
 #ifndef _CartridgeType_hpp_
 #define _CartridgeType_hpp_
 
-namespace gbc
+namespace james
 {
 	namespace core
 	{

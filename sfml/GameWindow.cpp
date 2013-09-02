@@ -1,12 +1,11 @@
 #include "GameWindow.hpp"
 
-using namespace gbc;
-using namespace gbc::core;
-using namespace gbc::ui;
+using namespace james;
+using namespace james::core;
+using namespace james::sfml;
 
-GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
-	: sf::RenderWindow(sf::VideoMode(width, height), "GBC"),
-	  _gbc(),
+GameWindow::GameWindow(int width, int height, std::string rom)
+	: sf::RenderWindow(sf::VideoMode(width, height), "James"),
 	  _rawFrame(),
 	  _frame(),
 	  _rightPressed(GBC_FALSE),
@@ -28,13 +27,10 @@ GameWindow::GameWindow(int width, int height, DynamicArray<int> &rom)
 	_tileMap0Window.setVisible(GBC_FALSE);
 	_tileMap1Window.setVisible(GBC_FALSE);
 #endif
+	LoadRom(rom);
 	
-	_gbc.Initialize();
-	_gbc.SetRom(rom);
-	_gbc.SetLCD(*this);
-	_gbc.SetJoypad(*this);
-	
-	_gbc.Start();
+	Initialize();
+	Start();
 }
 
 GameWindow::~GameWindow()
@@ -45,7 +41,7 @@ void GameWindow::throwTilemaps()
 {
 	for (int i = 0; i < 2; i++)
 	{
-		TileMap::TileMapArray2 tileMap = _gbc.GetTileMap(i);
+		TileMap::TileMapArray2 tileMap = GetDevice().GetTileMap(i);
 		
 		std::cout << "TILEMAP " << ToDec(i) << std::endl;
 		
@@ -114,7 +110,7 @@ void GameWindow::throwMem()
 			std::cout << std::endl << ToFixedHex((i >> 4) & 0xFFF, 3) << "* |";
 		}
 		
-		std::cout << "   " << ToFixedHex(_gbc.ReadByte(i), 2);
+		std::cout << "   " << ToFixedHex(GetDevice().ReadByte(i), 2);
 	}
 	
 	std::cout << std::endl << std::endl;
@@ -122,7 +118,7 @@ void GameWindow::throwMem()
 
 void GameWindow::throwRegs()
 {
-	core::cpu::State state = _gbc.GetProcessor().GetState();
+	core::cpu::State state = GetDevice().GetProcessor().GetState();
 	
 	std::cout << "\tA = 0x" << ToFixedHex(state.a, 2) << std::endl;
 	std::cout << "\tF = 0x" << ToFixedHex(state.f, 2) << std::endl;
@@ -148,7 +144,7 @@ void GameWindow::throwSprAttr()
 	
 	for (int i = 0; i < 40; i++)
 	{
-		core::SpriteAttribute spriteAttribute = _gbc.GetSpriteAttribute(i);
+		core::SpriteAttribute spriteAttribute = GetDevice().GetSpriteAttribute(i);
 		
 		std::cout << "\t Y = " << spriteAttribute.y << std::endl;
 		std::cout << "\t X = " << spriteAttribute.x << std::endl;
@@ -166,7 +162,7 @@ void GameWindow::throwSprAttr()
 
 void GameWindow::Render()
 {
-	_gbc.RenderFrame();
+	RenderFrame();
 	
 	sf::Event event;
 	sf::Texture texture;
@@ -180,7 +176,8 @@ void GameWindow::Render()
 	{
 		if (event.type == sf::Event::Closed)
 		{
-			_gbc.Finalize();
+			Pause();
+			Finalize();
 			
 			LOG("Exiting James");
 			
@@ -193,18 +190,30 @@ void GameWindow::Render()
 			{
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 				{
-					_gbc.Reset();
+					Reset();
 				}
 				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
 				{
-					if (_gbc.IsPaused())
+					if (IsPaused())
 					{
-						_gbc.Start();
+						Start();
 					}
 					else
 					{
-						_gbc.Pause();
+						Pause();
+					}
+				}
+				
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+				{
+					if (!GetDevice().GetProcessor().IsRecording())
+					{
+						GetDevice().GetProcessor().StartRecording("cpu.record");
+					}
+					else
+					{
+						GetDevice().GetProcessor().StopRecording();
 					}
 				}
 				
@@ -215,7 +224,6 @@ void GameWindow::Render()
 					std::cout << std::endl;
 				
 					throwTilemaps();
-
 				}
 				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
@@ -229,7 +237,7 @@ void GameWindow::Render()
 					std::cout << "Read memory location (hex value [!]): 0x";
 					std::cin >> std::hex >> address;
 					std::cout << "MEM[0x" << ToFixedHex(address, 4) << "] = "
-					          << "0x" << ToFixedHex(_gbc.ReadByte(address), 2) << std::endl << std::endl;
+					          << "0x" << ToFixedHex(GetDevice().ReadByte(address), 2) << std::endl << std::endl;
 				}
 				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
@@ -246,11 +254,6 @@ void GameWindow::Render()
 					LOG("Current cpu registers");
 					
 					throwRegs();
-				}
-				
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-				{
-					LOG("Current sprite attributes");
 				
 					throwSprAttr();
 				}
@@ -274,7 +277,7 @@ void GameWindow::Render()
 		if ((_startPressed   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space)))
 		        IRQ_mark++;
 		if (IRQ_mark)
-			_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+			GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
 	}
 	
 	clear();
@@ -357,7 +360,7 @@ int GameWindow::GetStart()
 #ifdef DEBUG
 void GameWindow::ShowTileMap(int tileMapNumber)
 {
-	if (tileMapNumber == 0)
+	/*if (tileMapNumber == 0)
 	{
 		_tileMap0WindowVisible = GBC_TRUE;
 		_tileMap0Window.setVisible(_tileMap0WindowVisible);
@@ -366,12 +369,12 @@ void GameWindow::ShowTileMap(int tileMapNumber)
 	{
 		_tileMap1WindowVisible = GBC_TRUE;
 		_tileMap1Window.setVisible(_tileMap1WindowVisible);
-	}
+	}*/
 }
 
 void GameWindow::HideTileMap(int tileMapNumber)
 {
-	if (tileMapNumber == 0)
+	/*if (tileMapNumber == 0)
 	{
 		_tileMap0WindowVisible = GBC_FALSE;
 		_tileMap0Window.setVisible(_tileMap0WindowVisible);
@@ -383,6 +386,6 @@ void GameWindow::HideTileMap(int tileMapNumber)
 	}
 	
 	_tileMap1Window.setVisible(false);
-	_tileMap0Window.setVisible(false);
+	_tileMap0Window.setVisible(false);*/
 }
 #endif

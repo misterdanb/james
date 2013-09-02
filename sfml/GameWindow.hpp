@@ -2,23 +2,20 @@
 #define _GameWindow_hpp_
 
 #include <SFML/Graphics.hpp>
-#include "../core/GameboyColor.hpp"
-#include "../core/LCD.hpp"
-#include "../core/Joypad.hpp"
-#include "../core/Color.template"
+#include "../core/Frontend.hpp"
 
 #include "TileMapWindow.hpp"
 
-namespace gbc
+namespace james
 {
-	namespace ui
+	namespace sfml
 	{
 		using namespace core;
 		
-		class GameWindow : public sf::RenderWindow, public ILCD, public IJoypad
+		class GameWindow : public sf::RenderWindow, public Frontend
 		{
 		public:
-			GameWindow(int, int, DynamicArray<int> &);
+			GameWindow(int, int, std::string);
 			~GameWindow();
 			
 			void Render();
@@ -42,8 +39,6 @@ namespace gbc
 			void throwMem();
 			void throwRegs();
 			void throwSprAttr();
-			
-			core::GameboyColor _gbc;
 			
 			Array<sf::Uint8, Frame::WIDTH * Frame::HEIGHT * 4> _rawFrame;
 			sf::Image _frame;
