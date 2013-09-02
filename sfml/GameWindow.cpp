@@ -251,9 +251,12 @@ void GameWindow::Render()
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
-			_leftPressed = GBC_TRUE;
+			if (!_leftPressed)
+			{
+				SignalJoypadInterrupt();
+			}
 			
-			SignalJoypadInterrupt();
+			_leftPressed = GBC_TRUE;
 		}
 		else
 		{
@@ -262,9 +265,12 @@ void GameWindow::Render()
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
-			_upPressed = GBC_TRUE;
+			if (!_upPressed)
+			{
+				SignalJoypadInterrupt();
+			}
 			
-			SignalJoypadInterrupt();
+			_upPressed = GBC_TRUE;
 		}
 		else
 		{
@@ -273,9 +279,12 @@ void GameWindow::Render()
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
-			_downPressed = GBC_TRUE;
+			if (!_downPressed)
+			{
+				SignalJoypadInterrupt();
+			}
 			
-			SignalJoypadInterrupt();
+			_downPressed = GBC_TRUE;
 		}
 		else
 		{
@@ -284,9 +293,12 @@ void GameWindow::Render()
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
 		{
-			_buttonAPressed = GBC_TRUE;
+			if (!_buttonAPressed)
+			{
+				SignalJoypadInterrupt();
+			}
 			
-			SignalJoypadInterrupt();
+			_buttonAPressed = GBC_TRUE;
 		}
 		else
 		{
@@ -295,9 +307,12 @@ void GameWindow::Render()
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Comma))
 		{
-			_buttonBPressed = GBC_TRUE;
+			if (!_buttonBPressed)
+			{
+				SignalJoypadInterrupt();
+			}
 			
-			SignalJoypadInterrupt();
+			_buttonBPressed = GBC_TRUE;
 		}
 		else
 		{
@@ -306,9 +321,12 @@ void GameWindow::Render()
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Dash))
 		{
-			_selectPressed = GBC_TRUE;
+			if (!_selectPressed)
+			{
+				SignalJoypadInterrupt();
+			}
 			
-			SignalJoypadInterrupt();
+			_selectPressed = GBC_TRUE;
 		}
 		else
 		{
@@ -317,9 +335,12 @@ void GameWindow::Render()
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
-			_startPressed = GBC_TRUE;
+			if (!_startPressed)
+			{
+				SignalJoypadInterrupt();
+			}
 			
-			SignalJoypadInterrupt();
+			_startPressed = GBC_TRUE;
 		}
 		else
 		{

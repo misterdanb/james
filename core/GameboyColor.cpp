@@ -191,19 +191,23 @@ void GameboyColor::RenderScanline()
 {		
 	if (_rc.lcdY < 144)
 	{
-		_renderer->RenderOAMSearch();
+		_rc.lcdMode = LCDMode::SEARCHING_OAM;
 		ExecuteMachineClocks(80 * _speedFactor);
+		_renderer->RenderOAMSearch();
 		
-		_renderer->RenderTransferData();
+		_rc.lcdMode = LCDMode::TRANSFERRING_DATA;
 		ExecuteMachineClocks(172 * _speedFactor);
+		_renderer->RenderTransferData();
 		
-		_renderer->RenderHorizontalBlank();
+		_rc.lcdMode = LCDMode::HORIZONTAL_BLANK;
 		ExecuteMachineClocks(204 * _speedFactor);
+		_renderer->RenderHorizontalBlank();
 	}
 	else
 	{
-		_renderer->RenderVerticalBlank();
+		_rc.lcdMode = LCDMode::VERTICAL_BLANK;
 		ExecuteMachineClocks(456 * _speedFactor);
+		_renderer->RenderVerticalBlank();
 	}
 }
 
@@ -377,7 +381,7 @@ inline void GameboyColor::WriteByte(int address, int value)
 	}
 	else if (address <= 0x9FFF)
 	{
-		//if (_rc.lcdMode != LCDMode::TRANSFERRING_DATA)
+		if (_rc.lcdMode != LCDMode::TRANSFERRING_DATA)
 		{
 			_rc.videoRam[_rc.selectedVideoRamBank][address - 0x8000] = value;
 			

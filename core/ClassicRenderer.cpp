@@ -11,8 +11,6 @@ ClassicRenderer::~ClassicRenderer()
 
 void ClassicRenderer::RenderOAMSearch()
 {
-	_rc.lcdMode = LCDMode::SEARCHING_OAM;
-	
 	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
 	
 	if (_rc.oamInterruptEnabled)
@@ -28,8 +26,6 @@ void ClassicRenderer::RenderOAMSearch()
 
 void ClassicRenderer::RenderTransferData()
 {
-	_rc.lcdMode = LCDMode::TRANSFERRING_DATA;
-	
 	if (_rc.lcdDisplayEnabled)
 	{
 		if (_rc.backgroundDisplayEnabled)
@@ -60,8 +56,6 @@ void ClassicRenderer::RenderTransferData()
 
 void ClassicRenderer::RenderHorizontalBlank()
 {
-	_rc.lcdMode = LCDMode::HORIZONTAL_BLANK;
-	
 	if (_rc.horizontalBlankInterruptEnabled)
 	{
 		_rc.interruptHandler->SignalLCDStatusInterrupt();
@@ -75,8 +69,6 @@ void ClassicRenderer::RenderHorizontalBlank()
 
 void ClassicRenderer::RenderVerticalBlank()
 {
-	_rc.lcdMode = LCDMode::VERTICAL_BLANK;
-	
 	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
 	
 	if (_rc.coincidenceInterruptEnabled && _rc.coincidenceFlag)

@@ -103,3 +103,6 @@ clean:
 	rm -rf *.o
 	rm -rf cpu/*.o
 	rm -rf cartridges/*.o
+
+install:
+	cp $(TARGET) /usr/lib/
