@@ -6,6 +6,7 @@
 
 #include "../James.hpp"
 #include "../MemoryBus.hpp"
+#include "../Serializable.hpp"
 #include "Header.hpp"
 
 namespace james
@@ -14,16 +15,16 @@ namespace james
 	{
 		namespace cartridges
 		{
-			class Cartridge : public IMemoryBus
+			class Cartridge : public IMemoryBus, public Serializable
 			{
 			public:
 				Cartridge(DynamicArray<int> &);
 				virtual ~Cartridge();
 				
-				Header GetHeader();
+				void Serialize(std::ostream &);
+				void Deserialize(std::istream &);
 				
-				void SaveRamDumpToFile();
-				void LoadRamDumpFromFile();
+				Header GetHeader();
 				
 				virtual int ReadByte(int) = GBC_NULL;
 				virtual void WriteByte(int, int) = GBC_NULL;

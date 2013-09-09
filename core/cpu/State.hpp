@@ -19,9 +19,9 @@ namespace james
 	
 				int ticks;
 	
-				int interruptsEnabled;
-				int stopped;
-				int halted;
+				bool interruptsEnabled;
+				bool stopped;
+				bool halted;
 			};
 		}
 	}
