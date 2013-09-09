@@ -4,6 +4,7 @@
 #include "../James.hpp"
 #include "../MemoryBus.hpp"
 #include "../InterruptHandler.hpp"
+#include "../Serializable.hpp"
 #include "State.hpp"
 #include "InstructionTable.hpp"
 #include "LookUpTables.hpp"
@@ -14,7 +15,7 @@ namespace james
 	{
 		namespace cpu
 		{
-			class Processor : public IInterruptHandler
+			class Processor : public IInterruptHandler, public Serializable
 			{
 			public:
 				static const int CFLAG_BIT = 4;
@@ -25,6 +26,9 @@ namespace james
 			public:
 				Processor();
 				~Processor();
+				
+				void Serialize(std::ostream &);
+				void Deserialize(std::istream &);
 				
 				void SetMemoryBus(IMemoryBus *);
 				

@@ -20,6 +20,58 @@ Processor::~Processor()
 {
 }
 
+void Processor::Serialize(std::ostream &os)
+{
+	// UNTESTED
+	DynamicArray<char> outState;
+	
+	outState.push_back(char(_state.a));
+	outState.push_back(char(_state.f));
+	outState.push_back(char(_state.b));
+	outState.push_back(char(_state.c));
+	outState.push_back(char(_state.d));
+	outState.push_back(char(_state.e));
+	outState.push_back(char(_state.h));
+	outState.push_back(char(_state.l));
+	outState.push_back(char(_state.pc));
+	outState.push_back(char(_state.sp));
+	
+	outState.push_back(char(_state.ticks));
+	
+	outState.push_back(char(_state.interruptsEnabled));
+	outState.push_back(char(_state.stopped));
+	outState.push_back(char(_state.halted));
+	
+	os.write(&outState[0], outState.size());
+}
+
+void Processor::Deserialize(std::istream &is)
+{
+	// UNTESTED
+	DynamicArray<char> inState;
+	
+	inState.resize(14);
+	
+	is.read(&inState[0], inState.size());
+	
+	_state.a = int(inState[0]);
+	_state.f = int(inState[1]);
+	_state.b = int(inState[2]);
+	_state.c = int(inState[3]);
+	_state.d = int(inState[4]);
+	_state.e = int(inState[5]);
+	_state.h = int(inState[6]);
+	_state.l = int(inState[7]);
+	_state.pc = int(inState[8]);
+	_state.sp = int(inState[9]);
+	
+	_state.ticks = int(inState[10]);
+	
+	_state.interruptsEnabled = bool(inState[11]);
+	_state.stopped = bool(inState[12]);
+	_state.halted = bool(inState[13]);
+}
+
 void Processor::SetMemoryBus(IMemoryBus *bus)
 {
 	_bus = bus;
@@ -636,13 +688,13 @@ void Processor::ExecuteInterrupt()
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 			                                         VERTICAL_BLANK_INTERRUPT_BIT_NUMBER,
-			                                         GBC_FALSE);
+			                                         false);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
-			_state.interruptsEnabled = GBC_FALSE;
-			_state.stopped = GBC_FALSE;
-			_state.halted = GBC_FALSE;
+			_state.interruptsEnabled = false;
+			_state.stopped = false;
+			_state.halted = false;
 			
 			_state.ticks += 16;
 			
@@ -659,13 +711,13 @@ void Processor::ExecuteInterrupt()
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 			                                                        LCD_STATUS_INTERRUPT_BIT_NUMBER,
-			                                                        GBC_FALSE);
+			                                                        false);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
-			_state.interruptsEnabled = GBC_FALSE;
-			_state.stopped = GBC_FALSE;
-			_state.halted = GBC_FALSE;
+			_state.interruptsEnabled = false;
+			_state.stopped = false;
+			_state.halted = false;
 			
 			_state.ticks += 16;
 			
@@ -682,13 +734,13 @@ void Processor::ExecuteInterrupt()
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 			                                                        TIMER_INTERRUPT_BIT_NUMBER,
-			                                                        GBC_FALSE);
+			                                                        false);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
-			_state.interruptsEnabled = GBC_FALSE;
-			_state.stopped = GBC_FALSE;
-			_state.halted = GBC_FALSE;
+			_state.interruptsEnabled = false;
+			_state.stopped = false;
+			_state.halted = false;
 			
 			_state.ticks += 16;
 			
@@ -705,13 +757,13 @@ void Processor::ExecuteInterrupt()
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 			                                         SERIAL_INTERRUPT_BIT_NUMBER,
-			                                         GBC_FALSE);
+			                                         false);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
-			_state.interruptsEnabled = GBC_FALSE;
-			_state.stopped = GBC_FALSE;
-			_state.halted = GBC_FALSE;
+			_state.interruptsEnabled = false;
+			_state.stopped = false;
+			_state.halted = false;
 			
 			_state.ticks += 16;
 		}
@@ -726,13 +778,13 @@ void Processor::ExecuteInterrupt()
 			
 			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 			                                         JOYPAD_INTERRUPT_BIT_NUMBER,
-			                                         GBC_FALSE);
+			                                         false);
 			
 			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
-			_state.interruptsEnabled = GBC_FALSE;
-			_state.stopped = GBC_FALSE;
-			_state.halted = GBC_FALSE;
+			_state.interruptsEnabled = false;
+			_state.stopped = false;
+			_state.halted = false;
 			
 			_state.ticks += 16;
 		}
@@ -753,9 +805,9 @@ void Processor::PowerUp()
 	_state.pc = 0x0100;
 	_state.sp = 0xFFFE;
 	
-	_state.interruptsEnabled = GBC_TRUE;
-	_state.halted = GBC_FALSE;
-	_state.stopped = GBC_FALSE;
+	_state.interruptsEnabled = true;
+	_state.halted = false;
+	_state.stopped = false;
 	
 	_bus->WriteByte(0xFF05, 0x00); // TIMA
 	_bus->WriteByte(0xFF06, 0x00); // TMA
@@ -794,7 +846,7 @@ void Processor::SignalVBlankInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        VERTICAL_BLANK_INTERRUPT_BIT_NUMBER,
-	                                                        GBC_TRUE);
+	                                                        true);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
@@ -803,7 +855,7 @@ void Processor::SignalLCDStatusInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        LCD_STATUS_INTERRUPT_BIT_NUMBER,
-	                                                        GBC_TRUE);
+	                                                        true);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
@@ -812,7 +864,7 @@ void Processor::SignalTimerInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        TIMER_INTERRUPT_BIT_NUMBER,
-	                                                        GBC_TRUE);
+	                                                        true);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
@@ -821,7 +873,7 @@ void Processor::SignalSerialInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        SERIAL_INTERRUPT_BIT_NUMBER,
-	                                                        GBC_TRUE);
+	                                                        true);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
@@ -830,7 +882,7 @@ void Processor::SignalJoypadInterrupt()
 {
 	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
 	                                                        JOYPAD_INTERRUPT_BIT_NUMBER,
-	                                                        GBC_TRUE);
+	                                                        true);
 	
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
@@ -997,7 +1049,7 @@ void Processor::INC_R(int &r)
 	r &= 0xFF;
 	
 	SetZFlag(r == 0x00);
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1014,7 +1066,7 @@ void Processor::INC_AA(int a1, int a2)
 	memory &= 0xFF;
 	
 	SetZFlag(memory == 0x00);
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	
 	_bus->WriteByte(address, memory);
 	
@@ -1042,7 +1094,7 @@ void Processor::DEC_AA(int a1, int a2)
 	memory &= 0xFF;
 	
 	SetZFlag(memory == 0x00);
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	
 	_bus->WriteByte(address, memory);
 	
@@ -1073,7 +1125,7 @@ void Processor::DEC_R(int &r)
 	r &= 0xFF;
 	
 	SetZFlag(r == 0x00);
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1111,9 +1163,9 @@ void Processor::RLCA()
 	
 	_state.a = ((_state.a << 1) & 0xFE) | (GetBit(_state.a, 7) ? 0x01 : 0x00);
 	
-	SetZFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetZFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1135,7 +1187,7 @@ void Processor::ADD_RR_RR(int &r11, int &r12, int r21, int r22)
 	int r1Full = JoinBytes(r11, r12);
 	int r2Full = JoinBytes(r21, r22);
 	
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	SetHFlag(((r1Full & 0x0FFF) + (r2Full & 0x0FFF)) > 0x0FFF);
 	
 	int result = (r1Full & 0xFFFF) + (r2Full & 0xFFFF);
@@ -1153,7 +1205,7 @@ void Processor::ADD_RR_SP(int &r1, int &r2)
 {
 	int rFull = JoinBytes(r1, r2);
 	
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	SetHFlag(((rFull & 0x0FFF) + (_state.sp & 0x0FFF)) > 0x0FFF);
 	
 	int result = (rFull + _state.sp);
@@ -1199,9 +1251,9 @@ void Processor::RRCA()
 	
 	_state.a = ((_state.a >> 1) & 0x7F) | (GetBit(_state.a, 0) ? 0x80 : 0x00);
 	
-	SetZFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetZFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1209,7 +1261,7 @@ void Processor::RRCA()
 
 void Processor::STOP()
 {
-	_state.stopped = GBC_TRUE;
+	_state.stopped = true;
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1223,9 +1275,9 @@ void Processor::RLA()
 	
 	_state.a = ((_state.a << 1) & 0xFF) | (oldCFlag ? 0x01 : 0x00);
 	
-	SetZFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
+	SetZFlag(false);
+	SetNFlag(false);
+	SetHFlag(false);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1247,9 +1299,9 @@ void Processor::RRA()
 	
 	_state.a = ((_state.a >> 1) & 0x7F) | (oldCFlag ? 0x80 : 0x00);
 	
-	SetZFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
+	SetZFlag(false);
+	SetNFlag(false);
+	SetHFlag(false);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1364,19 +1416,19 @@ void Processor::DAA()
 		}
 	}
 	
-	SetHFlag(GBC_FALSE);
-	SetZFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetZFlag(false);
 	
 	if (_state.a > 0xFF)
 	{
-		SetCFlag(GBC_TRUE);
+		SetCFlag(true);
 	}
 	
 	_state.a &= 0xFF;
 	
 	if (_state.a == 0x00)
 	{
-		SetZFlag(GBC_TRUE);
+		SetZFlag(true);
 	}
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1388,8 +1440,8 @@ void Processor::CPL()
 	_state.a = ~_state.a;
 	_state.a &= 0xFF;
 	
-	SetNFlag(GBC_TRUE);
-	SetHFlag(GBC_TRUE);
+	SetNFlag(true);
+	SetHFlag(true);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1397,9 +1449,9 @@ void Processor::CPL()
 
 void Processor::SCF()
 {
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
-	SetCFlag(GBC_TRUE);
+	SetHFlag(false);
+	SetNFlag(false);
+	SetCFlag(true);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1407,9 +1459,9 @@ void Processor::SCF()
 
 void Processor::CCF()
 {
-	SetHFlag(GBC_FALSE);
+	SetHFlag(false);
 	SetCFlag(!GetCFlag());
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1425,7 +1477,7 @@ void Processor::LD_R_R(int &r1, int r2)
 
 void Processor::HALT()
 {
-	_state.halted = GBC_TRUE;
+	_state.halted = true;
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1433,7 +1485,7 @@ void Processor::HALT()
 
 void Processor::ADD_R_R(int &r1, int r2)
 {
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	SetHFlag(((r1 & 0x0F) + (r2 & 0x0F)) > 0x0F);
 	
 	r1 += r2;
@@ -1452,7 +1504,7 @@ void Processor::ADD_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	SetHFlag(((r & 0x0F) + (memory & 0x0F)) > 0x0F);
 	
 	r += memory;
@@ -1471,7 +1523,7 @@ void Processor::ADC_R_R(int &r1, int r2)
 {
 	int oldCFlag = GetCFlag();
 	
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	SetHFlag(((r1 & 0x0F) + (r2 & 0x0F) + (oldCFlag ? 0x01 : 0x00)) > 0x0F);
 	
 	r1 += r2 + (oldCFlag ? 0x01 : 0x00);
@@ -1491,7 +1543,7 @@ void Processor::ADC_R_AA(int &r, int a1, int a2)
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
 	
-	SetNFlag(GBC_FALSE);
+	SetNFlag(false);
 	SetHFlag(((r & 0x0F) + (memory & 0x0F) + (oldCFlag ? 0x01 : 0x00)) > 0x0F);
 	
 	r += memory + (oldCFlag ? 0x01 : 0x00);
@@ -1508,7 +1560,7 @@ void Processor::ADC_R_AA(int &r, int a1, int a2)
 
 void Processor::SUB_R_R(int &r1, int r2)
 {
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	SetHFlag(((r1 & 0x0F) - (r2 & 0x0F)) < 0x00);
 	
 	r1-= r2;
@@ -1527,7 +1579,7 @@ void Processor::SUB_R_AA(int &r, int a1, int a2)
 {
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	SetHFlag(((r & 0x0F) - (memory & 0x0F)) < 0x00);
 	
 	r -= memory;
@@ -1546,7 +1598,7 @@ void Processor::SBC_R_R(int &r1, int r2)
 {
 	int oldCFlag = GetCFlag();
 	
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	SetHFlag(((r1 & 0x0F) - ((r2 & 0x0F) + (oldCFlag ? 0x01 : 0x00))) < 0x00);
 	
 	r1 -= (r2 + (oldCFlag ? 0x01 : 0x00));
@@ -1566,7 +1618,7 @@ void Processor::SBC_R_AA(int &r, int a1, int a2)
 	int memory = _bus->ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
 	
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	SetHFlag(((r & 0x0F) - ((memory & 0x0F) + (oldCFlag ? 0x01 : 0x00))) < 0x00);
 	
 	r -= (memory + (oldCFlag ? 0x01 : 0x00));
@@ -1585,9 +1637,9 @@ void Processor::AND_R_R(int &r1, int r2)
 {
 	r1 &= r2;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_TRUE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(true);
+	SetNFlag(false);
 	SetZFlag(r1 == 0x00);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1600,9 +1652,9 @@ void Processor::AND_R_AA(int &r, int a1, int a2)
 	
 	r &= memory;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_TRUE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(true);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1613,9 +1665,9 @@ void Processor::XOR_R_R(int &r1, int r2)
 {
 	r1 ^= r2;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r1 == 0x00);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1628,9 +1680,9 @@ void Processor::XOR_R_AA(int &r, int a1, int a2)
 	
 	r ^= memory;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1641,9 +1693,9 @@ void Processor::OR_R_R(int &r1, int r2)
 {
 	r1 |= r2;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r1 == 0x00);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1656,9 +1708,9 @@ void Processor::OR_R_AA(int &r, int a1, int a2)
 	
 	r |= memory;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1669,7 +1721,7 @@ void Processor::CP_R_R(int &r1, int r2)
 {
 	SetCFlag(r2 > r1);
 	SetHFlag((r2 & 0x0F) > (r1 & 0x0F));
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	SetZFlag(r2 == r1);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1682,7 +1734,7 @@ void Processor::CP_R_AA(int &r, int a1, int a2)
 	
 	SetCFlag(memory > r);
 	SetHFlag((memory & 0x0F) > (r & 0x0F));
-	SetNFlag(GBC_TRUE);
+	SetNFlag(true);
 	SetZFlag(memory == r);
 	
 	UpdatePC(InstructionTable::DEFAULT);
@@ -1751,8 +1803,8 @@ void Processor::RET_IF(int c)
 
 void Processor::RETI()
 {
-	_state.interruptsEnabled = GBC_TRUE;
-	_state.halted = GBC_FALSE;
+	_state.interruptsEnabled = true;
+	_state.halted = false;
 	
 	_state.pc = (_bus->ReadByte(_state.sp + 1) << 8) | _bus->ReadByte(_state.sp);
 	
@@ -1925,8 +1977,8 @@ void Processor::ADD_SP_N()
 {
 	SetCFlag(0xFF - (_state.sp & 0xFF) < GetOpLow(InstructionTable::DEFAULT));          // to be understood
 	SetHFlag(0x0F - (_state.sp & 0x0F) < (GetOpLow(InstructionTable::DEFAULT) & 0x0F)); // to be understood
-	SetNFlag(GBC_FALSE);
-	SetZFlag(GBC_FALSE);
+	SetNFlag(false);
+	SetZFlag(false);
 	
 	_state.sp += GetSignedValue(GetOpLow(InstructionTable::DEFAULT));
 	_state.sp &= 0xFFFF;
@@ -1939,8 +1991,8 @@ void Processor::LD_HL_SP_N()
 {
 	SetCFlag(0xFF - (_state.sp & 0xFF) < GetOpLow(InstructionTable::DEFAULT));          // to be understood
 	SetHFlag(0x0F - (_state.sp & 0x0F) < (GetOpLow(InstructionTable::DEFAULT) & 0x0F)); // to be understood
-	SetNFlag(GBC_FALSE);
-	SetZFlag(GBC_FALSE);
+	SetNFlag(false);
+	SetZFlag(false);
 	
 	int result = _state.sp + GetSignedValue(GetOpLow(InstructionTable::DEFAULT));
 	
@@ -1961,7 +2013,7 @@ void Processor::LD_SP_HL()
 
 void Processor::DI()
 {
-	_state.interruptsEnabled = GBC_FALSE;
+	_state.interruptsEnabled = false;
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1969,7 +2021,7 @@ void Processor::DI()
 
 void Processor::EI()
 {
-	_state.interruptsEnabled = GBC_TRUE;
+	_state.interruptsEnabled = true;
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1983,8 +2035,8 @@ void Processor::RLC_R(int &r)
 	
 	r = ((r << 1) & 0xFE) | (GetBit(r, 7) ? 0x01 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2000,8 +2052,8 @@ void Processor::RLC_AA(int a1, int a2)
 	
 	memory = ((memory << 1) & 0xFE) | (GetBit(memory, 7) ? 0x01 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2016,8 +2068,8 @@ void Processor::RRC_R(int &r)
 	
 	r = ((r >> 1) & 0x7F) | (GetBit(r, 0) ? 0x80 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2033,8 +2085,8 @@ void Processor::RRC_AA(int a1, int a2)
 	
 	memory = ((memory >> 1) & 0x7F) | (GetBit(memory, 0) ? 0x80 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2051,8 +2103,8 @@ void Processor::RL_R(int &r)
 	
 	r = ((r << 1) & 0xFE) | (oldCFlag ? 0x01 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2070,8 +2122,8 @@ void Processor::RL_AA(int a1, int a2)
 	
 	memory = ((memory << 1) & 0xFE) | (oldCFlag ? 0x01 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2088,8 +2140,8 @@ void Processor::RR_R(int &r)
 	
 	r = ((r >> 1) & 0x7F) | (oldCFlag ? 0x80 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2107,8 +2159,8 @@ void Processor::RR_AA(int a1, int a2)
 	
 	memory = ((memory >> 1) & 0x7F) | (oldCFlag ? 0x80 : 0x00);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2123,8 +2175,8 @@ void Processor::SLA_R(int &r)
 	
 	r = (r << 1) & 0xFE;
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2140,8 +2192,8 @@ void Processor::SLA_AA(int a1, int a2)
 	
 	memory = (memory << 1) & 0xFE;
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2156,8 +2208,8 @@ void Processor::SRA_R(int &r)
 	
 	r = (r & 0x80) | ((r >> 1) & 0x7F);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2173,8 +2225,8 @@ void Processor::SRA_AA(int a1, int a2)
 	
 	memory = (memory & 0x80) | ((memory >> 1) & 0x7F);
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2187,9 +2239,9 @@ void Processor::SWAP_R(int &r)
 {
 	r = ((r << 4) | (r >> 4)) & 0xFF;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2203,9 +2255,9 @@ void Processor::SWAP_AA(int a1, int a2)
 	
 	memory = ((memory << 4) | (memory >> 4)) & 0xFF;
 	
-	SetCFlag(GBC_FALSE);
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetCFlag(false);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2220,8 +2272,8 @@ void Processor::SRL_R(int &r)
 	
 	r = (r >> 1) & 0x7F;
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(r == 0x00);
 	
 	UpdatePC(InstructionTable::CB);
@@ -2237,8 +2289,8 @@ void Processor::SRL_AA(int a1, int a2)
 	
 	memory = (memory >> 1) & 0x7F;
 	
-	SetHFlag(GBC_FALSE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(false);
+	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
 	_bus->WriteByte(address, memory);
@@ -2249,8 +2301,8 @@ void Processor::SRL_AA(int a1, int a2)
 
 void Processor::BIT_X_R(int x, int &r)
 {
-	SetHFlag(GBC_TRUE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(true);
+	SetNFlag(false);
 	SetZFlag(!GetBit(r, x));
 	
 	UpdatePC(InstructionTable::CB);
@@ -2262,8 +2314,8 @@ void Processor::BIT_X_AA(int x, int a1, int a2)
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
 	
-	SetHFlag(GBC_TRUE);
-	SetNFlag(GBC_FALSE);
+	SetHFlag(true);
+	SetNFlag(false);
 	SetZFlag(!GetBit(memory, x));
 	
 	_bus->WriteByte(address, memory);
@@ -2274,7 +2326,7 @@ void Processor::BIT_X_AA(int x, int a1, int a2)
 
 void Processor::RES_X_R(int x, int &r)
 {
-	r = SetBit(r, x, GBC_FALSE);
+	r = SetBit(r, x, false);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2285,7 +2337,7 @@ void Processor::RES_X_AA(int x, int a1, int a2)
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
 	
-	memory = SetBit(memory, x, GBC_FALSE);
+	memory = SetBit(memory, x, false);
 	
 	_bus->WriteByte(address, memory);
 	
@@ -2295,7 +2347,7 @@ void Processor::RES_X_AA(int x, int a1, int a2)
 
 void Processor::SET_X_R(int x, int &r)
 {
-	r = SetBit(r, x, GBC_TRUE);
+	r = SetBit(r, x, true);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2306,7 +2358,7 @@ void Processor::SET_X_AA(int x, int a1, int a2)
 	int address = JoinBytes(a1, a2);
 	int memory = _bus->ReadByte(address);
 	
-	memory = SetBit(memory, x, GBC_TRUE);
+	memory = SetBit(memory, x, true);
 	
 	_bus->WriteByte(address, memory);
 	

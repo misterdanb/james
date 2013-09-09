@@ -74,7 +74,24 @@ void GameboyColor::SetJoypad(IJoypad &joypad)
 void GameboyColor::SetRom(DynamicArray<int> &rom)
 {
 	_cartridge = Cartridge::Create(rom);
-	_cartridge->LoadRamDumpFromFile();
+	
+	std::string path = ToHex(_cartridge->GetHeader().globalChecksum[0]) +
+	                   ToHex(_cartridge->GetHeader().globalChecksum[1]) +
+	                   std::string(".battery\0");
+	
+	std::ifstream file(path, std::ios::binary);
+	
+	if (file.is_open() && !file.bad())
+	{
+		file >> (*_cartridge);
+		file.close();
+		
+		LOG("Loaded cartridge ram battery");
+	}
+	else
+	{
+		ERROR("Failed to load cartridge ram battery");
+	}
 	
 	LOG("Loaded cartridge");
 	
@@ -150,7 +167,23 @@ void GameboyColor::Finalize()
 {
 	LOG("Finalizing Gameboy Color emulation");
 	
-	_cartridge->SaveRamDumpToFile();
+	std::string path = ToHex(_cartridge->GetHeader().globalChecksum[0]) +
+	                   ToHex(_cartridge->GetHeader().globalChecksum[1]) +
+	                   std::string(".battery\0");
+	
+	std::ofstream file(path, std::ios::binary);
+	
+	if (file.is_open() && !file.bad())
+	{
+		file << (*_cartridge);
+		file.close();
+		
+		LOG("Saved cartridge ram battery");
+	}
+	else
+	{
+		ERROR("Failed to save cartridge ram battery");
+	}
 }
 
 void GameboyColor::Start()

@@ -31,65 +31,27 @@ Cartridge::~Cartridge()
 {
 }
 
+void Cartridge::Serialize(std::ostream &os)
+{
+	DynamicArray<char> outRam(_ram.begin(), _ram.end());
+	
+	os.write(&outRam[0], _header.ramDimensions.size + 1);
+}
+
+void Cartridge::Deserialize(std::istream &is)
+{
+	DynamicArray<char> inRam;
+	
+	inRam.resize(_header.ramDimensions.size + 1);
+	
+	is.read(&inRam[0], _header.ramDimensions.size + 1);
+	
+	_ram = DynamicArray<int>(inRam.begin(), inRam.end());
+}
+
 Header Cartridge::GetHeader()
 {
 	return _header;
-}
-
-void Cartridge::SaveRamDumpToFile()
-{
-	std::string path = ToHex(_header.globalChecksum[0]) +
-	                   ToHex(_header.globalChecksum[1]) +
-	                   std::string(".battery\0");
-	
-	std::ofstream file(path, std::ios::binary);
-	
-	if (file.is_open() && !file.bad())
-	{
-		DynamicArray<char> outRam(_ram.begin(), _ram.end());
-		
-		file.write(&outRam[0], _header.ramDimensions.size);
-		file.close();
-		
-		LOG("Saved cartridge ram battery");
-	}
-	else
-	{
-		ERROR("Failed to save cartridge ram battery");
-	}
-}
-
-void Cartridge::LoadRamDumpFromFile()
-{
-	std::string path = ToHex(_header.globalChecksum[0]) +
-	                   ToHex(_header.globalChecksum[1]) +
-	                   std::string(".battery\0");
-	
-	std::ifstream file(path, std::ios::binary);
-	
-	/*LOG(std::string("open: ") + (file.is_open() ? "true" : "false"));
-	LOG(std::string("good: ") + (file.good() ? "true" : "false"));
-	LOG(std::string("bad:  ") + (file.bad() ? "true" : "false"));
-	LOG(std::string("fail: ") + (file.fail() ? "true" : "false"));
-	LOG(std::string("eof:  ") + (file.eof() ? "true" : "false"));*/
-	
-	if (file.is_open() && !file.bad())
-	{
-		DynamicArray<char> inRam;
-		
-		inRam.resize(_header.ramDimensions.size);
-		
-		file.read(&inRam[0], _header.ramDimensions.size);
-		file.close();
-		
-		_ram = DynamicArray<int>(inRam.begin(), inRam.end());
-		
-		LOG("Loaded cartridge ram battery");
-	}
-	else
-	{
-		ERROR("Failed to load cartridge ram battery");
-	}
 }
 
 Cartridge *Cartridge::Create(DynamicArray<int> rom)
