@@ -8,7 +8,9 @@ TileMapWindow::TileMapWindow(int tileMapNumber, core::GameboyColor &gbc)
 	                                 core::TileMap::HEIGHT * core::Tile::HEIGHT),
 	                   std::string("TILEMAP") + ToDec(tileMapNumber)),
 	  _tileMapNumber(tileMapNumber),
-	  _gbc(gbc)
+	  _gbc(gbc),
+	  _frame(),
+	  _rawFrame()
 {
 }
 

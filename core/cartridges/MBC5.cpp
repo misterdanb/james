@@ -5,7 +5,9 @@ using namespace james::core;
 using namespace james::core::cartridges;
 
 MBC5::MBC5(DynamicArray<int> rom)
-	: Cartridge(rom)
+	: Cartridge(rom),
+	  _ramEnabled(),
+	  _romRamMode()
 {
 }
 

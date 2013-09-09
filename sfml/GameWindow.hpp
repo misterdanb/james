@@ -35,6 +35,11 @@ namespace james
 			void HideTileMap(int);
 		
 		private:
+			void throwTilemaps();
+			void throwMem();
+			void throwRegs();
+			void throwSprAttr();
+			
 			Array<sf::Uint8, Frame::WIDTH * Frame::HEIGHT * 4> _rawFrame;
 			sf::Image _frame;
 			
@@ -46,12 +51,13 @@ namespace james
 			int _buttonBPressed;
 			int _selectPressed;
 			int _startPressed;
-			
+#ifdef DEBUG			
 			int _tileMap0WindowVisible;
 			int _tileMap1WindowVisible;
 			
-			//TileMapWindow _tileMap0Window;
-			//TileMapWindow _tileMap1Window;
+			TileMapWindow _tileMap0Window;
+			TileMapWindow _tileMap1Window;
+#endif
 		};
 	}
 }

@@ -17,9 +17,41 @@ namespace james
 {
 	namespace core
 	{
+		class GameboyClassicSpecificRenderContext
+		{
+		public:
+			GameboyClassicSpecificRenderContext();
+			~GameboyClassicSpecificRenderContext();
+			ColorPalette monochromeBackgroundPalette;
+			ColorPalette monochromeSpritePalette0;
+			ColorPalette monochromeSpritePalette1;
+		private:
+			GameboyClassicSpecificRenderContext(GameboyClassicSpecificRenderContext &) = delete;
+			GameboyClassicSpecificRenderContext& operator=(GameboyClassicSpecificRenderContext &) = delete;
+		};
+		class GameboyColorSpecificRenderContext
+		{
+		public:
+			GameboyColorSpecificRenderContext();
+			~GameboyColorSpecificRenderContext();
+			TileMapAttribute tileMapAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
+			Queue<Pair<int, int>>changedTileMapAttributes;
+			ColorPalette colorBackgroundPalettes[8];
+			ColorPalette colorSpritePalettes[8];
+			int dmaTransferActive;
+			int dmaTransferSourceAddress;
+			int dmaTransferDestinationAddress;
+			int dmaTransferLength;
+			int currentDMATransferOffset;
+		private:
+                        GameboyColorSpecificRenderContext(GameboyColorSpecificRenderContext &) = delete;
+			GameboyColorSpecificRenderContext& operator=(GameboyColorSpecificRenderContext &) = delete;
+		};
 		class RenderContext
 		{
 		public:
+			RenderContext();
+			~RenderContext();
 			// memory dimensions
 			static const int VIDEO_RAM_BANKS = 2;
 			static const int VIDEO_RAM_BANK_SIZE = 0x2000;
@@ -103,31 +135,13 @@ namespace james
 			Array<SpriteAttribute, 40> spriteAttributes;
 			Queue<int> changedSpriteAttributes;
 			
-			struct GameboyClassicSpecificRenderContext
-			{
-				// lcd monochrome palettes
-				ColorPalette monochromeBackgroundPalette;
-				ColorPalette monochromeSpritePalette0;
-				ColorPalette monochromeSpritePalette1;
-			} gameboyClassicSpecific;
-			
-			struct GameboyColorSpecificRenderContext
-			{
-				// background map attributes
-				TileMapAttribute tileMapAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
-				Queue<Pair<int, int>>changedTileMapAttributes;
-				
-				// lcd color palettes
-				ColorPalette colorBackgroundPalettes[8];
-				ColorPalette colorSpritePalettes[8];
-				
-				// hblank dma transfer
-				int dmaTransferActive;
-				int dmaTransferSourceAddress;
-				int dmaTransferDestinationAddress;
-				int dmaTransferLength;
-				int currentDMATransferOffset;
-			} gameboyColorSpecific;
+			GameboyClassicSpecificRenderContext gameboyClassicSpecific;
+			GameboyColorSpecificRenderContext gameboyColorSpecific;
+
+		private:
+			RenderContext(RenderContext &) = delete;
+			RenderContext& operator=(RenderContext &) = delete;
+
 		};
 	}
 }

@@ -13,11 +13,12 @@ MMM01::~MMM01()
 {
 }
 
-int MMM01::ReadByte(int address)
+int MMM01::ReadByte(int)
 {
 	return 0;
 }
 
-void MMM01::WriteByte(int address, int value)
+void MMM01::WriteByte(int, int)
 {
+		return;
 }

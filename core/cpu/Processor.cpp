@@ -6,7 +6,10 @@ using namespace james::core::cpu;
 
 Processor::Processor()
 	: _counter(0),
-	  _state(),
+	  _currentOpCodes(),
+	  _currentOpLows(),
+	  _currentOpHighs(),
+	  _state(), 
 	  _bus(NULL),
 	  _recording(false),
 	  _recordingPath("")

@@ -19,10 +19,10 @@ namespace james
 			typedef PixelMap<TileMap::WIDTH * Tile::WIDTH, TileMap::HEIGHT * Tile::HEIGHT> RenderedTileMap;
 			
 			// color enable masks
-			static const int COLOR_0 = 0b00000001;
-			static const int COLOR_1 = 0b00000010;
-			static const int COLOR_2 = 0b00000100;
-			static const int COLOR_3 = 0b00001000;
+			static const int COLOR_0 = 1;
+			static const int COLOR_1 = 2;
+			static const int COLOR_2 = 4;
+			static const int COLOR_3 = 16;
 		
 		public:
 			Renderer(RenderContext &);
@@ -37,8 +37,8 @@ namespace james
 		
 		public:
 			RenderContext &_rc;
-			RenderContext::GameboyClassicSpecificRenderContext &_rcClassic;
-			RenderContext::GameboyColorSpecificRenderContext &_rcColor;
+			GameboyClassicSpecificRenderContext &_rcClassic;
+			GameboyColorSpecificRenderContext &_rcColor;
 		};
 	}
 }

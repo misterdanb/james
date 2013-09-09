@@ -62,9 +62,12 @@ namespace james
 	{
 		std::string result = string;
 		
-		for (int i = 0; i < string.size(); i++)
+		for (unsigned int i = 0; i < string.size(); i++)
 		{
-			result[i] = std::toupper(string[i]);
+			result[i] = (char) std::toupper(string[i]);
+//			int temp = std::toupper(string[i]);
+//			std::string tmp = std::to_string(temp);
+//			result[i] = *(tmp.c_str());
 		}
 		
 		return result;

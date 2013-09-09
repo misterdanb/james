@@ -5,6 +5,7 @@ using namespace james::core;
 using namespace james::core::cartridges;
 
 RamDimensions::RamDimensions(int ramDimensionsIdentifier)
+: size(), banks(), bankSize()
 {
 	switch (ramDimensionsIdentifier)
 	{

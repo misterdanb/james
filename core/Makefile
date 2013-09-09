@@ -23,6 +23,9 @@ $(TARGET): $(OBJECTS)
 $(TARGET)-debug: $(OBJECTS)
 	$(CC) $(FLAGS) $(LDFLAGS) $(DEBUGFLAGS) -o $(TARGET) $(OBJECTS)
 
+RenderContext.o: RenderContext.cpp
+	$(CC) $(FLAGS) $(CFLAGS) RenderContext.cpp -o RenderContext.o
+	
 Frontend.o: Frontend.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Frontend.cpp -o Frontend.o
 

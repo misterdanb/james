@@ -53,6 +53,8 @@ namespace james
 				int GetCounter();
 				
 			private:
+				Processor(Processor &) = delete;
+				Processor & operator=(Processor &) = delete;
 				// helper methods
 				void FetchInstruction(InstructionTable instructionTable);
 				

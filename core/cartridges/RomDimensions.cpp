@@ -5,6 +5,7 @@ using namespace james::core;
 using namespace james::core::cartridges;
 
 RomDimensions::RomDimensions(int romDimensionsIdentifier)
+: size(), banks(), bankSize()
 {
 	switch (romDimensionsIdentifier)
 	{

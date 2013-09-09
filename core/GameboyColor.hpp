@@ -71,6 +71,8 @@ namespace james
 			void WriteByte(int, int);
 		
 		private:
+			GameboyColor(GameboyColor &);
+			GameboyColor & operator=(GameboyColor &);
 			// emulation state
 			bool _paused;
 			int _pendingClocks;
@@ -107,8 +109,8 @@ namespace james
 			
 			RenderContext _rc;
 			
-			RenderContext::GameboyClassicSpecificRenderContext &_rcClassic = _rc.gameboyClassicSpecific;
-			RenderContext::GameboyColorSpecificRenderContext &_rcColor = _rc.gameboyColorSpecific;
+			GameboyClassicSpecificRenderContext &_rcClassic = _rc.gameboyClassicSpecific;
+			GameboyColorSpecificRenderContext &_rcColor = _rc.gameboyColorSpecific;
 		};
 	}
 }

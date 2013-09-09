@@ -6,6 +6,8 @@ using namespace james::sfml;
 
 GameWindow::GameWindow(int width, int height, std::string rom)
 	: sf::RenderWindow(sf::VideoMode(width, height), "James"),
+	  _rawFrame(),
+	  _frame(),
 	  _rightPressed(GBC_FALSE),
 	  _leftPressed(GBC_FALSE),
 	  _upPressed(GBC_FALSE),
@@ -13,15 +15,18 @@ GameWindow::GameWindow(int width, int height, std::string rom)
 	  _buttonAPressed(GBC_FALSE),
 	  _buttonBPressed(GBC_FALSE),
 	  _selectPressed(GBC_FALSE),
-	  _startPressed(GBC_FALSE)//,
-	  //_tileMap0WindowVisible(GBC_FALSE),
-	  //_tileMap1WindowVisible(GBC_FALSE),
-	  //_tileMap0Window(0, _gbc),
-	  //_tileMap1Window(1, _gbc)
+	  _startPressed(GBC_FALSE)
+#ifdef DEBUG
+	  ,_tileMap0WindowVisible(GBC_FALSE),
+	  _tileMap1WindowVisible(GBC_FALSE),
+	  _tileMap0Window(0, GetDevice()),
+	  _tileMap1Window(1, GetDevice())
+#endif
 {
-	//_tileMap0Window.setVisible(GBC_FALSE);
-	//_tileMap1Window.setVisible(GBC_FALSE);
-	
+#ifdef DEBUG
+	_tileMap0Window.setVisible(GBC_FALSE);
+	_tileMap1Window.setVisible(GBC_FALSE);
+#endif
 	LoadRom(rom);
 	
 	Initialize();
@@ -56,7 +61,7 @@ void GameWindow::Render()
 			close();
 		}
 		
-		if (event.type == sf::Event::KeyPressed)
+		else if (event.type == sf::Event::KeyPressed)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 			{
@@ -94,45 +99,8 @@ void GameWindow::Render()
 					LOG("Current tilemaps");
 					
 					std::cout << std::endl;
-					
-					for (int i = 0; i < 2; i++)
-					{
-						TileMap::TileMapArray2 tileMap = GetDevice().GetTileMap(i);
-						
-						std::cout << "TILEMAP " << ToDec(i) << std::endl;
-						
-						std::cout << "     ";
-						
-						for (int x = 0; x < TileMap::WIDTH; x++)
-						{
-							std::cout << " " << ToFixedDec(x, 2);
-						}
-						
-						std::cout << std::endl;
-						
-						std::cout << "-----";
-						
-						for (int x = 0; x < TileMap::WIDTH; x++)
-						{
-							std::cout << "---";
-						}
-						
-						std::cout << std::endl;
-						
-						for (int y = 0; y < TileMap::HEIGHT; y++)
-						{
-							std::cout << ToFixedDec(y, 2) << " | ";
-							
-							for (int x = 0; x < TileMap::WIDTH; x++)
-							{
-								std::cout << " " << ToFixedHex(tileMap[x][y], 2);
-							}
-							
-							std::cout << std::endl;
-						}
-						
-						std::cout << std::endl;
-					}
+				
+					ThrowTilemaps();
 				}
 				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::M))
@@ -155,196 +123,64 @@ void GameWindow::Render()
 					
 					std::cout << std::endl;
 					
-					for (int i = 0; i < 0x10000; i++)
-					{
-						if ((i % 0x0100) == 0)
-						{
-							std::cout << std::endl << std::endl;;
-							
-							std::cout << ToFixedHex((i >> 8) & 0xFF, 2) << "** |";
-							
-							for (int j = 0; j < 0x10; j++)
-							{
-								std::cout << " " << ToFixedHex((i >> 8) & 0xFF, 2) << "*" << ToFixedHex(j, 1);
-							}
-							
-							std::cout << std::endl;
-							
-							std::cout << "------";
-							
-							for (int j = 0; j < 0x10; j++)
-							{
-								std::cout << "-----";
-							}
-						}
-						
-						if ((i % 0x10) == 0)
-						{
-							std::cout << std::endl << ToFixedHex((i >> 4) & 0xFFF, 3) << "* |";
-						}
-						
-						std::cout << "   " << ToFixedHex(GetDevice().ReadByte(i), 2);
-					}
-					
-					std::cout << std::endl << std::endl;
+					ThrowMem();
 				}
 				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 				{
 					LOG("Current cpu registers");
 					
-					core::cpu::State state = GetDevice().GetProcessor().GetState();
-					
-					std::cout << "\tA = 0x" << ToFixedHex(state.a, 2) << std::endl;
-					std::cout << "\tF = 0x" << ToFixedHex(state.f, 2) << std::endl;
-					std::cout << "\tB = 0x" << ToFixedHex(state.b, 2) << std::endl;
-					std::cout << "\tC = 0x" << ToFixedHex(state.c, 2) << std::endl;
-					std::cout << "\tD = 0x" << ToFixedHex(state.d, 2) << std::endl;
-					std::cout << "\tE = 0x" << ToFixedHex(state.e, 2) << std::endl;
-					std::cout << "\tH = 0x" << ToFixedHex(state.h, 2) << std::endl;
-					std::cout << "\tL = 0x" << ToFixedHex(state.l, 2) << std::endl;
-					std::cout << "\tSP = 0x" << ToFixedHex(state.pc, 2) << std::endl;
-					std::cout << "\tPC = 0x" << ToFixedHex(state.sp, 2) << std::endl;
-					std::cout << "\tIME = " << std::boolalpha << bool(state.interruptsEnabled) << std::endl;
-					std::cout << "\tStopped = " << std::boolalpha << bool(state.stopped) << std::endl;
-					std::cout << "\tHalted = " << std::boolalpha << bool(state.halted) << std::endl;
-					
-					std::cout << std::endl;
-				}
-				
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-				{
-					LOG("Current sprite attributes");
-					
-					std::cout << std::endl;
-					
-					for (int i = 0; i < 40; i++)
-					{
-						core::SpriteAttribute spriteAttribute = GetDevice().GetSpriteAttribute(i);
-						
-						std::cout << "\t Y = " << spriteAttribute.y << std::endl;
-						std::cout << "\t X = " << spriteAttribute.x << std::endl;
-						std::cout << "\t Tile number = " << spriteAttribute.tileNumber << std::endl;
-						std::cout << "\t Color palette number = " << spriteAttribute.colorPaletteNumber << std::endl;
-						std::cout << "\t Tile video ram bank number = " << spriteAttribute.tileVideoRamBankNumber << std::endl;
-						std::cout << "\t Monochrome palette number = " << spriteAttribute.monochromePaletteNumber << std::endl;
-						std::cout << "\t Horizontal flip = " << GetEnumValue(spriteAttribute.horizontalFlip) << std::endl;
-						std::cout << "\t Vertical flip = " << GetEnumValue(spriteAttribute.verticalFlip) << std::endl;
-						std::cout << "\t Sprite to background priority = " << GetEnumValue(spriteAttribute.spriteToBackgroundPriority) << std::endl;
-						
-						std::cout << std::endl;
-					}
+					ThrowRegs();
+					ThrowSprAttr();
 				}
 			}
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		bool irqMark = false;
+		
+		if (_rightPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
-			_rightPressed = GBC_TRUE;
-			
-			SignalJoypadInterrupt();
-		}
-		else
-		{
-			_rightPressed = GBC_FALSE;
+			irqMark = true;
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (_leftPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
-			if (!_leftPressed)
-			{
-				SignalJoypadInterrupt();
-			}
-			
-			_leftPressed = GBC_TRUE;
-		}
-		else
-		{
-			_leftPressed = GBC_FALSE;
+			irqMark = true;
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		if (_upPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
-			if (!_upPressed)
-			{
-				SignalJoypadInterrupt();
-			}
-			
-			_upPressed = GBC_TRUE;
-		}
-		else
-		{
-			_upPressed = GBC_FALSE;
+			irqMark = true;
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		if (_downPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
-			if (!_downPressed)
-			{
-				SignalJoypadInterrupt();
-			}
-			
-			_downPressed = GBC_TRUE;
-		}
-		else
-		{
-			_downPressed = GBC_FALSE;
+			irqMark = true;
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
+		if (_buttonAPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Period))
 		{
-			if (!_buttonAPressed)
-			{
-				SignalJoypadInterrupt();
-			}
-			
-			_buttonAPressed = GBC_TRUE;
-		}
-		else
-		{
-			_buttonAPressed = GBC_FALSE;
+			irqMark = true;
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Comma))
+		if (_buttonBPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Comma))
 		{
-			if (!_buttonBPressed)
-			{
-				SignalJoypadInterrupt();
-			}
-			
-			_buttonBPressed = GBC_TRUE;
-		}
-		else
-		{
-			_buttonBPressed = GBC_FALSE;
+			irqMark = true;
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Dash))
+		if (_selectPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Dash))
 		{
-			if (!_selectPressed)
-			{
-				SignalJoypadInterrupt();
-			}
-			
-			_selectPressed = GBC_TRUE;
-		}
-		else
-		{
-			_selectPressed = GBC_FALSE;
+			irqMark = true;
 		}
 		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+		if (_startPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
-			if (!_startPressed)
-			{
-				SignalJoypadInterrupt();
-			}
-			
-			_startPressed = GBC_TRUE;
+			irqMark = true;
 		}
-		else
+		
+		if (irqMark)
 		{
-			_startPressed = GBC_FALSE;
+			GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
 		}
 	}
 	
@@ -352,7 +188,8 @@ void GameWindow::Render()
 	draw(sprite);
 	display();
 	
-	/*if (_tileMap0WindowVisible)
+#ifdef DEBUG
+	if (_tileMap0WindowVisible)
 	{
 		_tileMap0Window.Render();
 	}
@@ -360,7 +197,8 @@ void GameWindow::Render()
 	if (_tileMap1WindowVisible)
 	{
 		_tileMap1Window.Render();
-	}*/
+	}
+#endif
 }
 
 void GameWindow::DrawFrame(Frame &frame)
@@ -423,23 +261,24 @@ int GameWindow::GetStart()
 	return _startPressed;
 }
 
+#ifdef DEBUG
 void GameWindow::ShowTileMap(int tileMapNumber)
 {
-	/*if (tileMapNumber == 0)
+	if (tileMapNumber == 0)
 	{
-		_tileMap0WindowVisible = GBC_TRUE;
+		_tileMap0WindowVisible = true;
 		_tileMap0Window.setVisible(_tileMap0WindowVisible);
 	}
 	else if (tileMapNumber == 1)
 	{
-		_tileMap1WindowVisible = GBC_TRUE;
+		_tileMap1WindowVisible = true;
 		_tileMap1Window.setVisible(_tileMap1WindowVisible);
-	}*/
+	}
 }
 
 void GameWindow::HideTileMap(int tileMapNumber)
 {
-	/*if (tileMapNumber == 0)
+	if (tileMapNumber == 0)
 	{
 		_tileMap0WindowVisible = GBC_FALSE;
 		_tileMap0Window.setVisible(_tileMap0WindowVisible);
@@ -451,5 +290,129 @@ void GameWindow::HideTileMap(int tileMapNumber)
 	}
 	
 	_tileMap1Window.setVisible(false);
-	_tileMap0Window.setVisible(false);*/
+	_tileMap0Window.setVisible(false);
+}
+#endif
+
+void GameWindow::ThrowTilemaps()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		TileMap::TileMapArray2 tileMap = GetDevice().GetTileMap(i);
+		
+		std::cout << "TILEMAP " << ToDec(i) << std::endl;
+		
+		std::cout << "     ";
+		
+		for (int x = 0; x < TileMap::WIDTH; x++)
+		{
+			std::cout << " " << ToFixedDec(x, 2);
+		}
+		
+		std::cout << std::endl;
+		
+		std::cout << "-----";
+		
+		for (int x = 0; x < TileMap::WIDTH; x++)
+		{
+			std::cout << "---";
+		}
+		
+		std::cout << std::endl;
+		
+		for (int y = 0; y < TileMap::HEIGHT; y++)
+		{
+			std::cout << ToFixedDec(y, 2) << " | ";
+			
+			for (int x = 0; x < TileMap::WIDTH; x++)
+			{
+				std::cout << " " << ToFixedHex(tileMap[x][y], 2);
+			}
+			
+			std::cout << std::endl;
+		}
+		
+		std::cout << std::endl;
+	}
+
+}
+
+void GameWindow::ThrowMem()
+{
+	for (int i = 0; i < 0x10000; i++)
+	{
+		if ((i % 0x0100) == 0)
+		{
+			std::cout << std::endl << std::endl;;
+			
+			std::cout << ToFixedHex((i >> 8) & 0xFF, 2) << "** |";
+			
+			for (int j = 0; j < 0x10; j++)
+			{
+				std::cout << " " << ToFixedHex((i >> 8) & 0xFF, 2) << "*" << ToFixedHex(j, 1);
+			}
+			
+			std::cout << std::endl;
+			
+			std::cout << "------";
+			
+			for (int j = 0; j < 0x10; j++)
+			{
+				std::cout << "-----";
+			}
+		}
+		
+		if ((i % 0x10) == 0)
+		{
+			std::cout << std::endl << ToFixedHex((i >> 4) & 0xFFF, 3) << "* |";
+		}
+		
+		std::cout << "   " << ToFixedHex(GetDevice().ReadByte(i), 2);
+	}
+	
+	std::cout << std::endl << std::endl;
+}
+
+void GameWindow::ThrowRegs()
+{
+	core::cpu::State state = GetDevice().GetProcessor().GetState();
+	
+	std::cout << "\tA = 0x" << ToFixedHex(state.a, 2) << std::endl;
+	std::cout << "\tF = 0x" << ToFixedHex(state.f, 2) << std::endl;
+	std::cout << "\tB = 0x" << ToFixedHex(state.b, 2) << std::endl;
+	std::cout << "\tC = 0x" << ToFixedHex(state.c, 2) << std::endl;
+	std::cout << "\tD = 0x" << ToFixedHex(state.d, 2) << std::endl;
+	std::cout << "\tE = 0x" << ToFixedHex(state.e, 2) << std::endl;
+	std::cout << "\tH = 0x" << ToFixedHex(state.h, 2) << std::endl;
+	std::cout << "\tL = 0x" << ToFixedHex(state.l, 2) << std::endl;
+	std::cout << "\tSP = 0x" << ToFixedHex(state.pc, 2) << std::endl;
+	std::cout << "\tPC = 0x" << ToFixedHex(state.sp, 2) << std::endl;
+	std::cout << "\tIME = " << std::boolalpha << bool(state.interruptsEnabled) << std::endl;
+	std::cout << "\tStopped = " << std::boolalpha << bool(state.stopped) << std::endl;
+	std::cout << "\tHalted = " << std::boolalpha << bool(state.halted) << std::endl;
+	
+	std::cout << std::endl;
+
+}
+
+void GameWindow::ThrowSprAttr()
+{
+	std::cout << std::endl;
+	
+	for (int i = 0; i < 40; i++)
+	{
+		core::SpriteAttribute spriteAttribute = GetDevice().GetSpriteAttribute(i);
+		
+		std::cout << "\t Y = " << spriteAttribute.y << std::endl;
+		std::cout << "\t X = " << spriteAttribute.x << std::endl;
+		std::cout << "\t Tile number = " << spriteAttribute.tileNumber << std::endl;
+		std::cout << "\t Color palette number = " << spriteAttribute.colorPaletteNumber << std::endl;
+		std::cout << "\t Tile video ram bank number = " << spriteAttribute.tileVideoRamBankNumber << std::endl;
+		std::cout << "\t Monochrome palette number = " << spriteAttribute.monochromePaletteNumber << std::endl;
+		std::cout << "\t Horizontal flip = " << GetEnumValue(spriteAttribute.horizontalFlip) << std::endl;
+		std::cout << "\t Vertical flip = " << GetEnumValue(spriteAttribute.verticalFlip) << std::endl;
+		std::cout << "\t Sprite to background priority = " << GetEnumValue(spriteAttribute.spriteToBackgroundPriority) << std::endl;
+		
+		std::cout << std::endl;
+	}
 }
