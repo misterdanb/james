@@ -47,7 +47,6 @@ void Processor::Execute(int ticks)
 	while (tickCountdown >= _state.ticks)
 	{
 		tickCountdown -= _state.ticks;
-		_state.ticks = 0;
 		
 		ExecuteInterrupt();
 		
@@ -55,6 +54,7 @@ void Processor::Execute(int ticks)
 		
 		ExecuteInstruction();
 	}
+	_state.ticks = 0;
 }
 
 void Processor::ExecuteInstruction()
