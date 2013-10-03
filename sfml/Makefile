@@ -6,7 +6,7 @@ LIBS         =  -ljames -lsfml-window -lsfml-system -lsfml-graphics
 FLAGS        = -std=c++11
 CFLAGS       = -O3 -c
 LDFLAGS      = -L../core
-DEBUGFLAGS   = -O0 -D DEBUG -pg
+DEBUGFLAGS   = -O0 -D DEBUG -pg -g -ggdb
 RELEASEFLAGS = -O3 -D NODEBUG
 
 TARGET  = james-sfml

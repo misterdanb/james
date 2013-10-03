@@ -5,7 +5,7 @@ INCLUDE      = -I .
 FLAGS        = -std=c++11
 CFLAGS       = -O3 -fPIC -c
 LDFLAGS      = -shared
-DEBUGFLAGS   = -O0 -D DEBUG -pg
+DEBUGFLAGS   = -O0 -D DEBUG -pg -g -ggdb
 RELEASEFLAGS = -O3 -D NODEBUG
 
 TARGET  = libjames.so
