@@ -419,7 +419,7 @@ inline void GameboyColor::WriteByte(int address, int value)
 	}
 	else if (address <= 0x9FFF)
 	{
-		if (_rc.lcdMode != LCDMode::TRANSFERRING_DATA)
+//		if (_rc.lcdMode != LCDMode::TRANSFERRING_DATA)
 		{
 			_rc.videoRam[_rc.selectedVideoRamBank][address - 0x8000] = value;
 			
