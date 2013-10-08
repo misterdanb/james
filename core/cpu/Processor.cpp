@@ -1404,7 +1404,7 @@ void Processor::DAA()
 	}
 	else
 	{
-		if (GetNFlag())
+		if (GetHFlag())
 		{
 			_state.a -= 0x06;
 			_state.a &= 0xFF;
