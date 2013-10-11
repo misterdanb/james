@@ -285,6 +285,62 @@ void GameboyColor::ExecuteMachineClocks (int clocks)
 
 void GameboyColor::UpdateTimer (int ticks)
 {
+	#if 1
+	static int ticks_per_cycle  = 0;
+	static int ticks_left_cycle = 0;
+	int counter = _rc.ioPorts[5];
+
+	if (! (_timerStopped))
+	{
+		if (! (ticks_per_cycle))
+		{
+			switch (_rc.ioPorts[7] & 0x03)
+			{
+				case 0:
+					ticks_per_cycle = 1024;
+					break;
+
+				case 1:
+					ticks_per_cycle = 16;
+					break;
+
+				case 2:
+					ticks_per_cycle = 64;
+					break;
+
+				case 3:
+					ticks_per_cycle = 256;
+					break;
+
+				default:
+					break;
+			}
+
+			ticks_left_cycle = ticks_per_cycle;
+		}
+
+		ticks_left_cycle -= ticks;
+
+		if (ticks_left_cycle <= 0)
+		{
+			ticks_left_cycle = 0;
+			counter++;
+		}
+
+		if (counter > 0xFF)
+		{
+			_rc.ioPorts[5]   =_rc.ioPorts[6];
+			_rc.interruptHandler->SignalTimerInterrupt();
+			ticks_per_cycle = 0;
+		}
+		else
+		{
+			_rc.ioPorts[5] = counter;
+		}
+	}
+
+	#else
+
 	if (!_timerStopped)
 	{
 		_timerCounter += ticks;
@@ -313,6 +369,8 @@ void GameboyColor::UpdateTimer (int ticks)
 
 		_deviderCounter %= 256;
 	}
+
+	#endif
 }
 
 inline int GameboyColor::ReadByte (int address)
