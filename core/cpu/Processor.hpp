@@ -3,8 +3,8 @@
 
 #include "../James.hpp"
 #include "../MemoryBus.hpp"
-#include "../InterruptHandler.hpp"
 #include "../Serializable.hpp"
+#include "../InterruptHandler.hpp"
 #include "State.hpp"
 #include "InstructionTable.hpp"
 #include "LookUpTables.hpp"
@@ -15,7 +15,7 @@ namespace james
 	{
 		namespace cpu
 		{
-			class Processor : public IInterruptHandler, public Serializable
+			class Processor : public Serializable
 			{
 			public:
 				static const int CFLAG_BIT = 4;
@@ -30,7 +30,7 @@ namespace james
 				void Serialize(std::ostream &);
 				void Deserialize(std::istream &);
 				
-				void SetMemoryBus(IMemoryBus *);
+				void SetMemoryBus(MemoryBus &);
 				
 				void Step();
 				void Execute(int);
@@ -39,12 +39,6 @@ namespace james
 				void ExecuteInterrupt();
 				
 				void PowerUp();
-				
-				void SignalVBlankInterrupt();
-				void SignalLCDStatusInterrupt();
-				void SignalTimerInterrupt();
-				void SignalSerialInterrupt();
-				void SignalJoypadInterrupt();
 				
 				void StartRecording(std::string);
 				void StopRecording();
@@ -197,7 +191,7 @@ namespace james
 				Array<int, LookUpTables::AMOUNT_OF_INSTUCTION_TABLES> _currentOpHighs;
 				
 				State _state;
-				IMemoryBus *_bus;
+				MemoryBus *_bus;
 			
 			private:
 				bool _recording;

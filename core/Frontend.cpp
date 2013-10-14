@@ -13,20 +13,20 @@ Frontend::~Frontend()
 
 void Frontend::Initialize()
 {
-	_gbc.Initialize();
+	_emulator.Initialize();
 	
-	_gbc.SetLCD(*this);
-	_gbc.SetJoypad(*this);
+	_emulator.SetLCD(*this);
+	_emulator.SetJoypad(*this);
 }
 
 void Frontend::Finalize()
 {
-	_gbc.Finalize();
+	_emulator.Finalize();
 }
 
 void Frontend::Reset()
 {
-	_gbc.Reset();
+	_emulator.Reset();
 }
 
 void Frontend::LoadRom(std::string path)
@@ -47,40 +47,40 @@ void Frontend::LoadRom(std::string path)
 		file.close();
 	}
 	
-	_gbc.SetRom(rom);
+	_emulator.SetRom(rom);
 }
 
 void Frontend::Start()
 {
-	_gbc.Start();
+	_emulator.Start();
 }
 
 void Frontend::Pause()
 {
-	_gbc.Pause();
+	_emulator.Pause();
 }
 
 bool Frontend::IsPaused()
 {
-	return _gbc.IsPaused();
+	return _emulator.IsPaused();
 }
 
 void Frontend::RenderFrame()
 {
-	_gbc.RenderFrame();
+	_emulator.RenderFrame();
 }
 
 void Frontend::SignalJoypadInterrupt()
 {
-	_gbc.GetInterruptHandler().SignalJoypadInterrupt();
+	_emulator.GetInterruptHandler().SignalJoypadInterrupt();
 }
 
 void Frontend::SignalSerialInterrupt()
 {
-	_gbc.GetInterruptHandler().SignalSerialInterrupt();
+	_emulator.GetInterruptHandler().SignalSerialInterrupt();
 }
 
-GameboyColor &Frontend::GetDevice()
+Emulator &Frontend::GetDevice()
 {
-	return _gbc;
+	return _emulator;
 }

@@ -10,6 +10,11 @@ namespace james
 {
 	namespace core
 	{
+		/*
+		 * PixelMap is a generic implementation for all possibly necessary
+		 * pixel matrices.
+		 */
+		
 		template<int width, int height>
 		class PixelMap : public Matrix<Color<int>, width, height>
 		{
@@ -19,9 +24,9 @@ namespace james
 			{
 				Color<int> nullColor;
 				
-				nullColor.red = 0;
-				nullColor.green = 0;
-				nullColor.blue = 0;
+				nullColor.SetRed(0);
+				nullColor.SetGreen(0);
+				nullColor.SetBlue(0);
 				
 				Clear(nullColor);
 			}

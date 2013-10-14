@@ -7,19 +7,24 @@ namespace james
 {
 	namespace core
 	{
-		class IJoypad
+		/*
+		 * Joypad is an interface to the physical input unit to
+		 * get recent inputs.
+		 */
+		
+		class Joypad
 		{
 		public:
-			virtual ~IJoypad();
+			virtual ~Joypad();
 			
-			virtual int GetRight() = GBC_NULL;
-			virtual int GetLeft() = GBC_NULL;
-			virtual int GetUp() = GBC_NULL;
-			virtual int GetDown() = GBC_NULL;
-			virtual int GetButtonA() = GBC_NULL;
-			virtual int GetButtonB() = GBC_NULL;
-			virtual int GetSelect() = GBC_NULL;
-			virtual int GetStart() = GBC_NULL;
+			virtual bool GetRight() = GBC_NULL;
+			virtual bool GetLeft() = GBC_NULL;
+			virtual bool GetUp() = GBC_NULL;
+			virtual bool GetDown() = GBC_NULL;
+			virtual bool GetButtonA() = GBC_NULL;
+			virtual bool GetButtonB() = GBC_NULL;
+			virtual bool GetSelect() = GBC_NULL;
+			virtual bool GetStart() = GBC_NULL;
 		};
 	}
 }

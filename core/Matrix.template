@@ -9,6 +9,11 @@ namespace james
 {
 	namespace core
 	{
+		/*
+		 * Matrix is a generic implementation for all possibly necessary
+		 * matrices.
+		 */
+		
 		template<class T, int width, int height>
 		class Matrix
 		{
@@ -21,13 +26,29 @@ namespace james
 			virtual ~Matrix()
 			{
 			}
+			
+			void SetArray(Array2<T, width, height> array)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					for (int x = 0; x < width; x++)
+					{
+						std::memcpy(&_matrixElements[x][y], &array[x][y], sizeof(T));
+					}
+				}
+			}
+			
+			Array2<T, width, height> &GetArray()
+			{
+				return _matrixElements;
+			}
 		
 		protected:
 			void Clear(T nullInstance)
 			{
-				for (int x = 0; x < width; x++)
+				for (int y = 0; y < height; y++)
 				{
-					for (int y = 0; y < height; y++)
+					for (int x = 0; x < width; x++)
 					{
 						std::memcpy(&_matrixElements[x][y], &nullInstance, sizeof(T));
 					}

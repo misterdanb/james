@@ -1,7 +1,7 @@
 #include "ClassicRenderer.hpp"
 
-ClassicRenderer::ClassicRenderer(RenderContext &rc)
-	: Renderer(rc)
+ClassicRenderer::ClassicRenderer()
+	: Renderer(), _vBlankInterruptAlreadyRequested(false)
 {
 }
 
@@ -11,41 +11,41 @@ ClassicRenderer::~ClassicRenderer()
 
 void ClassicRenderer::RenderOAMSearch()
 {
-	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
+	(*_ioPorts).SetCoincidenceFlag((*_ioPorts).GetLCDY() == (*_ioPorts).GetLCDYCompare());
 	
-	if (_rc.oamInterruptEnabled)
+	if ((*_ioPorts).GetOAMInterruptEnabled())
 	{
-		_rc.interruptHandler->SignalLCDStatusInterrupt();
+		(*_interruptHandler).SignalLCDStatusInterrupt();
 	}
 	
-	if (_rc.coincidenceInterruptEnabled && _rc.coincidenceFlag)
+	if ((*_ioPorts).GetCoincidenceInterruptEnabled() && (*_ioPorts).GetCoincidenceFlag())
 	{
-		_rc.interruptHandler->SignalLCDStatusInterrupt();
+		(*_interruptHandler).SignalLCDStatusInterrupt();
 	}
 }
 
 void ClassicRenderer::RenderTransferData()
 {
-	if (_rc.lcdDisplayEnabled)
+	if ((*_ioPorts).GetLCDDisplayEnabled())
 	{
-		if (_rc.backgroundDisplayEnabled)
+		if ((*_ioPorts).GetBackgroundDisplayEnabled())
 		{
 			DrawBackgroundMap(COLOR_0);
 		}
 		
-		/*if (_rc.windowDisplayEnabled)
+		/*if (_ioPorts.GetWindowDisplayEnabled())
 		{
 			DrawWindowMap(COLOR_0);
 		}*/
 		
 		DrawSprites(COLOR_1 | COLOR_2 | COLOR_3, SpriteToBackgroundPriority::SPRITE_BEHIND_BACKGROUND);
 		
-		if (_rc.backgroundDisplayEnabled)
+		if ((*_ioPorts).GetBackgroundDisplayEnabled())
 		{
 			DrawBackgroundMap(COLOR_1 | COLOR_2 | COLOR_3);
 		}
 		
-		if (_rc.windowDisplayEnabled)
+		if ((*_ioPorts).GetWindowDisplayEnabled())
 		{
 			DrawWindowMap(COLOR_0 | COLOR_1 | COLOR_2 | COLOR_3);
 		}
@@ -54,126 +54,141 @@ void ClassicRenderer::RenderTransferData()
 	}
 }
 
-void ClassicRenderer::RenderHorizontalBlank()
+void ClassicRenderer::RenderHBlank()
 {
-	if (_rc.horizontalBlankInterruptEnabled)
+	if ((*_ioPorts).GetHBlankInterruptEnabled())
 	{
-		_rc.interruptHandler->SignalLCDStatusInterrupt();
+		(*_interruptHandler).SignalLCDStatusInterrupt();
 	}
 	
-	if (_rc.lcdY < 144)
+	if ((*_ioPorts).GetLCDY() < 144)
 	{
-		_rc.lcdY++;
+		(*_ioPorts).SetLCDY((*_ioPorts).GetLCDY() + 1);
 	}
 }
 
-void ClassicRenderer::RenderVerticalBlank()
+void ClassicRenderer::RenderVBlank()
 {
-	_rc.coincidenceFlag = (_rc.lcdY == _rc.lcdYCompare);
+	(*_ioPorts).SetCoincidenceFlag((*_ioPorts).GetLCDY() == (*_ioPorts).GetLCDYCompare());
 	
-	if (_rc.coincidenceInterruptEnabled && _rc.coincidenceFlag)
+	if ((*_ioPorts).GetCoincidenceInterruptEnabled() && (*_ioPorts).GetCoincidenceFlag())
 	{
-		_rc.interruptHandler->SignalLCDStatusInterrupt();
+		(*_interruptHandler).SignalLCDStatusInterrupt();
 	}
 	
-	if (_rc.verticalBlankInterruptEnabled && !_rc.verticalBlankInterruptAlreadyRequested)
+	// which vblank interrupt? in memory or in ioports?
+	if ((*_memory).GetVBlankInterruptEnabled() && !_vBlankInterruptAlreadyRequested)
 	{
-		_rc.interruptHandler->SignalVBlankInterrupt();
-		_rc.verticalBlankInterruptAlreadyRequested = GBC_TRUE;
+		(*_interruptHandler).SignalVBlankInterrupt();
+		_vBlankInterruptAlreadyRequested = true;
 	}
 	
-	if (_rc.lcdY >= 144)
+	if ((*_ioPorts).GetLCDY() >= 144)
 	{
-		_rc.lcdY++;
+		(*_ioPorts).SetLCDY((*_ioPorts).GetLCDY() + 1);
 	}
 	
-	if (_rc.lcdY > 153)
+	if ((*_ioPorts).GetLCDY() > 153)
 	{
-		_rc.lcdY = 0;
-		_rc.verticalBlankInterruptAlreadyRequested = GBC_FALSE;
+		(*_ioPorts).SetLCDY(0);
+		_vBlankInterruptAlreadyRequested = false;
 	}
 }
 
-Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap(int tileMapNumber)
+Frame ClassicRenderer::GetFrame()
 {
-	RenderedTileMap renderedTileMap;
+	return Frame(_frameBuffer);
+}
+
+PixelMap<Renderer::RENDERED_BACKGROUND_WIDTH, Renderer::RENDERED_BACKGROUND_HEIGHT> ClassicRenderer::GetRenderedBackground(int backgroundIndex)
+{
+	PixelMap<RENDERED_BACKGROUND_WIDTH, RENDERED_BACKGROUND_HEIGHT> renderedBackground;
 	
-	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
+	for (int mapX = 0; mapX < BackgroundTileNumberMap::WIDTH; mapX++)
 	{
-		for (int mapY = 0; mapY < TileMap::HEIGHT; mapY++)
+		for (int mapY = 0; mapY < BackgroundTileNumberMap::HEIGHT; mapY++)
 		{
-			int backgroundMapElement = _rc.tileMaps
-			                           [tileMapNumber].data
-			                           [mapX][mapY];
+			int backgroundTileNumberIndex = mapY * BackgroundTileNumberMap::WIDTH + mapX;
+			int backgroundTileNumber = (*_videoRam).GetBackgroundTileNumber(backgroundIndex, backgroundTileNumberIndex);
 			
-			int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
-			                 (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
-			                 (((0x8000 - 0x8000) / 16) + backgroundMapElement);
+			int tileIndex = 0;
+			
+			if ((*_ioPorts).GetBackgroundAndWindowTileDataSelect())
+			{
+				tileIndex = (0x9000 - 0x8000) / Tile::DATA_SIZE + GetSignedValue(backgroundTileNumber);
+			}
+			else
+			{
+				tileIndex = (0x8000 - 0x8000) / Tile::DATA_SIZE + backgroundTileNumber;
+			}
+			
+			Array2<int, Tile::WIDTH, Tile::HEIGHT> &tileArray = (*_videoRam).GetTile(tileIndex).GetArray();
+			Array<Color<int>, 4> &backgroundPalette = (*_ioPorts).GetMonochromeBackgroundPalette();
 			
 			for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
 			{
 				for (int tileY = 0; tileY < Tile::HEIGHT; tileY++)
 				{
-					Color<int> &pixel = renderedTileMap.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
+					Color<int> &pixel = renderedBackground.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
 					
-					pixel = _rcClassic.monochromeBackgroundPalette.colors[_rc.tiles[0][tileNumber].data[tileX][tileY]];
+					pixel = backgroundPalette[tileArray[tileX][tileY]];
 					
-					pixel.red = ((pixel.red << 3) | (pixel.red >> 2)) & 0xFF,
-					pixel.green = ((pixel.green << 3) | (pixel.green >> 2)) & 0xFF,
-					pixel.blue = ((pixel.blue << 3) | (pixel.blue >> 2)) & 0xFF;
+					pixel.SetRed(((pixel.GetRed() << 3) | (pixel.GetRed() >> 2)) & 0xFF),
+					pixel.SetGreen(((pixel.GetGreen() << 3) | (pixel.GetGreen() >> 2)) & 0xFF),
+					pixel.SetBlue(((pixel.GetBlue() << 3) | (pixel.GetBlue() >> 2)) & 0xFF);
 				}
 			}
 		}
 	}
 	
-	return renderedTileMap;
+	return renderedBackground;
 }
 
-void ClassicRenderer::DrawSprites(int enabledColors,
-                                  SpriteToBackgroundPriority spriteToBackgroundPriority)
+void ClassicRenderer::DrawSprites(int enabledColors, SpriteToBackgroundPriority spriteToBackgroundPriority)
 {
 	int drawnSprites = 0;
 	int hardCodedSpriteLimit = 40;
-	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
+	
+	for (int i = 0; i < 40; i++)
 	{
+		SpriteAttribute spriteAttribute = (*_spriteAttributeRam).GetSpriteAttribute(i);
+		
 		// only draw visible sprites
-		if ((spriteAttribute.x != -8) &&
-		    (spriteAttribute.y != -16) &&
-		    (spriteAttribute.x < 168) &&
-		    (spriteAttribute.y < 160) &&
-		    (_rc.lcdY >= spriteAttribute.y) &&
-		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
-		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
+		if ((spriteAttribute.GetX() != -8) &&
+		    (spriteAttribute.GetY() != -16) &&
+		    (spriteAttribute.GetX() < 168) &&
+		    (spriteAttribute.GetY() < 160) &&
+		    ((*_ioPorts).GetLCDY() >= spriteAttribute.GetY()) &&
+		    ((*_ioPorts).GetLCDY() < (spriteAttribute.GetY() + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
+		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline?
 		{
-			if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
+			if (spriteAttribute.GetSpriteToBackgroundPriority() == spriteToBackgroundPriority)
 			{
-				ColorPalette colorPalette = spriteAttribute.monochromePaletteNumber == 0 ?
-				                            _rcClassic.monochromeSpritePalette0 :
-				                            _rcClassic.monochromeSpritePalette1;
+				Array<Color<int>, 4> &spritePalette = (*_ioPorts).GetMonochromeSpritePalette(spriteAttribute.GetMonochromePaletteNumber());
 				
-				if (_rc.spriteSize == 0)
+				if ((*_ioPorts).GetSpriteSize() == SpriteSize::SIZE_8x8)
 				{
-					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-					         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
-					         spriteAttribute.horizontalFlip,
-					         spriteAttribute.verticalFlip,
-					         colorPalette,
+					DrawTile(Vector2<int>(spriteAttribute.GetX(), spriteAttribute.GetY()),
+					         (*_videoRam).GetTile(spriteAttribute.GetTileNumber()),
+					         spriteAttribute.GetHorizontalFlip(),
+					         spriteAttribute.GetVerticalFlip(),
+					         spritePalette,
 					         enabledColors);
 				}
-				else if (_rc.spriteSize == 1)
+				else if ((*_ioPorts).GetSpriteSize() == SpriteSize::SIZE_8x16)
 				{
-					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-					         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber & 0xFE)],
-					         spriteAttribute.horizontalFlip,
-					         spriteAttribute.verticalFlip,
-					         colorPalette,
+					DrawTile(Vector2<int>(spriteAttribute.GetX(), spriteAttribute.GetY()),
+					         (*_videoRam).GetTile(spriteAttribute.GetTileNumber() & 0xFE),
+					         spriteAttribute.GetHorizontalFlip(),
+					         spriteAttribute.GetVerticalFlip(),
+					         spritePalette,
 					         enabledColors);
 					
-					DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y + 8),
-					         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber | 0x01)],
-					         spriteAttribute.horizontalFlip,
-					         spriteAttribute.verticalFlip,
-					         colorPalette,
+					DrawTile(Vector2<int>(spriteAttribute.GetX(), spriteAttribute.GetY()),
+					         (*_videoRam).GetTile(spriteAttribute.GetTileNumber() | 0x01),
+					         spriteAttribute.GetHorizontalFlip(),
+					         spriteAttribute.GetVerticalFlip(),
+					         spritePalette,
 					         enabledColors);
 				}
 				
@@ -185,48 +200,47 @@ void ClassicRenderer::DrawSprites(int enabledColors,
 
 void ClassicRenderer::DrawSprites(int enabledColors)
 {
-	// find a better name than counter
 	int drawnSprites = 0;
 	int hardCodedSpriteLimit = 40;
 	
-	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
+	for (int i = 0; i < 40; i++)
 	{
+		SpriteAttribute spriteAttribute = (*_spriteAttributeRam).GetSpriteAttribute(i);
+		
 		// only draw visible sprites
-		if ((spriteAttribute.x != -8) &&
-		    (spriteAttribute.y != -16) &&
-		    (spriteAttribute.x < 168) &&
-		    (spriteAttribute.y < 160) &&
-		    (_rc.lcdY >= spriteAttribute.y) &&
-		    (_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
-		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
+		if ((spriteAttribute.GetX() != -8) &&
+		    (spriteAttribute.GetY() != -16) &&
+		    (spriteAttribute.GetX() < 168) &&
+		    (spriteAttribute.GetY() < 160) &&
+		    ((*_ioPorts).GetLCDY() >= spriteAttribute.GetY()) &&
+		    ((*_ioPorts).GetLCDY() < (spriteAttribute.GetY() + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
+		    (drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline?
 		{
-			ColorPalette colorPalette = spriteAttribute.monochromePaletteNumber == 0 ?
-										_rcClassic.monochromeSpritePalette0 :
-										_rcClassic.monochromeSpritePalette1;
+			Array<Color<int>, 4> &spritePalette = (*_ioPorts).GetMonochromeSpritePalette(spriteAttribute.GetMonochromePaletteNumber());
 			
-			if (_rc.spriteSize == 0)
+			if ((*_ioPorts).GetSpriteSize() == SpriteSize::SIZE_8x8)
 			{
-				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-				         _rc.tiles[0][(0x8000 - 0x8000) + spriteAttribute.tileNumber],
-				         spriteAttribute.horizontalFlip,
-				         spriteAttribute.verticalFlip,
-				         colorPalette,
+				DrawTile(Vector2<int>(spriteAttribute.GetX(), spriteAttribute.GetY()),
+				         (*_videoRam).GetTile(spriteAttribute.GetTileNumber()),
+				         spriteAttribute.GetHorizontalFlip(),
+				         spriteAttribute.GetVerticalFlip(),
+				         spritePalette,
 				         enabledColors);
 			}
-			else if (_rc.spriteSize == 1)
+			else if ((*_ioPorts).GetSpriteSize() == SpriteSize::SIZE_8x16)
 			{
-				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y),
-				         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber & 0xFE)],
-				         spriteAttribute.horizontalFlip,
-				         spriteAttribute.verticalFlip,
-				         colorPalette,
+				DrawTile(Vector2<int>(spriteAttribute.GetX(), spriteAttribute.GetY()),
+				         (*_videoRam).GetTile(spriteAttribute.GetTileNumber() | 0x01),
+				         spriteAttribute.GetHorizontalFlip(),
+				         spriteAttribute.GetVerticalFlip(),
+				         spritePalette,
 				         enabledColors);
 				
-				DrawTile(Vector2<int>(spriteAttribute.x, spriteAttribute.y + 8),
-				         _rc.tiles[0][(0x8000 - 0x8000) + (spriteAttribute.tileNumber | 0x01)],
-				         spriteAttribute.horizontalFlip,
-				         spriteAttribute.verticalFlip,
-				         colorPalette,
+				DrawTile(Vector2<int>(spriteAttribute.GetX(), spriteAttribute.GetY()),
+				         (*_videoRam).GetTile(spriteAttribute.GetTileNumber() & 0xFE),
+				         spriteAttribute.GetHorizontalFlip(),
+				         spriteAttribute.GetVerticalFlip(),
+				         spritePalette,
 				         enabledColors);
 			}
 			
@@ -237,7 +251,7 @@ void ClassicRenderer::DrawSprites(int enabledColors)
 
 void ClassicRenderer::DrawBackgroundMap(int enabledColors)
 {
-	for (int mapX = 0; mapX < TileMap::WIDTH; mapX++)
+	for (int mapX = 0; mapX < BackgroundTileNumberMap::WIDTH; mapX++)
 	{
 		DrawBackgroundMapTile(mapX, enabledColors);
 	}
@@ -245,7 +259,7 @@ void ClassicRenderer::DrawBackgroundMap(int enabledColors)
 
 void ClassicRenderer::DrawWindowMap(int enabledColors)
 {
-	if (_rc.lcdY >= _rc.windowY)
+	if ((*_ioPorts).GetLCDY() >= (*_ioPorts).GetWindowY())
 	{
 		for (int mapX = 0; mapX < Frame::WIDTH / Tile::WIDTH; mapX++)
 		{
@@ -263,47 +277,47 @@ void ClassicRenderer::DrawWindowMap(int enabledColors)
 
 void ClassicRenderer::DrawBackgroundMapTile(int mapX, int enabledColors)
 {
-	Vector2<int> position((mapX * Tile::WIDTH) - _rc.scrollX,
-	                      _rc.lcdY - ((_rc.lcdY + _rc.scrollY) % Tile::HEIGHT));
+	Vector2<int> position((mapX * Tile::WIDTH) - (*_ioPorts).GetScrollX(),
+	                      (*_ioPorts).GetLCDY() - (((*_ioPorts).GetLCDY() + (*_ioPorts).GetScrollY()) % Tile::HEIGHT));
 	
-	if (position.x < -8)
+	if (position.GetX() < -8)
 	{
-		position.x += TileMap::WIDTH * Tile::WIDTH; // IAW: 256, eeyup
+		position.SetX(position.GetX() + BackgroundTileNumberMap::WIDTH * Tile::WIDTH); // IAW: 256, eeyup
 	}
 	
-	position.x %= TileMap::WIDTH * Tile::WIDTH;
+	position.SetX(position.GetX() % BackgroundTileNumberMap::WIDTH * Tile::WIDTH);
 	
 	int mapElementX = mapX;
-	int mapElementY = (_rc.lcdY + _rc.scrollY) / Tile::HEIGHT;
+	int mapElementY = ((*_ioPorts).GetLCDY() + (*_ioPorts).GetScrollY()) / Tile::HEIGHT;
 	
 	if (mapElementY < 0)
 	{
-		mapElementY += TileMap::HEIGHT;
+		mapElementY += BackgroundTileNumberMap::HEIGHT;
 	}
 	else
 	{
-		mapElementY %= TileMap::HEIGHT;
+		mapElementY %= BackgroundTileNumberMap::HEIGHT;
 	}
 	
-	int backgroundMapElement = _rc.tileMaps
-		                       [_rc.backgroundTileMapDisplaySelect].data
-		                       [mapElementX][mapElementY];
+	int backgroundTileNumberIndex = mapElementY * BackgroundTileNumberMap::WIDTH + mapElementX;
+	int backgroundTileNumber = (*_videoRam).GetBackgroundTileNumber((*_ioPorts).GetBackgroundMapDisplaySelect(), backgroundTileNumberIndex);
 	
-	int tileVideoRamBankNumber = 0;
+	int tileIndex = 0;
 	
-	int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
-		             (((0x9000 - 0x8000) / 16) + GetSignedValue(backgroundMapElement)) :
-		             (((0x8000 - 0x8000) / 16) + backgroundMapElement);
-	
-	Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
-	
-	ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
+	if ((*_ioPorts).GetBackgroundAndWindowTileDataSelect())
+	{
+		tileIndex = (0x9000 - 0x8000) / Tile::DATA_SIZE + GetSignedValue(backgroundTileNumber);
+	}
+	else
+	{
+		tileIndex = (0x8000 - 0x8000) / Tile::DATA_SIZE + backgroundTileNumber;
+	}
 	
 	DrawTile(position,
-		     tile,
+		     (*_videoRam).GetTile(tileIndex),
 		     HorizontalFlip::NOT_FLIPPED,
 		     VerticalFlip::NOT_FLIPPED,
-		     colorPalette,
+		     (*_ioPorts).GetMonochromeBackgroundPalette(),
 		     enabledColors);
 }
 
@@ -316,34 +330,34 @@ void ClassicRenderer::DrawBackgroundMapTile(int mapX, int enabledColors)
 
 void ClassicRenderer::DrawWindowMapTile(int mapX, int enabledColors)
 {
-	Vector2<int> position((mapX * Tile::WIDTH) + _rc.windowX,
-	                      _rc.lcdY - ((_rc.lcdY - _rc.windowY) % Tile::HEIGHT));
+	Vector2<int> position((mapX * Tile::WIDTH) + (*_ioPorts).GetWindowX(),
+	                      (*_ioPorts).GetLCDY() - (((*_ioPorts).GetLCDY() - (*_ioPorts).GetWindowY()) % Tile::HEIGHT));
 	
 	int mapElementX = mapX;
-	int mapElementY = (_rc.lcdY - _rc.windowY) / Tile::HEIGHT;
+	int mapElementY = ((*_ioPorts).GetLCDY() - (*_ioPorts).GetWindowY()) / Tile::HEIGHT;
 	
 	if (mapElementX < Frame::WIDTH / Tile::WIDTH && mapElementY < Frame::HEIGHT / Tile::HEIGHT)
 	{
-		int windowMapElement = _rc.tileMaps
-								   [_rc.windowTileMapDisplaySelect].data
-								   [mapElementX][mapElementY];
+		int backgroundTileNumberIndex = mapElementY * BackgroundTileNumberMap::WIDTH + mapElementX;
+		int backgroundTileNumber = (*_videoRam).GetBackgroundTileNumber((*_ioPorts).GetWindowMapDisplaySelect(), backgroundTileNumberIndex);
 		
-		int tileVideoRamBankNumber = 0;
+		int tileIndex = 0;
 		
-		int tileNumber = (!_rc.backgroundAndWindowTileDataSelect) ?
-						 (((0x9000 - 0x8000) / 16) + GetSignedValue(windowMapElement)) :
-						 (((0x8000 - 0x8000) / 16) + windowMapElement);
-		
-		Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
-		
-		ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
+		if ((*_ioPorts).GetBackgroundAndWindowTileDataSelect())
+		{
+			tileIndex = (0x9000 - 0x8000) / Tile::DATA_SIZE + GetSignedValue(backgroundTileNumber);
+		}
+		else
+		{
+			tileIndex = (0x8000 - 0x8000) / Tile::DATA_SIZE + backgroundTileNumber;
+		}
 		
 		DrawTile(position,
-				 tile,
-				 HorizontalFlip::NOT_FLIPPED,
-				 VerticalFlip::NOT_FLIPPED,
-				 colorPalette,
-				 enabledColors);
+		         (*_videoRam).GetTile(tileIndex),
+		         HorizontalFlip::NOT_FLIPPED,
+		         VerticalFlip::NOT_FLIPPED,
+		         (*_ioPorts).GetMonochromeBackgroundPalette(),
+		         enabledColors);
 	}
 }
 
@@ -351,19 +365,21 @@ void ClassicRenderer::DrawTile(Vector2<int> position,
                                Tile tile,
                                HorizontalFlip horizontalFlip,
                                VerticalFlip verticalFlip,
-                               ColorPalette colorPalette,
+                               Array<Color<int>, 4> colorPalette,
                                int enabledColors)
 {
-	int tileY = _rc.lcdY - position.y;
+	int tileY = (*_ioPorts).GetLCDY() - position.GetY();
 	
 	if (tileY >= 0 && tileY < Tile::HEIGHT)
 	{
+		Array2<int, Tile::WIDTH, Tile::HEIGHT> &tileArray = tile.GetArray();
+		
 		for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
 		{
-			int scanlinePosition = position.x + tileX;
+			int scanlinePosition = position.GetX() + tileX;
 			
 			if (scanlinePosition >= 0 && scanlinePosition < Frame::WIDTH &&
-			    _rc.lcdY >= 0 && _rc.lcdY < Frame::HEIGHT)
+			    (*_ioPorts).GetLCDY() >= 0 && (*_ioPorts).GetLCDY() < Frame::HEIGHT)
 			{
 				int realTileX = tileX;
 				int realTileY = tileY;
@@ -378,14 +394,14 @@ void ClassicRenderer::DrawTile(Vector2<int> position,
 					realTileY = 7 - tileY;
 				}
 				
-				int colorNumber = tile.data[realTileX][realTileY];
+				int colorNumber = tileArray[realTileX][realTileY];
 				
 				if (((colorNumber == 0) && (enabledColors & COLOR_0)) ||
 				    ((colorNumber == 1) && (enabledColors & COLOR_1)) ||
 				    ((colorNumber == 2) && (enabledColors & COLOR_2)) ||
 				    ((colorNumber == 3) && (enabledColors & COLOR_3)))
 				{
-					_rc.rawFrame[_rc.lcdY * Frame::WIDTH + scanlinePosition] = colorPalette.colors[colorNumber];
+					_frameBuffer[scanlinePosition][(*_ioPorts).GetLCDY()] = colorPalette[colorNumber];
 				}
 			}
 		}

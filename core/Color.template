@@ -11,9 +11,55 @@ namespace james
 		class Color
 		{
 		public:
-			T red;
-			T green;
-			T blue;
+			Color()
+			{
+			}
+			
+			Color(T red, T green, T blue)
+			{
+				SetRed(red);
+				SetGreen(green);
+				SetBlue(blue);
+			}
+			
+			~Color()
+			{
+			}
+			
+			void SetRed(T red)
+			{
+				_red = red;
+			}
+			
+			void SetGreen(T green)
+			{
+				_green = green;
+			}
+			
+			void SetBlue(T blue)
+			{
+				_blue = blue;
+			}
+			
+			T &GetRed()
+			{
+				return _red;
+			}
+			
+			T &GetGreen()
+			{
+				return _green;
+			}
+			
+			T &GetBlue()
+			{
+				return _blue;
+			}
+		
+		private:
+			T _red;
+			T _green;
+			T _blue;
 		};
 	}
 }

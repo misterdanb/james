@@ -5,7 +5,7 @@ using namespace james::core;
 using namespace james::core::cartridges;
 
 MBC2::MBC2(DynamicArray<int> rom)
-	: Cartridge(rom), _ramEnabled(GBC_FALSE)
+	: Cartridge(rom), _ramEnabled(false)
 {
 }
 

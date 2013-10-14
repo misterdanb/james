@@ -16,16 +16,11 @@ namespace james
 			static const int WIDTH = 160;
 			static const int HEIGHT = 144;
 			
-			typedef Array2<Color<int>, WIDTH, HEIGHT> FrameArray2;
-		
 		public:
 			Frame();
-			Frame(Color<int>[]);
+			Frame(Array2<Color<int>, WIDTH, HEIGHT>);
 			~Frame();
-		
-		public:
-			FrameArray2 &data;
-		
+			
 		protected:
 			using PixelMap<WIDTH, HEIGHT>::_matrixElements;
 		};

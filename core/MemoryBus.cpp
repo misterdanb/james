@@ -1,5 +1,5 @@
 #include "MemoryBus.hpp"
 
-IMemoryBus::~IMemoryBus()
+MemoryBus::~MemoryBus()
 {
 }

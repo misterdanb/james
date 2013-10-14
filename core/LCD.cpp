@@ -3,6 +3,6 @@
 using namespace james;
 using namespace james::core;
 
-ILCD::~ILCD()
+LCD::~LCD()
 {
 }

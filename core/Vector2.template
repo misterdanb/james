@@ -11,20 +11,40 @@ namespace james
 		class Vector2 : public Vector<T, 2>
 		{
 		public:
-			Vector2(T newX, T newY)
-				: Vector<T, 2>(), x(_vectorElements[0]), y(_vectorElements[1])
+			Vector2(T x, T y)
+				: Vector<T, 2>(), _x(_vectorElements[0]), _y(_vectorElements[1])
 			{
-				x = newX;
-				y = newY;
+				_x = x;
+				_y = y;
 			}
 			
 			~Vector2()
 			{
 			}
+			
+			void SetX(T x)
+			{
+				_x = x;
+			}
+			
+			void SetY(T y)
+			{
+				_y = y;
+			}
+			
+			T &GetX()
+			{
+				return _x;
+			}
+			
+			T &GetY()
+			{
+				return _y;
+			}
 		
-		public:
-			T &x;
-			T &y;
+		private:
+			T &_x;
+			T &_y;
 		
 		protected:
 			using Vector<T, 2>::_vectorElements;

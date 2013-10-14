@@ -54,6 +54,11 @@ Header Cartridge::GetHeader()
 	return _header;
 }
 
+std::string Cartridge::Info()
+{
+	return std::string("");
+}
+
 Cartridge *Cartridge::Create(DynamicArray<int> rom)
 {
 	CartridgeType cartridgeType = CartridgeType(rom[Header::CARTRIDGE_TYPE_ADDRESS]);

@@ -3,6 +3,8 @@
 
 #include "James.hpp"
 #include "Renderer.hpp"
+#include "SpriteSize.hpp"
+#include "PixelMap.template"
 
 using namespace james;
 using namespace james::core;
@@ -14,15 +16,16 @@ namespace james
 		class ClassicRenderer : public Renderer
 		{
 		public:
-			ClassicRenderer(RenderContext &);
+			ClassicRenderer();
 			~ClassicRenderer();
 			
 			void RenderOAMSearch();
 			void RenderTransferData();
-			void RenderHorizontalBlank();
-			void RenderVerticalBlank();
+			void RenderHBlank();
+			void RenderVBlank();
 			
-			Renderer::RenderedTileMap GetRenderedTileMap(int);
+			Frame GetFrame();
+			PixelMap<Renderer::RENDERED_BACKGROUND_WIDTH, Renderer::RENDERED_BACKGROUND_HEIGHT> GetRenderedBackground(int);
 		
 		private:
 			void DrawSprites(int, SpriteToBackgroundPriority);
@@ -31,7 +34,11 @@ namespace james
 			void DrawWindowMap(int);
 			void DrawBackgroundMapTile(int, int);
 			void DrawWindowMapTile(int, int);
-			void DrawTile(Vector2<int>, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
+			void DrawTile(Vector2<int>, Tile, HorizontalFlip, VerticalFlip, Array<Color<int>, 4>, int);
+			
+			bool _vBlankInterruptAlreadyRequested;
+			
+			Array2<Color<int>, Frame::WIDTH, Frame::HEIGHT> _frameBuffer;
 		};
 	}
 }

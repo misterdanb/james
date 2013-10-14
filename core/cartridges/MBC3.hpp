@@ -23,7 +23,7 @@ namespace james
 				void WriteByte(int, int);
 			
 			private:
-				int _ramRtcEnabled;
+				bool _ramRtcEnabled;
 				int _ramRtcMode;
 				Array<int, 5> _rtc;
 			};

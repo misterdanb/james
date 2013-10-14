@@ -72,9 +72,9 @@ void Processor::Deserialize(std::istream &is)
 	_state.halted = bool(inState[13]);
 }
 
-void Processor::SetMemoryBus(IMemoryBus *bus)
+void Processor::SetMemoryBus(MemoryBus &bus)
 {
-	_bus = bus;
+	_bus = &bus;
 }
 
 void Processor::Step()
@@ -674,23 +674,23 @@ void Processor::ExecuteInterrupt()
 {
 	if (_state.interruptsEnabled || _state.halted)
 	{
-		int interruptsToBePerformed = _bus->ReadByte(INTERRUPT_ENABLE_ADDRESS) &
-		                              _bus->ReadByte(INTERRUPT_REQUEST_ADDRESS);
+		int interruptsToBePerformed = _bus->ReadByte(InterruptHandler::INTERRUPT_ENABLE_ADDRESS) &
+		                              _bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS);
 		
-		if (interruptsToBePerformed & (1 << VERTICAL_BLANK_INTERRUPT_BIT_NUMBER))
+		if (interruptsToBePerformed & (1 << InterruptHandler::VBLANK_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
 			_bus->WriteByte(_state.sp, GetLow(_state.pc));
 			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
-			_state.pc = VERTICAL_BLANK_INTERRUPT_VECTOR;
+			_state.pc = InterruptHandler::VBLANK_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         VERTICAL_BLANK_INTERRUPT_BIT_NUMBER,
+			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			                                         InterruptHandler::VBLANK_INTERRUPT_BIT_NUMBER,
 			                                         false);
 			
-			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -700,20 +700,20 @@ void Processor::ExecuteInterrupt()
 			
 			return;
 		}
-		else if (interruptsToBePerformed & (1 << LCD_STATUS_INTERRUPT_BIT_NUMBER))
+		else if (interruptsToBePerformed & (1 << InterruptHandler::LCD_STATUS_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
 			_bus->WriteByte(_state.sp, GetLow(_state.pc));
 			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
-			_state.pc = LCD_STATUS_INTERRUPT_VECTOR;
+			_state.pc = InterruptHandler::LCD_STATUS_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                                        LCD_STATUS_INTERRUPT_BIT_NUMBER,
+			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			                                                        InterruptHandler::LCD_STATUS_INTERRUPT_BIT_NUMBER,
 			                                                        false);
 			
-			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -723,20 +723,20 @@ void Processor::ExecuteInterrupt()
 			
 			return;
 		}
-		else if (interruptsToBePerformed & (1 << TIMER_INTERRUPT_BIT_NUMBER))
+		else if (interruptsToBePerformed & (1 << InterruptHandler::TIMER_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
 			_bus->WriteByte(_state.sp, GetLow(_state.pc));
 			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
-			_state.pc = TIMER_INTERRUPT_VECTOR;
+			_state.pc = InterruptHandler::TIMER_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                                        TIMER_INTERRUPT_BIT_NUMBER,
+			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			                                                        InterruptHandler::TIMER_INTERRUPT_BIT_NUMBER,
 			                                                        false);
 			
-			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -746,20 +746,20 @@ void Processor::ExecuteInterrupt()
 			
 			return;
 		}
-		else if (interruptsToBePerformed & (1 << SERIAL_INTERRUPT_BIT_NUMBER))
+		else if (interruptsToBePerformed & (1 << InterruptHandler::SERIAL_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
 			_bus->WriteByte(_state.sp, GetLow(_state.pc));
 			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
-			_state.pc = SERIAL_INTERRUPT_VECTOR;
+			_state.pc = InterruptHandler::SERIAL_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         SERIAL_INTERRUPT_BIT_NUMBER,
+			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			                                         InterruptHandler::SERIAL_INTERRUPT_BIT_NUMBER,
 			                                         false);
 			
-			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -767,20 +767,20 @@ void Processor::ExecuteInterrupt()
 			
 			_state.ticks += 16;
 		}
-		else if (interruptsToBePerformed & (1 << JOYPAD_INTERRUPT_BIT_NUMBER))
+		else if (interruptsToBePerformed & (1 << InterruptHandler::JOYPAD_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
 			_bus->WriteByte(_state.sp, GetLow(_state.pc));
 			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
-			_state.pc = JOYPAD_INTERRUPT_VECTOR;
+			_state.pc = InterruptHandler::JOYPAD_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-			                                         JOYPAD_INTERRUPT_BIT_NUMBER,
+			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			                                         InterruptHandler::JOYPAD_INTERRUPT_BIT_NUMBER,
 			                                         false);
 			
-			_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -840,51 +840,6 @@ void Processor::PowerUp()
 	_bus->WriteByte(0xFF4A, 0x00); // WY
 	_bus->WriteByte(0xFF4B, 0x00); // WX
 	_bus->WriteByte(0xFFFF, 0x00); // IE
-}
-
-void Processor::SignalVBlankInterrupt()
-{
-	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        VERTICAL_BLANK_INTERRUPT_BIT_NUMBER,
-	                                                        true);
-	
-	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
-}
-
-void Processor::SignalLCDStatusInterrupt()
-{
-	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        LCD_STATUS_INTERRUPT_BIT_NUMBER,
-	                                                        true);
-	
-	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
-}
-
-void Processor::SignalTimerInterrupt()
-{
-	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        TIMER_INTERRUPT_BIT_NUMBER,
-	                                                        true);
-	
-	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
-}
-
-void Processor::SignalSerialInterrupt()
-{
-	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        SERIAL_INTERRUPT_BIT_NUMBER,
-	                                                        true);
-	
-	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
-}
-
-void Processor::SignalJoypadInterrupt()
-{
-	int newInterruptRequestRegister = SetBit(_bus->ReadByte(INTERRUPT_REQUEST_ADDRESS),
-	                                                        JOYPAD_INTERRUPT_BIT_NUMBER,
-	                                                        true);
-	
-	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
 void Processor::StartRecording(std::string path)

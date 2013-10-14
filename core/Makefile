@@ -23,14 +23,11 @@ $(TARGET): $(OBJECTS)
 $(TARGET)-debug: $(OBJECTS)
 	$(CC) $(FLAGS) $(LDFLAGS) $(DEBUGFLAGS) -o $(TARGET) $(OBJECTS)
 
-RenderContext.o: RenderContext.cpp
-	$(CC) $(FLAGS) $(CFLAGS) RenderContext.cpp -o RenderContext.o
-	
 Frontend.o: Frontend.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Frontend.cpp -o Frontend.o
 
-GameboyColor.o: GameboyColor.cpp
-	$(CC) $(FLAGS) $(CFLAGS) GameboyColor.cpp -o GameboyColor.o
+Emulator.o: Emulator.cpp
+	$(CC) $(FLAGS) $(CFLAGS) Emulator.cpp -o Emulator.o
 
 ClassicRenderer.o: ClassicRenderer.cpp
 	$(CC) $(FLAGS) $(CFLAGS) ClassicRenderer.cpp -o ClassicRenderer.o
@@ -38,14 +35,47 @@ ClassicRenderer.o: ClassicRenderer.cpp
 Renderer.o: Renderer.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Renderer.cpp -o Renderer.o
 
+Memory.o: Memory.cpp
+	$(CC) $(FLAGS) $(CFLAGS) Memory.cpp -o Memory.o
+
+HighRam.o: HighRam.cpp
+	$(CC) $(FLAGS) $(CFLAGS) HighRam.cpp -o HighRam.o
+
+IOPorts.o: IOPorts.cpp
+	$(CC) $(FLAGS) $(CFLAGS) IOPorts.cpp -o IOPorts.o
+
+SpriteAttributeRam.o: SpriteAttributeRam.cpp
+	$(CC) $(FLAGS) $(CFLAGS) SpriteAttributeRam.cpp -o SpriteAttributeRam.o
+
+WorkRam.o: WorkRam.cpp
+	$(CC) $(FLAGS) $(CFLAGS) WorkRam.cpp -o WorkRam.o
+
+VideoRam.o: VideoRam.cpp
+	$(CC) $(FLAGS) $(CFLAGS) VideoRam.cpp -o VideoRam.o
+
+MemoryBlock.o: MemoryBlock.cpp
+	$(CC) $(FLAGS) $(CFLAGS) MemoryBlock.cpp -o MemoryBlock.o
+
 Joypad.o: Joypad.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Joypad.cpp -o Joypad.o
+
+SerialPort.o: SerialPort.cpp
+	$(CC) $(FLAGS) $(CFLAGS) SerialPort.cpp -o SerialPort.o
 
 LCD.o: LCD.cpp
 	$(CC) $(FLAGS) $(CFLAGS) LCD.cpp -o LCD.o
 
 Frame.o: Frame.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Frame.cpp -o Frame.o
+
+BackgroundTileNumberMap.o: BackgroundTileNumberMap.cpp
+	$(CC) $(FLAGS) $(CFLAGS) BackgroundTileNumberMap.cpp -o BackgroundTileNumberMap.o
+
+BackgroundAttributeMap.o: BackgroundAttributeMap.cpp
+	$(CC) $(FLAGS) $(CFLAGS) BackgroundAttributeMap.cpp -o BackgroundAttributeMap.o
+
+BackgroundAttribute.o: BackgroundAttribute.cpp
+	$(CC) $(FLAGS) $(CFLAGS) BackgroundAttribute.cpp -o BackgroundAttribute.o
 
 Tile.o: Tile.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Tile.cpp -o Tile.o

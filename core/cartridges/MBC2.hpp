@@ -23,7 +23,7 @@ namespace james
 				void WriteByte(int, int);
 			
 			private:
-				int _ramEnabled;
+				bool _ramEnabled;
 			};
 		}
 	}

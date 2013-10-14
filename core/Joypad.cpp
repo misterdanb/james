@@ -3,6 +3,6 @@
 using namespace james;
 using namespace james::core;
 
-IJoypad::~IJoypad()
+Joypad::~Joypad()
 {
 }

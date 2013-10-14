@@ -10,10 +10,19 @@ namespace james
 {
 	namespace core
 	{
-		class IMemoryBus
+		/*
+		 * MemoryBus is an interface to all classes that represent an
+		 * addressable part of the memory.
+		 */
+		
+		class MemoryBus
 		{
 		public:
-			virtual ~IMemoryBus();
+			virtual ~MemoryBus();
+			
+			/*int &operator[](int)
+			{
+			}*/
 			
 			virtual int ReadByte(int) = GBC_NULL;
 			virtual void WriteByte(int, int) = GBC_NULL;

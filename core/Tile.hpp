@@ -16,14 +16,18 @@ namespace james
 			static const int WIDTH = 8;
 			static const int HEIGHT = 8;
 			
+			static const int DATA_SIZE = 16;
+			
 			typedef Array2<int, WIDTH, HEIGHT> TileArray2;
 		
 		public:
 			Tile();
+			Tile(Array<int, DATA_SIZE>);
 			~Tile();
-		
-		public:
-			TileArray2 &data;
+			
+			void SetData(Array<int, DATA_SIZE>);
+			
+			Array<int, DATA_SIZE> GetData();
 		
 		protected:
 			using ByteMap<WIDTH, HEIGHT>::_matrixElements;

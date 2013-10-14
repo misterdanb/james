@@ -22,20 +22,24 @@ namespace james
 		public:
 			GameboyClassicSpecificRenderContext();
 			~GameboyClassicSpecificRenderContext();
+			
 			ColorPalette monochromeBackgroundPalette;
 			ColorPalette monochromeSpritePalette0;
 			ColorPalette monochromeSpritePalette1;
+			
 		private:
 			GameboyClassicSpecificRenderContext(GameboyClassicSpecificRenderContext &) = delete;
-			GameboyClassicSpecificRenderContext& operator=(GameboyClassicSpecificRenderContext &) = delete;
+			GameboyClassicSpecificRenderContext &operator=(GameboyClassicSpecificRenderContext &) = delete;
 		};
+		
 		class GameboyColorSpecificRenderContext
 		{
 		public:
 			GameboyColorSpecificRenderContext();
 			~GameboyColorSpecificRenderContext();
+			
 			TileMapAttribute tileMapAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
-			Queue<Pair<int, int>>changedTileMapAttributes;
+			Queue<Pair<int, int>> changedTileMapAttributes;
 			ColorPalette colorBackgroundPalettes[8];
 			ColorPalette colorSpritePalettes[8];
 			int dmaTransferActive;
@@ -43,15 +47,18 @@ namespace james
 			int dmaTransferDestinationAddress;
 			int dmaTransferLength;
 			int currentDMATransferOffset;
+			
 		private:
-                        GameboyColorSpecificRenderContext(GameboyColorSpecificRenderContext &) = delete;
-			GameboyColorSpecificRenderContext& operator=(GameboyColorSpecificRenderContext &) = delete;
+			GameboyColorSpecificRenderContext(GameboyColorSpecificRenderContext &) = delete;
+			GameboyColorSpecificRenderContext &operator=(GameboyColorSpecificRenderContext &) = delete;
 		};
+		
 		class RenderContext
 		{
 		public:
 			RenderContext();
 			~RenderContext();
+			
 			// memory dimensions
 			static const int VIDEO_RAM_BANKS = 2;
 			static const int VIDEO_RAM_BANK_SIZE = 0x2000;
@@ -64,7 +71,7 @@ namespace james
 			static const int IO_PORTS_SIZE = 0x80;
 			
 			static const int HIGH_RAM_SIZE = 0x80;
-		
+			
 		public:
 			// ram
 			Array2<int, VIDEO_RAM_BANKS, VIDEO_RAM_BANK_SIZE> videoRam;
@@ -137,10 +144,10 @@ namespace james
 			
 			GameboyClassicSpecificRenderContext gameboyClassicSpecific;
 			GameboyColorSpecificRenderContext gameboyColorSpecific;
-
+			
 		private:
 			RenderContext(RenderContext &) = delete;
-			RenderContext& operator=(RenderContext &) = delete;
+			RenderContext &operator=(RenderContext &) = delete;
 
 		};
 	}

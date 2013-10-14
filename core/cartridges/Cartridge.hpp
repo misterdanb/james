@@ -15,7 +15,7 @@ namespace james
 	{
 		namespace cartridges
 		{
-			class Cartridge : public IMemoryBus, public Serializable
+			class Cartridge : public MemoryBus, public Serializable
 			{
 			public:
 				Cartridge(DynamicArray<int> &);
@@ -28,6 +28,8 @@ namespace james
 				
 				virtual int ReadByte(int) = GBC_NULL;
 				virtual void WriteByte(int, int) = GBC_NULL;
+				
+				std::string Info();
 				
 				static Cartridge *Create(DynamicArray<int>);
 				

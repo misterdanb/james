@@ -8,16 +8,21 @@ namespace james
 {
 	namespace core
 	{
-		class ILCD
+		/*
+		 * LCD is an interface to the physical presentation unit to
+		 * show the rendered frames.
+		 */
+		
+		class LCD
 		{
 		public:
 			static const int LCD_WIDTH = Frame::WIDTH;
 			static const int LCD_HEIGHT = Frame::HEIGHT;
 		
 		public:
-			virtual ~ILCD();
+			virtual ~LCD();
 			
-			virtual void DrawFrame(Frame &) = GBC_NULL;
+			virtual void DrawFrame(Frame) = GBC_NULL;
 		};
 	}
 }

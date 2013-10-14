@@ -19,6 +19,19 @@ namespace james
 			virtual ~Vector()
 			{
 			}
+			
+			void SetArray(Array<T, size> array)
+			{
+				for (int i = 0; i < size; i++)
+				{
+					std::memcpy(&_vectorElements[i], &array[i], sizeof(T));
+				}
+			}
+			
+			Array<T, size> &GetArray()
+			{
+				return _vectorElements;
+			}
 		
 		protected:
 			using Matrix<T, 1, size>::_matrixElements;

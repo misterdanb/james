@@ -71,17 +71,13 @@ namespace james
 	using namespace std;
 	using namespace core;
 	
-	// consts
-	const int GBC_FALSE = 0;
-	const int GBC_TRUE = 1;
-	
 	// const expressions
-	constexpr int GetBit(int x, int n)
+	constexpr bool GetBit(int x, int n)
 	{
 		return (x >> n) & 0x01;
 	}
 	
-	constexpr int SetBit(int x, int n, int value)
+	constexpr int SetBit(int x, int n, bool value)
 	{
 		return (x & (~(0x01 << n))) | (value ? (0x01 << n) : 0x00);
 	}
