@@ -45,11 +45,11 @@ namespace james
 			
 			int GetBackgroundTileNumber(int, int);
 			BackgroundTileNumberMap GetBackgroundTileNumberMap(int);
-			BackgroundAttribute GetBackgroundAttribute(int);
+			BackgroundAttribute GetBackgroundAttribute(int, int);
 			BackgroundAttributeMap GetBackgroundAttributeMap(int);
 		
 		private:
-			IOPorts &_ioPorts;
+			IOPorts *_ioPorts;
 		};
 	}
 }

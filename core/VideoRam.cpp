@@ -3,7 +3,7 @@
 using namespace james;
 using namespace james::core;
 
-VideoRam::VideoRam(IOPorts &ioPorts)
+VideoRam::VideoRam()
 	: MemoryBlock(VIDEO_RAM_BANKS, VIDEO_RAM_BANK_SIZE)
 {
 }
@@ -17,7 +17,7 @@ int VideoRam::ReadByte(int address)
 	return ReadByteFromBank((*_ioPorts).GetSelectedVideoRamBank(), address - VIDEO_RAM_OFFSET);
 }
 
-int VideoRam::WriteByte(int address, int value)
+void VideoRam::WriteByte(int address, int value)
 {
 	WriteByteToBank((*_ioPorts).GetSelectedVideoRamBank(), address - VIDEO_RAM_OFFSET, value);
 }
@@ -27,13 +27,13 @@ void VideoRam::SetIOPorts(IOPorts &ioPorts)
 	_ioPorts = &ioPorts;
 }
 
-void VideoRam::SetTile(int bank, int tileIndex, Tile tile)
+void VideoRam::SetTile(int tileIndex, Tile tile)
 {
 	Array<int, Tile::DATA_SIZE> tileData = tile.GetData();
 	
 	for (int address = tileIndex * Tile::DATA_SIZE, i = 0; i < Tile::DATA_SIZE; address++, i++)
 	{
-		WriteByteToBank(bank, address, tileData[i]);
+		WriteByteToBank(0, address, tileData[i]);
 	}
 }
 
@@ -98,7 +98,7 @@ BackgroundTileNumberMap VideoRam::GetBackgroundTileNumberMap(int backgroundIndex
 		backgroundTileNumberMapData[i] = ReadByteFromBank(0, address);
 	}
 	
-	return BackgroundTileNumberMap(tileMapNumberMapData();
+	return BackgroundTileNumberMap(backgroundTileNumberMapData);
 }
 
 BackgroundAttribute VideoRam::GetBackgroundAttribute(int backgroundIndex, int backgroundAttributeIndex)

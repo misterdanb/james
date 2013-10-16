@@ -5,15 +5,14 @@ IOPorts::IOPorts()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		for (int j = 0; j < 3; j++)
-		{
-			_monochromePalette[i][j] = i * 0x08;
-		}
+		_monochromePalette[i].SetRed(i * 0x08);
+		_monochromePalette[i].SetGreen(i * 0x08);
+		_monochromePalette[i].SetBlue(i * 0x08);
 	}
 	
 	std::copy(_monochromePalette.begin(),
 	          _monochromePalette.end(),
-	          _rcClassic.monochromeBackgroundPalette.colors.begin());
+	          _monochromeBackgroundPalette.begin());
 	
 	for (int i = 0; i < 2; i++)
 	{
@@ -48,10 +47,10 @@ int IOPorts::ReadByte(int address)
 		//case 0xFF00: return 0xFF;
 		case 0xFF00:
 			// joypad
-			return ((!(_directionKeysSelected ? _joypad.GetRight() : _joypad.GetButtonA())) ? 0x01 : 0) |
-			       ((!(_directionKeysSelected ? _joypad.GetLeft() : _joypad.GetButtonB())) ? 0x02 : 0) |
-			       ((!(_directionKeysSelected ? _joypad.GetUp() : _joypad.GetSelect())) ? 0x04 : 0) |
-			       ((!(_directionKeysSelected ? _joypad.GetDown() : _joypad.GetStart())) ? 0x08 : 0) |
+			return ((!(_directionKeysSelected ? (*_joypad).GetRight() : (*_joypad).GetButtonA())) ? 0x01 : 0) |
+			       ((!(_directionKeysSelected ? (*_joypad).GetLeft() : (*_joypad).GetButtonB())) ? 0x02 : 0) |
+			       ((!(_directionKeysSelected ? (*_joypad).GetUp() : (*_joypad).GetSelect())) ? 0x04 : 0) |
+			       ((!(_directionKeysSelected ? (*_joypad).GetDown() : (*_joypad).GetStart())) ? 0x08 : 0) |
 			       ((!_directionKeysSelected) ? 0x10 : 0) |
 			       ((!_buttonKeysSelected) ? 0x20 : 0);
 			
@@ -224,6 +223,8 @@ void IOPorts::WriteByte(int address, int value)
 			// dma to oam transfer
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
 			
+			_oamDMATransferAddress = value << 8;
+			
 			ExecuteOAMDMATransfer();
 			
 			break;
@@ -322,12 +323,17 @@ void IOPorts::WriteByte(int address, int value)
 			// new dma length/mode/start
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
 			
-			if (GetBit(value, 7) && !_rcColor.dmaTransferActive)
+			// TODO: something must be wrong here, check this later again...
+			if (GetBit(value, 7) && !_hdmaTransferActive)
 			{
 				_hdmaMode = HDMAMode::HBLANK_HDMA;
 				
-				_hdmaTransferSourceAddress = JoinBytes(_rc.ioPorts[0xFF51 - 0xFF00], _rc.ioPorts[0xFF52 - 0xFF00]) & 0xFFF0;
-				_hdmaTransferDestinationAddress = (JoinBytes(_rc.ioPorts[0xFF53 - 0xFF00], _rc.ioPorts[0xFF54 - 0xFF00]) & 0x1FF0) | 9x8000;
+				_hdmaTransferSourceAddress = JoinBytes(ReadByteFromBank(0, 0xFF51 - IO_PORTS_OFFSET),
+				                                       ReadByteFromBank(0, 0xFF52 - IO_PORTS_OFFSET)) & 0xFFF0;
+				
+				_hdmaTransferDestinationAddress = (JoinBytes(ReadByteFromBank(0, 0xFF53 - IO_PORTS_OFFSET),
+				                                             ReadByteFromBank(0, 0xFF54 - IO_PORTS_OFFSET)) & 0x1FF0) | 0x8000;
+				
 				_hdmaTransferLength = ((value & 0x7F) + 1) * 0x10;
 				_hBlankHDMATransferCurrentOffset = 0x0000;
 				
@@ -376,28 +382,32 @@ void IOPorts::WriteByte(int address, int value)
 			// RECHECK THIS!!!
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
 			
-			if ((((ReadByteFromBank(0xFF68 - IO_PORTS_OFFSET) & 0x3F) % 8) % 2) == 0)
+			if ((((ReadByteFromBank(0, 0xFF68 - IO_PORTS_OFFSET) & 0x3F) % 8) % 2) == 0)
 			{
-				int palette = (ReadByteFromBank([0xFF68 - IO_PORTS_OFFSET) & 0x3F) / 8;
-				int color = ((ReadByteFromBank(0xFF68 - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
+				int palette = (ReadByteFromBank(0, 0xFF68 - IO_PORTS_OFFSET) & 0x3F) / 8;
+				int color = ((ReadByteFromBank(0, 0xFF68 - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
 				
-				_colorBackgroundPalettes[palette][color].red = value & 31;
-				_colorBackgroundPalettes[palette][color].green &= 24;
-				_colorBackgroundPalettes[palette][color].green |= (value >> 5) & 7;
+				int newRed = value & 0x1F;
+				int newGreen = (_colorBackgroundPalettes[palette][color].GetGreen() & 0x18) | ((value >> 5) & 0x07);
+				
+				_colorBackgroundPalettes[palette][color].SetRed(newRed);
+				_colorBackgroundPalettes[palette][color].SetGreen(newGreen);
 			}
 			else
 			{
-				int palette = (ReadByteFromBank(0xFF68 - IO_PORTS_OFFSET) & 0x3F) / 8;
-				int color = ((ReadByteFromBank(0xFF68 - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
+				int palette = (ReadByteFromBank(0, 0xFF68 - IO_PORTS_OFFSET) & 0x3F) / 8;
+				int color = ((ReadByteFromBank(0, 0xFF68 - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
 				
-				_colorBackgroundPalettes[palette][color].green &= 7;
-				_colorBackgroundPalettes[palette][color].green |= (value << 3) & 24;
-				_colorBackgroundPalettes[palette][color].blue = (value >> 2) & 31;
+				int newGreen = (_colorBackgroundPalettes[palette][color].GetGreen() & 0x07) | ((value << 3) & 0x18);
+				int newBlue = (value >> 2) & 0x1F;
+				
+				_colorBackgroundPalettes[palette][color].SetGreen(newGreen);
+				_colorBackgroundPalettes[palette][color].SetBlue(newBlue);
 			}
 			
 			if (_colorBackgroundPaletteIndexAutoIncrement)
 			{
-				WriteByteToBank(0, 0xFF68 - IO_PORTS_OFFSET, (ReadByteFromBank(0xFF68 - IO_PORTS_OFFSET) + 1) & 0xFF);
+				WriteByteToBank(0, 0xFF68 - IO_PORTS_OFFSET, (ReadByteFromBank(0, 0xFF68 - IO_PORTS_OFFSET) + 1) & 0xFF);
 			}
 			
 			break;
@@ -422,23 +432,27 @@ void IOPorts::WriteByte(int address, int value)
 			// RECHECK THIS!!!
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
 			
-			if ((((ReadByteFromBank(0xFF6A - IO_PORTS_OFFSET) & 0x3F) % 8) % 2) == 0)
+			if ((((ReadByteFromBank(0, 0xFF6A - IO_PORTS_OFFSET) & 0x3F) % 8) % 2) == 0)
 			{
-				int palette = (ReadByteFromBank(0xFF6A - IO_PORTS_OFFSET) & 0x3F) / 8;
-				int color = ((ReadByteFromBank(0xFF6A - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
+				int palette = (ReadByteFromBank(0, 0xFF6A - IO_PORTS_OFFSET) & 0x3F) / 8;
+				int color = ((ReadByteFromBank(0, 0xFF6A - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
 				
-				_colorSpritePalettes[palette][color].red = value & 0x1F;
-				_colorSpritePalettes[palette][color].green &= 0x18;
-				_colorSpritePalettes[palette][color].green |= (value >> 5) & 0x07;
+				int newRed = value & 0x1F;
+				int newGreen = (_colorBackgroundPalettes[palette][color].GetGreen() & 0x18) | ((value >> 5) & 0x07);
+				
+				_colorSpritePalettes[palette][color].SetRed(newRed);
+				_colorSpritePalettes[palette][color].SetGreen(newGreen);
 			}
 			else
 			{
-				int palette = (ReadByteFromBank(0xFF6A - IO_PORTS_OFFSET) & 0x3F) / 8;
-				int color = ((ReadByteFromBank(0xFF6A - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
+				int palette = (ReadByteFromBank(0, 0xFF6A - IO_PORTS_OFFSET) & 0x3F) / 8;
+				int color = ((ReadByteFromBank(0, 0xFF6A - IO_PORTS_OFFSET) & 0x3F) % 8) / 2;
 				
-				_colorSpritePalettes[palette][color].green &= 0x07;
-				_colorSpritePalettes[palette][color].green |= (value << 3) & 0x18;
-				_colorSpritePalettes[palette][color].blue = (value >> 2) & 0x1Fy;
+				int newGreen = (_colorBackgroundPalettes[palette][color].GetGreen() & 0x07) | ((value << 3) & 0x18);
+				int newBlue = (value >> 2) & 0x1F;
+				
+				_colorBackgroundPalettes[palette][color].SetGreen(newGreen);
+				_colorBackgroundPalettes[palette][color].SetBlue(newBlue);
 			}
 			
 		case 0xFF70:
@@ -481,7 +495,7 @@ void IOPorts::ExecuteOAMDMATransfer()
 {
 	for (int i = 0; i < 0x0100; i++)
 	{
-		_bus.WriteByte(0xFE00 + i, _bus.ReadByte((_ioPorts.GetOAMDMATransferAddress() << 8) + i));
+		(*_bus).WriteByte(SpriteAttributeRam::SPRITE_ATTRIBUTE_RAM_OFFSET + i, (*_bus).ReadByte(_oamDMATransferAddress + i));
 	}
 }
 
@@ -491,7 +505,7 @@ void IOPorts::ExecuteHDMATransfer()
 	{
 		for (int offset = 0; offset < _hdmaTransferLength; offset++)
 		{
-			WriteByte(_hdmaTransferDestinationAddress + i, _bus.ReadByte(_hdmaransferSourceAddress + i));
+			WriteByte(_hdmaTransferDestinationAddress + offset, (*_bus).ReadByte(_hdmaTransferSourceAddress + offset));
 		}
 		
 		// emulate bit 7 for reading, so the dma transfer "takes some time"
@@ -503,7 +517,7 @@ void IOPorts::ExecuteHDMATransfer()
 	{
 		for (int offset = _hBlankHDMATransferCurrentOffset; offset < _hBlankHDMATransferCurrentOffset + 0x10; offset++)
 		{
-			_bus.WriteByte(_hdmaTransferDestinationAddress + offset, _bus.ReadByte(_hdmaTransferSourceAddress + offset));
+			(*_bus).WriteByte(_hdmaTransferDestinationAddress + offset, (*_bus).ReadByte(_hdmaTransferSourceAddress + offset));
 		}
 		
 		_hBlankHDMATransferCurrentOffset += 0x10;
@@ -534,7 +548,7 @@ void IOPorts::SetHDMATransferActive(bool hdmaTransferActive)
 {
 	_hdmaTransferActive = hdmaTransferActive;
 	
-	WriteByteToBank(0, 0xFF55 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0xFF55 - IO_PORTS_OFFSET, 7, !hdmaTransferActive));
+	WriteByteToBank(0, 0xFF55 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF55 - IO_PORTS_OFFSET), 7, !_hdmaTransferActive));
 }
 
 void IOPorts::SetHDMAMode(HDMAMode hdmaMode)
@@ -572,7 +586,7 @@ void IOPorts::SetHBlankHDMATransferCurrentOffset(int hBlankHDMATransferCurrentOf
 
 void IOPorts::SetSelectedWorkRamBank(bool selectedWorkRamBank)
 {
-	_selectedWorkRamBank = selectedWorkRamBank
+	_selectedWorkRamBank = selectedWorkRamBank;
 }
 
 void IOPorts::SetSelectedVideoRamBank(bool selectedVideoRamBank)
@@ -584,7 +598,7 @@ void IOPorts::SetDirectionKeysSelected(bool directionKeysSelected)
 {
 	_directionKeysSelected = directionKeysSelected;
 	
-	WriteByteToBank(0, 0xFF00 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF00 - IO_PORTS_OFFSET), 4, directionkeysSelected));
+	WriteByteToBank(0, 0xFF00 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF00 - IO_PORTS_OFFSET), 4, directionKeysSelected));
 }
 
 void IOPorts::SetButtonKeysSelected(bool buttonKeysSelected)
@@ -598,12 +612,12 @@ void IOPorts::SetLCDDisplayEnabled(bool lcdDisplayEnabled)
 {
 	_lcdDisplayEnabled = lcdDisplayEnabled;
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 7, buttonKeysSelected));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 7, lcdDisplayEnabled));
 }
 
 void IOPorts::SetWindowMapDisplaySelect(bool windowMapDisplaySelect)
 {
-	_windowTileMapDisplaySelect = windowMapDisplaySelect;
+	_windowMapDisplaySelect = windowMapDisplaySelect;
 	
 	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 6, windowMapDisplaySelect));
 }
@@ -654,7 +668,7 @@ void IOPorts::SetLCDMode(LCDMode lcdMode)
 {
 	_lcdMode = lcdMode;
 	
-	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, (ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET) & 0xFC) | GetEnumValue(spriteSize) & 0x03);
+	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, (ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET) & 0xFC) | GetEnumValue(lcdMode) & 0x03);
 }
 
 void IOPorts::SetCoincidenceFlag(bool coincidenceFlag)
@@ -699,7 +713,7 @@ void IOPorts::SetScrollX(int scrollX)
 	WriteByteToBank(0, 0xFF43 - IO_PORTS_OFFSET, scrollX);
 }
 
-void IOPorts::SetScrollY(int scrollY);
+void IOPorts::SetScrollY(int scrollY)
 {
 	_scrollY = scrollY;
 	
@@ -734,28 +748,28 @@ void IOPorts::SetWindowY(int windowY)
 	WriteByteToBank(0, 0xFF4A - IO_PORTS_OFFSET, windowY);
 }
 
-void SetDevider(int devider)
+void IOPorts::SetDivider(int divider)
 {
-	_devider = devider;
+	_divider = divider;
 	
-	WriteByteToBank(0, 0xFF04 - IO_PORTS_OFFSET, devider);
+	WriteByteToBank(0, 0xFF04 - IO_PORTS_OFFSET, divider);
 }
 
-void SetTimerCounter(int timerCounter)
+void IOPorts::SetTimerCounter(int timerCounter)
 {
 	_timerCounter = timerCounter;
 	
 	WriteByteToBank(0, 0xFF05 - IO_PORTS_OFFSET, timerCounter);
 }
 
-void SetTimerModulo(int timerModulo)
+void IOPorts::SetTimerModulo(int timerModulo)
 {
 	_timerModulo = timerModulo;
 	
 	WriteByteToBank(0, 0xFF06 - IO_PORTS_OFFSET, timerModulo);
 }
 
-void SetTimerClockFrequency(int timerClockFrequency)
+void IOPorts::SetTimerClockFrequency(int timerClockFrequency)
 {
 	_timerClockFrequency = timerClockFrequency;
 	
@@ -787,16 +801,16 @@ void SetTimerClockFrequency(int timerClockFrequency)
 	WriteByteToBank(0, 0xFF07 - IO_PORTS_OFFSET, (ReadByteFromBank(0, 0xFF07 - IO_PORTS_OFFSET) & 0xFC) | bitValue);
 }
 
-void SetTimerStopped(bool timerStopped)
+void IOPorts::SetTimerStopped(bool timerStopped)
 {
 	_timerStopped = timerStopped;
 	
-	WriteByteToBank(0, 0xFF07 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF07 - IO_PORTS_OFFSET), timerStopped));
+	WriteByteToBank(0, 0xFF07 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF07 - IO_PORTS_OFFSET), 2, timerStopped));
 }
 
 MemoryBus &IOPorts::GetMemoryBus()
 {
-	return (*_ioPorts);
+	return (*_bus);
 }
 
 Joypad &IOPorts::GetJoypad()
@@ -811,42 +825,42 @@ SerialPort &IOPorts::GetSerialPort()
 
 bool IOPorts::GetRightPressed()
 {
-	return _joypad->GetRight();
+	return (*_joypad).GetRight();
 }
 
 bool IOPorts::GetLeftPressed()
 {
-	return _joypad->GetLeft();
+	return (*_joypad).GetLeft();
 }
 
 bool IOPorts::GetUpPressed()
 {
-	return _joypad->GetUp();
+	return (*_joypad).GetUp();
 }
 
 bool IOPorts::GetDownPressed()
 {
-	return _joypad->GetDown();
+	return (*_joypad).GetDown();
 }
 
 bool IOPorts::GetButtonAPressed()
 {
-	return _joypad->GetButtonA();
+	return (*_joypad).GetButtonA();
 }
 
 bool IOPorts::GetButtonBPressed()
 {
-	return _joypad->GetButtonB();
+	return (*_joypad).GetButtonB();
 }
 
 bool IOPorts::GetSelectPressed()
 {
-	return _joypad->GetSelect();
+	return (*_joypad).GetSelect();
 }
 
 bool IOPorts::GetStartPressed()
 {
-	return _joypad->GetStart();
+	return (*_joypad).GetStart();
 }
 
 bool IOPorts::GetHDMATransferActive()
@@ -889,12 +903,12 @@ bool IOPorts::GetSelectedVideoRamBank()
 	return _selectedVideoRamBank;
 }
 
-int IOPorts::GetDirectionKeysSelected()
+bool IOPorts::GetDirectionKeysSelected()
 {
 	return _directionKeysSelected;
 }
 
-int IOPorts::GetButtonKeysSelected()
+bool IOPorts::GetButtonKeysSelected()
 {
 	return _buttonKeysSelected;
 }
@@ -921,7 +935,7 @@ bool IOPorts::GetBackgroundAndWindowTileDataSelect()
 
 bool IOPorts::GetBackgroundMapDisplaySelect()
 {
-	return _backgroundMapDisplaySelect
+	return _backgroundMapDisplaySelect;
 }
 
 SpriteSize IOPorts::GetSpriteSize()
@@ -999,7 +1013,7 @@ int IOPorts::GetWindowY()
 	return _windowY;
 }
 
-int IOPorts::GetDevider()
+int IOPorts::GetDivider()
 {
 	return _divider;
 }
@@ -1034,7 +1048,7 @@ Array<Color<int>, 4> &IOPorts::GetMonochromeSpritePalette(int paletteNumber)
 	return _monochromeSpritePalettes[paletteNumber];
 }
 
-Array<Color<int>, 4> &IOPorts::GetColorBackgroundPalettes(int paletteNumber)
+Array<Color<int>, 4> &IOPorts::GetColorBackgroundPalette(int paletteNumber)
 {
 	return _colorBackgroundPalettes[paletteNumber];
 }

@@ -8,24 +8,24 @@ GameWindow::GameWindow(int width, int height, std::string rom)
 	: sf::RenderWindow(sf::VideoMode(width, height), "James"),
 	  _rawFrame(),
 	  _frame(),
-	  _rightPressed(GBC_FALSE),
-	  _leftPressed(GBC_FALSE),
-	  _upPressed(GBC_FALSE),
-	  _downPressed(GBC_FALSE),
-	  _buttonAPressed(GBC_FALSE),
-	  _buttonBPressed(GBC_FALSE),
-	  _selectPressed(GBC_FALSE),
-	  _startPressed(GBC_FALSE)
+	  _rightPressed(false),
+	  _leftPressed(false),
+	  _upPressed(false),
+	  _downPressed(false),
+	  _buttonAPressed(false),
+	  _buttonBPressed(false),
+	  _selectPressed(false),
+	  _startPressed(false)
 #ifdef DEBUG
-	  ,_tileMap0WindowVisible(GBC_FALSE),
+	  /*,_tileMap0WindowVisible(GBC_FALSE),
 	  _tileMap1WindowVisible(GBC_FALSE),
 	  _tileMap0Window(0, GetDevice()),
-	  _tileMap1Window(1, GetDevice())
+	  _tileMap1Window(1, GetDevice())*/
 #endif
 {
 #ifdef DEBUG
-	_tileMap0Window.setVisible(GBC_FALSE);
-	_tileMap1Window.setVisible(GBC_FALSE);
+	/*_tileMap0Window.setVisible(GBC_FALSE);
+	_tileMap1Window.setVisible(GBC_FALSE);*/
 #endif
 	LoadRom(rom);
 	
@@ -60,12 +60,11 @@ void GameWindow::Render()
 			
 			close();
 		}
-		
 		else if (event.type == sf::Event::KeyPressed)
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
 			{
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+				/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 				{
 					Reset();
 				}
@@ -132,7 +131,7 @@ void GameWindow::Render()
 					
 					ThrowRegs();
 					ThrowSprAttr();
-				}
+				}*/
 			}
 		}
 		
@@ -189,7 +188,7 @@ void GameWindow::Render()
 	display();
 	
 #ifdef DEBUG
-	if (_tileMap0WindowVisible)
+/*	if (_tileMap0WindowVisible)
 	{
 		_tileMap0Window.Render();
 	}
@@ -197,13 +196,13 @@ void GameWindow::Render()
 	if (_tileMap1WindowVisible)
 	{
 		_tileMap1Window.Render();
-	}
+	}*/
 #endif
 }
 
-void GameWindow::DrawFrame(Frame &frame)
+void GameWindow::DrawFrame(Frame frame)
 {
-	core::Frame::FrameArray2 &rawMap = frame.data;
+	auto &rawMap = frame.GetArray();
 	
 	for (int y = 0; y < Frame::HEIGHT; y++)
 	{
@@ -211,9 +210,9 @@ void GameWindow::DrawFrame(Frame &frame)
 		{
 			int pixelIndex = y * Frame::WIDTH + x;
 			
-			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[x][y].red);
-			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[x][y].green);
-			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rawMap[x][y].blue);
+			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[x][y].GetRed());
+			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[x][y].GetGreen());
+			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rawMap[x][y].GetBlue());
 			_rawFrame[pixelIndex * 4 + 3] = (sf::Uint8) (0xFF);
 		}
 	}
@@ -221,48 +220,48 @@ void GameWindow::DrawFrame(Frame &frame)
 	_frame.create(Frame::WIDTH, Frame::HEIGHT, &_rawFrame[0]);
 }
 
-int GameWindow::GetRight()
+bool GameWindow::GetRight()
 {
 	return _rightPressed;
 }
 
-int GameWindow::GetLeft()
+bool GameWindow::GetLeft()
 {
 	return _leftPressed;
 }
 
-int GameWindow::GetUp()
+bool GameWindow::GetUp()
 {
 	return _upPressed;
 }
 
-int GameWindow::GetDown()
+bool GameWindow::GetDown()
 {
 	return _downPressed;
 }
 
-int GameWindow::GetButtonA()
+bool GameWindow::GetButtonA()
 {
 	return _buttonAPressed;
 }
 
-int GameWindow::GetButtonB()
+bool GameWindow::GetButtonB()
 {
 	return _buttonBPressed;
 }
 
-int GameWindow::GetSelect()
+bool GameWindow::GetSelect()
 {
 	return _selectPressed;
 }
 
-int GameWindow::GetStart()
+bool GameWindow::GetStart()
 {
 	return _startPressed;
 }
 
 #ifdef DEBUG
-void GameWindow::ShowTileMap(int tileMapNumber)
+/*void GameWindow::ShowTileMap(int tileMapNumber)
 {
 	if (tileMapNumber == 0)
 	{
@@ -415,4 +414,5 @@ void GameWindow::ThrowSprAttr()
 		
 		std::cout << std::endl;
 	}
-}
+}*/
+#endif

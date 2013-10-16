@@ -63,9 +63,9 @@ void Memory::WriteByte(int address, int value)
 	}
 	else if (address <= 0x9FFF)
 	{
-		if (_ioPorts.GetLCD() != LCDMode::TRANSFERRING_DATA)
+		if ((*_ioPorts).GetLCDMode() != LCDMode::TRANSFERRING_DATA)
 		{
-			_videoRam->Writebyte(address, value);
+			_videoRam->WriteByte(address, value);
 		}
 	}
 	else if (address <= 0xBFFF)
@@ -74,14 +74,14 @@ void Memory::WriteByte(int address, int value)
 	}
 	else if (address <= 0xFDFF)
 	{
-		_workRam->Writebyte(address, value);
+		_workRam->WriteByte(address, value);
 	}
 	else if (address <= 0xFE9F)
 	{
-		if (_ioPorts.GetLCD() != LCDMode::SEARCHING_OAM &&
-		    _ioPorts.GetLCD() != LCDMode::TRANSFERRING_DATA)
+		if ((*_ioPorts).GetLCDMode() != LCDMode::SEARCHING_OAM &&
+		    (*_ioPorts).GetLCDMode() != LCDMode::TRANSFERRING_DATA)
 		{
-			_spriteAttributeRam->Writebyte(address, value);
+			_spriteAttributeRam->WriteByte(address, value);
 		}
 	}
 	else if (address <= 0xFEFF)
@@ -93,7 +93,7 @@ void Memory::WriteByte(int address, int value)
 	}
 	else if (address <= 0xFFFE)
 	{
-		_highRam->Writebyte(address, value);
+		_highRam->WriteByte(address, value);
 	}
 	else if (address == InterruptHandler::INTERRUPT_ENABLE_ADDRESS)
 	{
@@ -114,9 +114,9 @@ void Memory::Serialize(std::ostream &os)
 	   << (*_ioPorts)
 	   << (*_highRam);
 	
-	char outInterruptEnableRegister = char(_interruptEnableRegister);
+	char outInterruptEnableRegister = char(GetInterruptEnableRegister());
 	
-	os.write(&GetInterruptEnableRegister(), 1);
+	os.write(&outInterruptEnableRegister, 1);
 }
 
 void Memory::Deserialize(std::istream &is)
@@ -151,7 +151,7 @@ void Memory::SetWorkRam(WorkRam &workRam)
 
 void Memory::SetSpriteAttributeRam(SpriteAttributeRam &spriteAttributeRam)
 {
-	_spriteAttributeRam = &_spriteAttributeRam;
+	_spriteAttributeRam = &spriteAttributeRam;
 }
 
 void Memory::SetIOPorts(IOPorts &ioPorts)
@@ -196,32 +196,32 @@ void Memory::SetInterruptEnableRegister(int interruptEnableRegister)
 
 cartridges::Cartridge &Memory::GetCartridge()
 {
-	return _cartridge;
+	return *_cartridge;
 }
 
 VideoRam &Memory::GetVideoRam()
 {
-	return _videoRam;
+	return *_videoRam;
 }
 
 WorkRam &Memory::GetWorkRam()
 {
-	return _workRam;
+	return *_workRam;
 }
 
 SpriteAttributeRam &Memory::GetSpriteAttributeRam()
 {
-	return _spriteAttributeRam;
+	return *_spriteAttributeRam;
 }
 
 IOPorts &Memory::GetIOPorts()
 {
-	return _ioPorts;
+	return *_ioPorts;
 }
 
 HighRam &Memory::GetHighRam()
 {
-	return _highRam;
+	return *_highRam;
 }
 
 int &Memory::GetInterruptEnableRegister()
@@ -229,27 +229,27 @@ int &Memory::GetInterruptEnableRegister()
 	return _interruptEnableRegister;
 }
 
-bool GetVBlankInterruptEnabled()
+bool Memory::GetVBlankInterruptEnabled()
 {
 	return GetBit(_interruptEnableRegister, InterruptHandler::VBLANK_INTERRUPT_BIT_NUMBER);
 }
 
-bool GetLCDStatusInterruptEnabled()
+bool Memory::GetLCDStatusInterruptEnabled()
 {
 	return GetBit(_interruptEnableRegister, InterruptHandler::LCD_STATUS_INTERRUPT_BIT_NUMBER);
 }
 
-bool GetTimerInterruptEnabled()
+bool Memory::GetTimerInterruptEnabled()
 {
 	return GetBit(_interruptEnableRegister, InterruptHandler::TIMER_INTERRUPT_BIT_NUMBER);
 }
 
-bool GetSerialInterruptEnabled()
+bool Memory::GetSerialInterruptEnabled()
 {
 	return GetBit(_interruptEnableRegister, InterruptHandler::SERIAL_INTERRUPT_BIT_NUMBER);
 }
 
-bool GetJoypadInterruptEnabled()
+bool Memory::GetJoypadInterruptEnabled()
 {
 	return GetBit(_interruptEnableRegister, InterruptHandler::JOYPAD_INTERRUPT_BIT_NUMBER);
 }

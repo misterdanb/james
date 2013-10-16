@@ -53,12 +53,12 @@ void InterruptHandler::SignalJoypadInterrupt()
 	_bus->WriteByte(INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 }
 
-void InterruptHandler::SetMemoryBus(MemoryBus &interruptHandler)
+void InterruptHandler::SetMemoryBus(MemoryBus &bus)
 {
-	_interruptHandler = &interruptHandler;
+	_bus = &bus;
 }
 
 MemoryBus &InterruptHandler::GetMemoryBus()
 {
-	return *_interruptHandler;
+	return *_bus;
 }

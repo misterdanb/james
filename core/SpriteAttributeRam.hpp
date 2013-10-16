@@ -17,7 +17,7 @@ namespace james
 			static const int SPRITE_ATTRIBUTE_RAM_OFFSET = 0xFE00;
 			
 			static const int SPRITE_ATTRIBUTE_RAM_BANKS = 1;
-			static const int SPRITE_ATTRIBUTE_RAM_SIZE = 0x0100;
+			static const int SPRITE_ATTRIBUTE_RAM_BANK_SIZE = 0x0100;
 			
 		public:
 			SpriteAttributeRam();

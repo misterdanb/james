@@ -1,10 +1,6 @@
 #include "Renderer.hpp"
 
-Renderer::Renderer(Memory &memory)
-	: _memory(memory),
-	  _videoRam(memory.GetVideoRam()),
-	  _spriteAttributeRam(memory.GetSpriteAttributeRam()),
-	  _ioPorts(memory.GetIOPorts())
+Renderer::Renderer()
 {
 }
 
@@ -13,13 +9,13 @@ Renderer::~Renderer()
 }
 
 
-void Renderer::SetMemory(Memory &memory;)
+void Renderer::SetMemory(Memory &memory)
 {
-	_memory = &memory
+	_memory = &memory;
 	
-	_videoRam = &(*memory).GetVideoRam();
-	_spriteAttributeRam = &(*memory).GetSpriteAttributeRam();
-	_ioPorts = &(*memory).GetIOPorts();
+	_videoRam = &memory.GetVideoRam();
+	_spriteAttributeRam = &memory.GetSpriteAttributeRam();
+	_ioPorts = &memory.GetIOPorts();
 }
 
 void Renderer::SetInterruptHandler(InterruptHandler &interruptHandler)

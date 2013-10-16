@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "../core/Frontend.hpp"
 
-#include "TileMapWindow.hpp"
+//#include "TileMapWindow.hpp"
 
 namespace james
 {
@@ -20,16 +20,16 @@ namespace james
 			
 			void Render();
 			
-			void DrawFrame(Frame &);
+			void DrawFrame(Frame);
 			
-			int GetRight();
-			int GetLeft();
-			int GetUp();
-			int GetDown();
-			int GetButtonA();
-			int GetButtonB();
-			int GetSelect();
-			int GetStart();
+			bool GetRight();
+			bool GetLeft();
+			bool GetUp();
+			bool GetDown();
+			bool GetButtonA();
+			bool GetButtonB();
+			bool GetSelect();
+			bool GetStart();
 			
 			void ShowTileMap(int);
 			void HideTileMap(int);
@@ -52,11 +52,11 @@ namespace james
 			int _selectPressed;
 			int _startPressed;
 #ifdef DEBUG			
-			bool _tileMap0WindowVisible;
+			/*bool _tileMap0WindowVisible;
 			bool _tileMap1WindowVisible;
 			
 			TileMapWindow _tileMap0Window;
-			TileMapWindow _tileMap1Window;
+			TileMapWindow _tileMap1Window;*/
 #endif
 		};
 	}

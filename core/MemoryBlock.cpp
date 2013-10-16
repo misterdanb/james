@@ -4,9 +4,7 @@ using namespace james;
 using namespace james::core;
 
 MemoryBlock::MemoryBlock(int banks, int size)
-	_banks(banks),
-	_size(size),
-	_data()
+	: _banks(banks), _size(size), _data()
 {
 	_data.resize(banks);
 	

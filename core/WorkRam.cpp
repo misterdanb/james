@@ -3,7 +3,7 @@
 using namespace james;
 using namespace james::core;
 
-WorkRam::WorkRam(IOPorts &ioPorts)
+WorkRam::WorkRam()
 	: MemoryBlock(WORK_RAM_BANKS, WORK_RAM_BANK_SIZE)
 {
 }
@@ -54,12 +54,12 @@ void WorkRam::WriteByte(int address, int value)
 	}
 }
 
-void VideoRam::SetIOPorts(IOPorts &ioPorts)
+void WorkRam::SetIOPorts(IOPorts &ioPorts)
 {
 	_ioPorts = &ioPorts;
 }
 
-IOPorts &VideoRam::GetIOPorts()
+IOPorts &WorkRam::GetIOPorts()
 {
 	return *_ioPorts;
 }

@@ -20,8 +20,12 @@ Emulator::Emulator()
 	  _cartridge(NULL),
 	  _forceClassicGameboy(true), // for testing
 	  _timerTicks(0),
-	  _deviderTicks(0),
+	  _dividerTicks(0),
 	  _renderer(nullptr)
+{
+}
+
+Emulator::~Emulator()
 {
 }
 
@@ -42,6 +46,13 @@ void Emulator::Initialize()
 	_memory.SetSpriteAttributeRam(*_spriteAttributeRam);
 	_memory.SetIOPorts(*_ioPorts);
 	_memory.SetHighRam(*_highRam);
+	
+	_hybr1s80.SetMemoryBus(_memory);
+	(*_ioPorts).SetMemoryBus(_memory);
+	(*_interruptHandler).SetMemoryBus(_memory);
+	
+	(*_videoRam).SetIOPorts(*_ioPorts);
+	(*_workRam).SetIOPorts(*_ioPorts);
 	
 	Reset();
 }
@@ -157,6 +168,8 @@ void Emulator::SetRom(DynamicArray<int> &rom)
 	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
 	{
 		_renderer.reset(new ClassicRenderer());
+		
+		(*_renderer).SetMemory(_memory);
 
 		LOG("Using Gameboy Classic rendering method.");
 	}
@@ -251,12 +264,12 @@ void Emulator::UpdateTimer(int ticks)
 		}
 	}
 	
-	_deviderTicks += ticks;
+	_dividerTicks += ticks;
 		
-	if ((*_ioPorts).GetDevider() > 0xFF)
+	if ((*_ioPorts).GetDivider() > 0xFF)
 	{
-		(*_ioPorts).SetDevider((*_ioPorts).GetDevider() + _deviderTicks / 0x100);
+		(*_ioPorts).SetDivider((*_ioPorts).GetDivider() + _dividerTicks / 0x100);
 		
-		_deviderTicks %= 0x100;
+		_dividerTicks %= 0x100;
 	}
 }

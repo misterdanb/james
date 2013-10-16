@@ -8,6 +8,8 @@
 #include "HDMAMode.hpp"
 #include "Joypad.hpp"
 #include "SerialPort.hpp"
+#include "InterruptHandler.hpp"
+#include "SpriteAttributeRam.hpp"
 
 namespace james
 {
@@ -75,7 +77,7 @@ namespace james
 			void SetWindowX(int);
 			void SetWindowY(int);
 			
-			void SetDevider(int);
+			void SetDivider(int);
 			void SetTimerCounter(int);
 			void SetTimerModulo(int);
 			void SetTimerClockFrequency(int);
@@ -131,7 +133,7 @@ namespace james
 			int GetWindowX();
 			int GetWindowY();
 			
-			int GetDevider();
+			int GetDivider();
 			int GetTimerCounter();
 			int GetTimerModulo();
 			int GetTimerClockFrequency();
@@ -150,6 +152,7 @@ namespace james
 			SerialPort *_serialPort;
 			
 			// dma config
+			int _oamDMATransferAddress;
 			bool _hdmaTransferActive;
 			HDMAMode _hdmaMode;
 			int _hdmaTransferSourceAddress;
@@ -184,12 +187,12 @@ namespace james
 			bool _coincidenceInterruptEnabled;
 			
 			// lcd position and scrolling
-			int scrollX;
-			int scrollY;
-			int lcdY;
-			int lcdYCompare;
-			int windowX;
-			int windowY;
+			int _scrollX;
+			int _scrollY;
+			int _lcdY;
+			int _lcdYCompare;
+			int _windowX;
+			int _windowY;
 			
 			// timer config
 			int _divider;
@@ -202,14 +205,14 @@ namespace james
 			Array<Color<int>, 4> _monochromePalette;
 			
 			Array<Color<int>, 4> _monochromeBackgroundPalette;
-			Array2<Color<int>, 4, 2> _monochromeSpritePalettes;
+			Array2<Color<int>, 2, 4> _monochromeSpritePalettes;
 			
 			// color palettes
 			int _colorBackgroundPaletteIndexAutoIncrement;
-			Array2<Color<int>, 4, 8> _colorBackgroundPalettes;
+			Array2<Color<int>, 8, 4> _colorBackgroundPalettes;
 			
 			int _colorSpritePaletteIndexAutoIncrement;
-			Array2<Color<int>, 4, 8> _colorSpritePalettes;
+			Array2<Color<int>, 8, 4> _colorSpritePalettes;
 		};
 	}
 }

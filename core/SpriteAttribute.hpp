@@ -3,6 +3,8 @@
 
 #include "James.hpp"
 #include "SpriteToBackgroundPriority.hpp"
+#include "HorizontalFlip.hpp"
+#include "VerticalFlip.hpp"
 
 namespace james
 {

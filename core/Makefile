@@ -80,6 +80,9 @@ BackgroundAttribute.o: BackgroundAttribute.cpp
 Tile.o: Tile.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Tile.cpp -o Tile.o
 
+SpriteAttribute.o: SpriteAttribute.cpp
+	$(CC) $(FLAGS) $(CFLAGS) SpriteAttribute.cpp -o SpriteAttribute.o
+
 cartridges/MMM01.o: cartridges/MMM01.cpp
 	$(CC) $(FLAGS) $(CFLAGS) cartridges/MMM01.cpp -o cartridges/MMM01.o
 

@@ -4,28 +4,28 @@ using namespace james;
 using namespace james::core;
 
 SpriteAttribute::SpriteAttribute()
-	: y(0),
-	  x(0),
-	  tileNumber(0),
-	  colorPaletteNumber(0),
-	  tileVideoRamBankNumber(0),
-	  monochromePaletteNumber(0),
-	  horizontalFlip(HorizontalFlip::NOT_FLIPPED),
-	  verticalFlip(VerticalFlip::NOT_FLIPPED),
-	  spriteToBackgroundPriority(SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND)
+	: _y(0),
+	  _x(0),
+	  _tileNumber(0),
+	  _colorPaletteNumber(0),
+	  _tileVideoRamBankNumber(0),
+	  _monochromePaletteNumber(0),
+	  _horizontalFlip(HorizontalFlip::NOT_FLIPPED),
+	  _verticalFlip(VerticalFlip::NOT_FLIPPED),
+	  _spriteToBackgroundPriority(SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND)
 {
 }
 
 SpriteAttribute::SpriteAttribute(Array<int, 4> spriteAttributeData)
-	: y(0),
-	  x(0),
-	  tileNumber(0),
-	  colorPaletteNumber(0),
-	  tileVideoRamBankNumber(0),
-	  monochromePaletteNumber(0),
-	  horizontalFlip(HorizontalFlip::NOT_FLIPPED),
-	  verticalFlip(VerticalFlip::NOT_FLIPPED),
-	  spriteToBackgroundPriority(SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND)
+	: _y(0),
+	  _x(0),
+	  _tileNumber(0),
+	  _colorPaletteNumber(0),
+	  _tileVideoRamBankNumber(0),
+	  _monochromePaletteNumber(0),
+	  _horizontalFlip(HorizontalFlip::NOT_FLIPPED),
+	  _verticalFlip(VerticalFlip::NOT_FLIPPED),
+	  _spriteToBackgroundPriority(SpriteToBackgroundPriority::SPRITE_ABOVE_BACKGROUND)
 {
 	SetData(spriteAttributeData);
 }
@@ -36,16 +36,16 @@ SpriteAttribute::~SpriteAttribute()
 
 void SpriteAttribute::SetData(Array<int, 4> spriteAttributeData)
 {
-	y = spriteAttributeData[0] - 16;
-	x = spriteAttributeData[1] - 8;
-	tileNumber = spriteAttributeData[2];
+	_y = spriteAttributeData[0] - 16;
+	_x = spriteAttributeData[1] - 8;
+	_tileNumber = spriteAttributeData[2];
 	
-	colorPaletteNumber = spriteAttributeData[3] & 0x07;
-	tileVideoRamBankNumber = (spriteAttributeData[3] >> 3) & 0x01;
-	monochromePaletteNumber = (spriteAttributeData[3] >> 4) & 0x01;
-	horizontalFlip = HorizontalFlip((spriteAttributeData[3] >> 5) & 0x01);
-	verticalFlip = VerticalFlip((spriteAttributeData[3] >> 6) & 0x01);
-	spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeData[3] >> 7) & 0x01);
+	_colorPaletteNumber = spriteAttributeData[3] & 0x07;
+	_tileVideoRamBankNumber = (spriteAttributeData[3] >> 3) & 0x01;
+	_monochromePaletteNumber = (spriteAttributeData[3] >> 4) & 0x01;
+	_horizontalFlip = HorizontalFlip((spriteAttributeData[3] >> 5) & 0x01);
+	_verticalFlip = VerticalFlip((spriteAttributeData[3] >> 6) & 0x01);
+	_spriteToBackgroundPriority = SpriteToBackgroundPriority((spriteAttributeData[3] >> 7) & 0x01);
 }
 
 void SpriteAttribute::SetX(int x)
@@ -97,17 +97,14 @@ Array<int, 4> SpriteAttribute::GetData()
 {
 	int spriteAttributeFlags = 0x00;
 	
-	spriteAttributeFlags |= colorPaletteNumber;
-	spriteAttributeFlags |= tileVideoRamBankNumber << 3;
-	spriteAttributeFlags |= monochromePaletteNumber << 4;
-	spriteAttributeFlags |= GetEnumValue(horizontalFlip) << 5;
-	spriteAttributeFlags |= GetEnumValue(verticalFlip) << 6;
-	spriteAttributeFlags |= GetEnumValue(spriteToBackgroundPriority) << 7;
+	spriteAttributeFlags |= _colorPaletteNumber;
+	spriteAttributeFlags |= _tileVideoRamBankNumber << 3;
+	spriteAttributeFlags |= _monochromePaletteNumber << 4;
+	spriteAttributeFlags |= GetEnumValue(_horizontalFlip) << 5;
+	spriteAttributeFlags |= GetEnumValue(_verticalFlip) << 6;
+	spriteAttributeFlags |= GetEnumValue(_spriteToBackgroundPriority) << 7;
 	
-	Array<int, 4> spriteAttributeData = { y,
-	                                      x,
-	                                      tileNumber,
-	                                      spriteAttributeFlags };
+	Array<int, 4> spriteAttributeData = { _y, _x, _tileNumber, spriteAttributeFlags };
 	
 	return spriteAttributeData;
 }

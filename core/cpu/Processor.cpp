@@ -131,11 +131,11 @@ void Processor::ExecuteInstruction()
 				<< "E=" << ToFixedHex(_state.e, 2) << " | "
 				<< "H=" << ToFixedHex(_state.h, 2) << " | "
 				<< "L=" << ToFixedHex(_state.l, 2) << " | "
-				<< "(HL)=" << ToFixedHex(_bus->ReadByte(JoinBytes(_state.h, _state.l)), 2) << " | "
+				<< "(HL)=" << ToFixedHex((*_bus).ReadByte(JoinBytes(_state.h, _state.l)), 2) << " | "
 				<< "PC=" << ToFixedHex(_state.pc, 4) << " | "
 				<< "SP=" << ToFixedHex(_state.sp, 4) << " | "
-				<< "POP_LOW=" << ToFixedHex(_bus->ReadByte(_state.sp), 2) << " | "
-				<< "POP_HIGH=" << ToFixedHex(_bus->ReadByte(_state.sp + 1), 2);
+				<< "POP_LOW=" << ToFixedHex((*_bus).ReadByte(_state.sp), 2) << " | "
+				<< "POP_HIGH=" << ToFixedHex((*_bus).ReadByte(_state.sp + 1), 2);
 			
 			LogToFile(_recordingPath, oss.str());
 		}
@@ -674,23 +674,23 @@ void Processor::ExecuteInterrupt()
 {
 	if (_state.interruptsEnabled || _state.halted)
 	{
-		int interruptsToBePerformed = _bus->ReadByte(InterruptHandler::INTERRUPT_ENABLE_ADDRESS) &
-		                              _bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS);
+		int interruptsToBePerformed = (*_bus).ReadByte(InterruptHandler::INTERRUPT_ENABLE_ADDRESS) &
+		                              (*_bus).ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS);
 		
 		if (interruptsToBePerformed & (1 << InterruptHandler::VBLANK_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
 			
-			_bus->WriteByte(_state.sp, GetLow(_state.pc));
-			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
+			(*_bus).WriteByte(_state.sp, GetLow(_state.pc));
+			(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
 			_state.pc = InterruptHandler::VBLANK_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			int newInterruptRequestRegister = SetBit((*_bus).ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
 			                                         InterruptHandler::VBLANK_INTERRUPT_BIT_NUMBER,
 			                                         false);
 			
-			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			(*_bus).WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -704,16 +704,16 @@ void Processor::ExecuteInterrupt()
 		{
 			_state.sp -= 2;
 			
-			_bus->WriteByte(_state.sp, GetLow(_state.pc));
-			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
+			(*_bus).WriteByte(_state.sp, GetLow(_state.pc));
+			(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
 			_state.pc = InterruptHandler::LCD_STATUS_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			int newInterruptRequestRegister = SetBit((*_bus).ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
 			                                                        InterruptHandler::LCD_STATUS_INTERRUPT_BIT_NUMBER,
 			                                                        false);
 			
-			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			(*_bus).WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -727,16 +727,16 @@ void Processor::ExecuteInterrupt()
 		{
 			_state.sp -= 2;
 			
-			_bus->WriteByte(_state.sp, GetLow(_state.pc));
-			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
+			(*_bus).WriteByte(_state.sp, GetLow(_state.pc));
+			(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
 			_state.pc = InterruptHandler::TIMER_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			int newInterruptRequestRegister = SetBit((*_bus).ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
 			                                                        InterruptHandler::TIMER_INTERRUPT_BIT_NUMBER,
 			                                                        false);
 			
-			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			(*_bus).WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -750,16 +750,16 @@ void Processor::ExecuteInterrupt()
 		{
 			_state.sp -= 2;
 			
-			_bus->WriteByte(_state.sp, GetLow(_state.pc));
-			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
+			(*_bus).WriteByte(_state.sp, GetLow(_state.pc));
+			(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
 			_state.pc = InterruptHandler::SERIAL_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			int newInterruptRequestRegister = SetBit((*_bus).ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
 			                                         InterruptHandler::SERIAL_INTERRUPT_BIT_NUMBER,
 			                                         false);
 			
-			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			(*_bus).WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -771,16 +771,16 @@ void Processor::ExecuteInterrupt()
 		{
 			_state.sp -= 2;
 			
-			_bus->WriteByte(_state.sp, GetLow(_state.pc));
-			_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc));
+			(*_bus).WriteByte(_state.sp, GetLow(_state.pc));
+			(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc));
 			
 			_state.pc = InterruptHandler::JOYPAD_INTERRUPT_VECTOR;
 			
-			int newInterruptRequestRegister = SetBit(_bus->ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
+			int newInterruptRequestRegister = SetBit((*_bus).ReadByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS),
 			                                         InterruptHandler::JOYPAD_INTERRUPT_BIT_NUMBER,
 			                                         false);
 			
-			_bus->WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
+			(*_bus).WriteByte(InterruptHandler::INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 			
 			_state.interruptsEnabled = false;
 			_state.stopped = false;
@@ -809,37 +809,37 @@ void Processor::PowerUp()
 	_state.halted = false;
 	_state.stopped = false;
 	
-	_bus->WriteByte(0xFF05, 0x00); // TIMA
-	_bus->WriteByte(0xFF06, 0x00); // TMA
-	_bus->WriteByte(0xFF07, 0x00); // TAC
-	_bus->WriteByte(0xFF10, 0x80); // NR10
-	_bus->WriteByte(0xFF11, 0xBF); // NR11
-	_bus->WriteByte(0xFF12, 0xF3); // NR12
-	_bus->WriteByte(0xFF14, 0xBF); // NR14
-	_bus->WriteByte(0xFF16, 0x3F); // NR21
-	_bus->WriteByte(0xFF17, 0x00); // NR22
-	_bus->WriteByte(0xFF19, 0xBF); // NR24
-	_bus->WriteByte(0xFF1A, 0x7F); // NR30
-	_bus->WriteByte(0xFF1B, 0xFF); // NR31
-	_bus->WriteByte(0xFF1C, 0x9F); // NR32
-	_bus->WriteByte(0xFF1E, 0xBF); // NR33
-	_bus->WriteByte(0xFF20, 0xFF); // NR41
-	_bus->WriteByte(0xFF21, 0x00); // NR42
-	_bus->WriteByte(0xFF22, 0x00); // NR43
-	_bus->WriteByte(0xFF23, 0xBF); // NR30
-	_bus->WriteByte(0xFF24, 0x77); // NR50
-	_bus->WriteByte(0xFF25, 0xF3); // NR51
-	_bus->WriteByte(0xFF26, 0xF1); // NR52
-	_bus->WriteByte(0xFF40, 0x91); // LCDC
-	_bus->WriteByte(0xFF42, 0x00); // SCY
-	_bus->WriteByte(0xFF43, 0x00); // SCX
-	_bus->WriteByte(0xFF45, 0x00); // LYC
-	_bus->WriteByte(0xFF47, 0xFC); // BGP
-	_bus->WriteByte(0xFF48, 0xFF); // OBP0
-	_bus->WriteByte(0xFF49, 0xFF); // OBP1
-	_bus->WriteByte(0xFF4A, 0x00); // WY
-	_bus->WriteByte(0xFF4B, 0x00); // WX
-	_bus->WriteByte(0xFFFF, 0x00); // IE
+	(*_bus).WriteByte(0xFF05, 0x00); // TIMA
+	(*_bus).WriteByte(0xFF06, 0x00); // TMA
+	(*_bus).WriteByte(0xFF07, 0x00); // TAC
+	(*_bus).WriteByte(0xFF10, 0x80); // NR10
+	(*_bus).WriteByte(0xFF11, 0xBF); // NR11
+	(*_bus).WriteByte(0xFF12, 0xF3); // NR12
+	(*_bus).WriteByte(0xFF14, 0xBF); // NR14
+	(*_bus).WriteByte(0xFF16, 0x3F); // NR21
+	(*_bus).WriteByte(0xFF17, 0x00); // NR22
+	(*_bus).WriteByte(0xFF19, 0xBF); // NR24
+	(*_bus).WriteByte(0xFF1A, 0x7F); // NR30
+	(*_bus).WriteByte(0xFF1B, 0xFF); // NR31
+	(*_bus).WriteByte(0xFF1C, 0x9F); // NR32
+	(*_bus).WriteByte(0xFF1E, 0xBF); // NR33
+	(*_bus).WriteByte(0xFF20, 0xFF); // NR41
+	(*_bus).WriteByte(0xFF21, 0x00); // NR42
+	(*_bus).WriteByte(0xFF22, 0x00); // NR43
+	(*_bus).WriteByte(0xFF23, 0xBF); // NR30
+	(*_bus).WriteByte(0xFF24, 0x77); // NR50
+	(*_bus).WriteByte(0xFF25, 0xF3); // NR51
+	(*_bus).WriteByte(0xFF26, 0xF1); // NR52
+	(*_bus).WriteByte(0xFF40, 0x91); // LCDC
+	(*_bus).WriteByte(0xFF42, 0x00); // SCY
+	(*_bus).WriteByte(0xFF43, 0x00); // SCX
+	(*_bus).WriteByte(0xFF45, 0x00); // LYC
+	(*_bus).WriteByte(0xFF47, 0xFC); // BGP
+	(*_bus).WriteByte(0xFF48, 0xFF); // OBP0
+	(*_bus).WriteByte(0xFF49, 0xFF); // OBP1
+	(*_bus).WriteByte(0xFF4A, 0x00); // WY
+	(*_bus).WriteByte(0xFF4B, 0x00); // WX
+	(*_bus).WriteByte(0xFFFF, 0x00); // IE
 }
 
 void Processor::StartRecording(std::string path)
@@ -878,15 +878,15 @@ void Processor::FetchInstruction(InstructionTable instructionTable)
 {
 	if (instructionTable == InstructionTable::DEFAULT)
 	{
-		_currentOpCodes[0] = _bus->ReadByte(_state.pc);
-		_currentOpLows[0] = _bus->ReadByte(_state.pc + 1);
-		_currentOpHighs[0] = _bus->ReadByte(_state.pc + 2);
+		_currentOpCodes[0] = (*_bus).ReadByte(_state.pc);
+		_currentOpLows[0] = (*_bus).ReadByte(_state.pc + 1);
+		_currentOpHighs[0] = (*_bus).ReadByte(_state.pc + 2);
 	}
 	else
 	{
-		_currentOpCodes[1] = _bus->ReadByte(_state.pc + 1);
-		_currentOpLows[1] = _bus->ReadByte(_state.pc + 2);
-		_currentOpHighs[1] = _bus->ReadByte(_state.pc + 3);
+		_currentOpCodes[1] = (*_bus).ReadByte(_state.pc + 1);
+		_currentOpLows[1] = (*_bus).ReadByte(_state.pc + 2);
+		_currentOpHighs[1] = (*_bus).ReadByte(_state.pc + 3);
 	}
 }
 
@@ -1013,7 +1013,7 @@ void Processor::INC_R(int &r)
 void Processor::INC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetHFlag((memory & 0x0F) == 0x0F);
 	
@@ -1023,7 +1023,7 @@ void Processor::INC_AA(int a1, int a2)
 	SetZFlag(memory == 0x00);
 	SetNFlag(false);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1041,7 +1041,7 @@ void Processor::INC_SP()
 void Processor::DEC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetHFlag((memory & 0x0F) == 0x00);
 	
@@ -1051,7 +1051,7 @@ void Processor::DEC_AA(int a1, int a2)
 	SetZFlag(memory == 0x00);
 	SetNFlag(true);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1130,8 +1130,8 @@ void Processor::LD_AA_SP(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
 	
-	_bus->WriteByte(address, GetLow(_state.sp));
-	_bus->WriteByte((address + 1) & 0xFFFF, GetHigh(_state.sp));
+	(*_bus).WriteByte(address, GetLow(_state.sp));
+	(*_bus).WriteByte((address + 1) & 0xFFFF, GetHigh(_state.sp));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1178,7 +1178,7 @@ void Processor::ADD_RR_SP(int &r1, int &r2)
 
 void Processor::LD_R_AA(int &r, int a1, int a2)
 {
-	r = _bus->ReadByte(JoinBytes(a1, a2));
+	r = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1194,7 +1194,7 @@ void Processor::LD_R_N(int &r)
 
 void Processor::LD_AA_N(int a1, int a2)
 {
-	_bus->WriteByte(JoinBytes(a1, a2), GetOpLow(InstructionTable::DEFAULT));
+	(*_bus).WriteByte(JoinBytes(a1, a2), GetOpLow(InstructionTable::DEFAULT));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1277,7 +1277,7 @@ void Processor::JR_N_IF(int c)
 
 void Processor::LD_AA_R_INC(int &a1, int &a2, int r)
 {
-	_bus->WriteByte(JoinBytes(a1, a2), r);
+	(*_bus).WriteByte(JoinBytes(a1, a2), r);
 	
 	a2++;
 	
@@ -1294,7 +1294,7 @@ void Processor::LD_AA_R_INC(int &a1, int &a2, int r)
 
 void Processor::LD_AA_R_DEC(int &a1, int &a2, int r)
 {
-	_bus->WriteByte(JoinBytes(a1, a2), r);
+	(*_bus).WriteByte(JoinBytes(a1, a2), r);
 	
 	a2--;
 	
@@ -1311,7 +1311,7 @@ void Processor::LD_AA_R_DEC(int &a1, int &a2, int r)
 
 void Processor::LD_R_AA_INC(int &r, int &a1, int &a2)
 {
-	r = _bus->ReadByte(JoinBytes(a1, a2));
+	r = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	a2++;
 	
@@ -1328,7 +1328,7 @@ void Processor::LD_R_AA_INC(int &r, int &a1, int &a2)
 
 void Processor::LD_R_AA_DEC(int &r, int &a1, int &a2)
 {
-	r = _bus->ReadByte(JoinBytes(a1, a2));
+	r = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	a2--;
 	
@@ -1457,7 +1457,7 @@ void Processor::ADD_R_R(int &r1, int r2)
 
 void Processor::ADD_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	SetNFlag(false);
 	SetHFlag(((r & 0x0F) + (memory & 0x0F)) > 0x0F);
@@ -1495,7 +1495,7 @@ void Processor::ADC_R_R(int &r1, int r2)
 
 void Processor::ADC_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
 	
 	SetNFlag(false);
@@ -1532,7 +1532,7 @@ void Processor::SUB_R_R(int &r1, int r2)
 
 void Processor::SUB_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	SetNFlag(true);
 	SetHFlag(((r & 0x0F) - (memory & 0x0F)) < 0x00);
@@ -1570,7 +1570,7 @@ void Processor::SBC_R_R(int &r1, int r2)
 
 void Processor::SBC_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	int oldCFlag = GetCFlag();
 	
 	SetNFlag(true);
@@ -1603,7 +1603,7 @@ void Processor::AND_R_R(int &r1, int r2)
 
 void Processor::AND_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	r &= memory;
 	
@@ -1631,7 +1631,7 @@ void Processor::XOR_R_R(int &r1, int r2)
 
 void Processor::XOR_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	r ^= memory;
 	
@@ -1659,7 +1659,7 @@ void Processor::OR_R_R(int &r1, int r2)
 
 void Processor::OR_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	r |= memory;
 	
@@ -1685,7 +1685,7 @@ void Processor::CP_R_R(int &r1, int r2)
 
 void Processor::CP_R_AA(int &r, int a1, int a2)
 {
-	int memory = _bus->ReadByte(JoinBytes(a1, a2));
+	int memory = (*_bus).ReadByte(JoinBytes(a1, a2));
 	
 	SetCFlag(memory > r);
 	SetHFlag((memory & 0x0F) > (r & 0x0F));
@@ -1700,8 +1700,8 @@ void Processor::CALL_NN()
 {
 	_state.sp -= 2;
 	
-	_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
-	_bus->WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	(*_bus).WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
 	
 	_state.pc = JoinBytes(GetOpHigh(InstructionTable::DEFAULT), GetOpLow(InstructionTable::DEFAULT));
 	
@@ -1714,8 +1714,8 @@ void Processor::CALL_NN_IF(int c)
 	{
 		_state.sp -= 2;
 		
-		_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
-		_bus->WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+		(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+		(*_bus).WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
 		
 		_state.pc = JoinBytes(GetOpHigh(InstructionTable::DEFAULT), GetOpLow(InstructionTable::DEFAULT));
 		
@@ -1731,7 +1731,7 @@ void Processor::CALL_NN_IF(int c)
 
 void Processor::RET()
 {
-	_state.pc = JoinBytes(_bus->ReadByte(_state.sp + 1), _bus->ReadByte(_state.sp));
+	_state.pc = JoinBytes((*_bus).ReadByte(_state.sp + 1), (*_bus).ReadByte(_state.sp));
 	
 	_state.sp += 2;
 	
@@ -1742,7 +1742,7 @@ void Processor::RET_IF(int c)
 {
 	if (c)
 	{
-		_state.pc = JoinBytes(_bus->ReadByte(_state.sp + 1), _bus->ReadByte(_state.sp));
+		_state.pc = JoinBytes((*_bus).ReadByte(_state.sp + 1), (*_bus).ReadByte(_state.sp));
 		
 		_state.sp += 2;
 		
@@ -1761,7 +1761,7 @@ void Processor::RETI()
 	_state.interruptsEnabled = true;
 	_state.halted = false;
 	
-	_state.pc = (_bus->ReadByte(_state.sp + 1) << 8) | _bus->ReadByte(_state.sp);
+	_state.pc = ((*_bus).ReadByte(_state.sp + 1) << 8) | (*_bus).ReadByte(_state.sp);
 	
 	_state.sp += 2;
 	
@@ -1800,8 +1800,8 @@ void Processor::JP_RR(int r1, int r2)
 
 void Processor::POP_RR(int &r1, int &r2)
 {
-	r1 = _bus->ReadByte(_state.sp + 1);
-	r2 = _bus->ReadByte(_state.sp);
+	r1 = (*_bus).ReadByte(_state.sp + 1);
+	r2 = (*_bus).ReadByte(_state.sp);
 	
 	_state.sp += 2;
 	
@@ -1811,8 +1811,8 @@ void Processor::POP_RR(int &r1, int &r2)
 
 void Processor::POP_AF()
 {
-	_state.a = _bus->ReadByte(_state.sp + 1);
-	_state.f = _bus->ReadByte(_state.sp) & 0xF0;
+	_state.a = (*_bus).ReadByte(_state.sp + 1);
+	_state.f = (*_bus).ReadByte(_state.sp) & 0xF0;
 	
 	_state.sp += 2;
 	
@@ -1824,8 +1824,8 @@ void Processor::PUSH_RR(int r1, int r2)
 {
 	_state.sp -= 2;
 	
-	_bus->WriteByte(_state.sp + 1, r1);
-	_bus->WriteByte(_state.sp, r2);
+	(*_bus).WriteByte(_state.sp + 1, r1);
+	(*_bus).WriteByte(_state.sp, r2);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1835,8 +1835,8 @@ void Processor::PUSH_AF()
 {
 	_state.sp -= 2;
 	
-	_bus->WriteByte(_state.sp + 1, _state.a);
-	_bus->WriteByte(_state.sp, _state.f & 0xF0);
+	(*_bus).WriteByte(_state.sp + 1, _state.a);
+	(*_bus).WriteByte(_state.sp, _state.f & 0xF0);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1886,8 +1886,8 @@ void Processor::RST(int a)
 {
 	_state.sp -= 2;
 	
-	_bus->WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
-	_bus->WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	(*_bus).WriteByte(_state.sp + 1, GetHigh(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
+	(*_bus).WriteByte(_state.sp, GetLow(_state.pc + GetOpLength(InstructionTable::DEFAULT)));
 	
 	_state.pc = a;
 	
@@ -1906,7 +1906,7 @@ void Processor::LDH_R_A(int &r, int a)
 
 void Processor::LD_A_R(int a, int r)
 {
-	_bus->WriteByte(JoinBytes(0xFF, a), r);
+	(*_bus).WriteByte(JoinBytes(0xFF, a), r);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1914,7 +1914,7 @@ void Processor::LD_A_R(int a, int r)
 
 void Processor::LD_R_A(int &r, int a)
 {
-	r = _bus->ReadByte(JoinBytes(0xFF, a));
+	r = (*_bus).ReadByte(JoinBytes(0xFF, a));
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -1922,7 +1922,7 @@ void Processor::LD_R_A(int &r, int a)
 
 void Processor::LD_AA_R(int a1, int a2, int r)
 {
-	_bus->WriteByte(JoinBytes(a1, a2), r);
+	(*_bus).WriteByte(JoinBytes(a1, a2), r);
 	
 	UpdatePC(InstructionTable::DEFAULT);
 	UpdateTicks(InstructionTable::DEFAULT);
@@ -2001,7 +2001,7 @@ void Processor::RLC_R(int &r)
 void Processor::RLC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 7));
 	
@@ -2011,7 +2011,7 @@ void Processor::RLC_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2034,7 +2034,7 @@ void Processor::RRC_R(int &r)
 void Processor::RRC_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 0));
 	
@@ -2044,7 +2044,7 @@ void Processor::RRC_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2069,7 +2069,7 @@ void Processor::RL_R(int &r)
 void Processor::RL_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	int oldCFlag = GetCFlag();
 	
@@ -2081,7 +2081,7 @@ void Processor::RL_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2106,7 +2106,7 @@ void Processor::RR_R(int &r)
 void Processor::RR_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	int oldCFlag = GetCFlag();
 	
@@ -2118,7 +2118,7 @@ void Processor::RR_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2141,7 +2141,7 @@ void Processor::SLA_R(int &r)
 void Processor::SLA_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 7));
 	
@@ -2151,7 +2151,7 @@ void Processor::SLA_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2174,7 +2174,7 @@ void Processor::SRA_R(int &r)
 void Processor::SRA_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 0));
 	
@@ -2184,7 +2184,7 @@ void Processor::SRA_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2206,7 +2206,7 @@ void Processor::SWAP_R(int &r)
 void Processor::SWAP_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	memory = ((memory << 4) | (memory >> 4)) & 0xFF;
 	
@@ -2215,7 +2215,7 @@ void Processor::SWAP_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2238,7 +2238,7 @@ void Processor::SRL_R(int &r)
 void Processor::SRL_AA(int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetCFlag(GetBit(memory, 0));
 	
@@ -2248,7 +2248,7 @@ void Processor::SRL_AA(int a1, int a2)
 	SetNFlag(false);
 	SetZFlag(memory == 0x00);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2267,13 +2267,13 @@ void Processor::BIT_X_R(int x, int &r)
 void Processor::BIT_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	SetHFlag(true);
 	SetNFlag(false);
 	SetZFlag(!GetBit(memory, x));
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2290,11 +2290,11 @@ void Processor::RES_X_R(int x, int &r)
 void Processor::RES_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	memory = SetBit(memory, x, false);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);
@@ -2311,11 +2311,11 @@ void Processor::SET_X_R(int x, int &r)
 void Processor::SET_X_AA(int x, int a1, int a2)
 {
 	int address = JoinBytes(a1, a2);
-	int memory = _bus->ReadByte(address);
+	int memory = (*_bus).ReadByte(address);
 	
 	memory = SetBit(memory, x, true);
 	
-	_bus->WriteByte(address, memory);
+	(*_bus).WriteByte(address, memory);
 	
 	UpdatePC(InstructionTable::CB);
 	UpdateTicks(InstructionTable::CB);

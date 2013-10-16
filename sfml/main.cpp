@@ -3,7 +3,6 @@
 #include <chrono>
 #include <unistd.h>
 #include "../core/James.hpp"
-#include "../core/GameboyColor.hpp"
 #include "GameWindow.hpp"
 
 int main(int argc, char *argv[])

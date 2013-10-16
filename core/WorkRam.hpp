@@ -34,7 +34,7 @@ namespace james
 			IOPorts &GetIOPorts();
 			
 		private:
-			IOPorts &_ioPorts;
+			IOPorts *_ioPorts;
 		};
 	}
 }

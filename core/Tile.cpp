@@ -4,14 +4,12 @@ using namespace james;
 using namespace james::core;
 
 Tile::Tile()
-	: ByteMap<WIDTH, HEIGHT>(),
-	  data(_matrixElements)
+	: ByteMap<WIDTH, HEIGHT>()
 {
 }
 
 Tile::Tile(Array<int, DATA_SIZE> tileData)
-	: ByteMap<WIDTH, HEIGHT>(),
-	  data(_matrixElements)
+	: ByteMap<WIDTH, HEIGHT>()
 {
 	SetData(tileData);
 }
@@ -40,8 +38,10 @@ Array<int, 16> Tile::GetData()
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
-			_tileData[y] |= (((_matrixElements[x][y] >> 1) & 0x01) << (7 - x));
-			_tileData[y + 1] |= (_matrixElements[x][y] & 0x01) << (7 - x);
+			tileData[y] |= (((_matrixElements[x][y] >> 1) & 0x01) << (7 - x));
+			tileData[y + 1] |= (_matrixElements[x][y] & 0x01) << (7 - x);
 		}
 	}
+	
+	return tileData;
 }

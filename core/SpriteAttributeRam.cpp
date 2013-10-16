@@ -4,7 +4,7 @@ using namespace james;
 using namespace james::core;
 
 SpriteAttributeRam::SpriteAttributeRam()
-	: Ram(SPRITE_ATTRIBUTE_RAM_BANKS, SPRITE_ATTRIBUTE_RAM_BANK_SIZE)
+	: MemoryBlock(SPRITE_ATTRIBUTE_RAM_BANKS, SPRITE_ATTRIBUTE_RAM_BANK_SIZE)
 {
 }
 

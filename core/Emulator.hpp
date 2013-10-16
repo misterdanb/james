@@ -88,7 +88,7 @@ namespace james
 			
 			// timer
 			int _timerTicks;
-			int _deviderTicks;
+			int _dividerTicks;
 			
 			std::unique_ptr<Renderer> _renderer;
 		};
