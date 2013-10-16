@@ -247,7 +247,7 @@ void Emulator::UpdateTimer(int ticks)
 		_timerTicks += ticks;
 		//(*_ioPorts).SetTimerCounter((*ioPorts).GetTimerCounter() + ticks);
 		
-		if (_timerTicks > (*_ioPorts).GetTimerClockFrequency())
+		if (_timerTicks >= (*_ioPorts).GetTimerClockFrequency())
 		{
 			int newTimerCounter = (*_ioPorts).GetTimerCounter() + _timerTicks / (*_ioPorts).GetTimerClockFrequency();
 			
@@ -260,13 +260,13 @@ void Emulator::UpdateTimer(int ticks)
 				(*_interruptHandler).SignalTimerInterrupt();
 			}
 			
-			_timerTicks %= (*_ioPorts).GetTimerClockFrequency();;
+			_timerTicks %= (*_ioPorts).GetTimerClockFrequency();
 		}
 	}
 	
 	_dividerTicks += ticks;
 		
-	if ((*_ioPorts).GetDivider() > 0xFF)
+	if ((*_ioPorts).GetDivider() >= 0x100)
 	{
 		(*_ioPorts).SetDivider((*_ioPorts).GetDivider() + _dividerTicks / 0x100);
 		
