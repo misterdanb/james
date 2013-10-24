@@ -39,7 +39,7 @@ namespace james
 			void Serialize(std::ostream &);
 			void Deserialize(std::istream &);
 			
-			void SetCartridge(cartridges::Cartridge &);
+			void SetCartridge(cartridges::Cartridge *);
 			void SetVideoRam(VideoRam &);
 			void SetWorkRam(WorkRam &);
 			void SetSpriteAttributeRam(SpriteAttributeRam &);

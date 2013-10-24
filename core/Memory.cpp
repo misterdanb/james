@@ -134,9 +134,9 @@ void Memory::Deserialize(std::istream &is)
 	SetInterruptEnableRegister(int(inInterruptEnableRegister));
 }
 
-void Memory::SetCartridge(cartridges::Cartridge &cartridge)
+void Memory::SetCartridge(cartridges::Cartridge *cartridge)
 {
-	_cartridge = &cartridge;
+	_cartridge = cartridge;
 }
 
 void Memory::SetVideoRam(VideoRam &videoRam)

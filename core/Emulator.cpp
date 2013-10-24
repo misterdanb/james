@@ -205,13 +205,6 @@ void Emulator::SetSerialPort(SerialPort &serialPort)
 	(*_ioPorts).SetSerialPort(serialPort);
 }
 
-void Emulator::SetCartridge(Cartridge &cartridge)
-{
-	_cartridge = &cartridge;
-	
-	_memory.SetCartridge(cartridge);
-}
-
 InterruptHandler &Emulator::GetInterruptHandler()
 {
 	return *_interruptHandler;
