@@ -46,7 +46,17 @@ void Emulator::Initialize()
 	_memory.SetSpriteAttributeRam(*_spriteAttributeRam);
 	_memory.SetIOPorts(*_ioPorts);
 	_memory.SetHighRam(*_highRam);
-	
+
+	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
+	{
+		_renderer.reset(new ClassicRenderer());
+		
+		(*_renderer).SetMemory(_memory);
+		
+		LOG("Using Gameboy Classic rendering method.");
+	}
+
 	_hybr1s80.SetMemoryBus(_memory);
 	(*_ioPorts).SetMemoryBus(_memory);
 	(*_interruptHandler).SetMemoryBus(_memory);
@@ -164,15 +174,16 @@ void Emulator::SetRom(DynamicArray<int> &rom)
 
 	LOG("Loaded cartridge");
 
-	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
-	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
-	{
-		_renderer.reset(new ClassicRenderer());
-		
-		(*_renderer).SetMemory(_memory);
-
-		LOG("Using Gameboy Classic rendering method.");
-	}
+//	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
+//	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
+//	{
+//		_renderer.reset(new ClassicRenderer());
+//		
+//		(*_renderer).SetMemory(_memory);
+//
+//		LOG("Using Gameboy Classic rendering method.");
+//	}
+	_memory.SetCartridge(_cartridge);
 }
 
 void Emulator::SetLCD(LCD &lcd)
