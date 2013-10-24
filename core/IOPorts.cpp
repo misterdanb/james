@@ -1,7 +1,9 @@
 #include "IOPorts.hpp"
 
 IOPorts::IOPorts()
-	: MemoryBlock(IO_PORTS_BANKS, IO_PORTS_BANK_SIZE)
+	: MemoryBlock(IO_PORTS_BANKS, IO_PORTS_BANK_SIZE),
+	  _lcdY(0),
+	  _divider(0)
 {
 	for (int i = 0; i < 4; i++)
 	{
