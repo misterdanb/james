@@ -134,7 +134,7 @@ void Emulator::RenderFrame()
 {
 	if (!_paused)
 	{
-		for (int i = 0; i < 154; i++)
+		for (int i = 0; i < 144; i++)
 		{
 			RenderScanline();
 		}
