@@ -5,7 +5,7 @@ Frame::Frame()
 {
 }
 
-Frame::Frame(Array2<Color<int>, WIDTH, HEIGHT> frameData)
+Frame::Frame(Array2<Color<int>, WIDTH, HEIGHT> &frameData)
 	: PixelMap<WIDTH, HEIGHT>()
 {
 	/*for (int y = 0; y < HEIGHT; y++)

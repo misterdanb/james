@@ -18,7 +18,7 @@ namespace james
 			
 		public:
 			Frame();
-			Frame(Array2<Color<int>, WIDTH, HEIGHT>);
+			Frame(Array2<Color<int>, WIDTH, HEIGHT> &);
 			~Frame();
 			
 		protected:
