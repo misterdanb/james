@@ -53,6 +53,7 @@ void Emulator::Initialize()
 		_renderer.reset(new ClassicRenderer());
 		
 		(*_renderer).SetMemory(_memory);
+		(*_renderer).SetInterruptHandler(*_interruptHandler);
 		
 		LOG("Using Gameboy Classic rendering method.");
 	}
