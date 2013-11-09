@@ -10,15 +10,10 @@ namespace james
 		class Serializable
 		{
 		public:
-			friend std::ostream &operator<<(std::ostream &os, const Serializable &s)
-			{
-			}
+			friend std::ostream &operator<<(std::ostream &, Serializable &);
+			friend std::istream &operator>>(std::istream &, Serializable &);
 			
-			friend std::istream &operator>>(std::istream &is, const Serializable &s)
-			{
-			}
-			
-		protected:
+		public:
 			virtual void Serialize(std::ostream &) = GBC_NULL;
 			virtual void Deserialize(std::istream &) = GBC_NULL;
 		};

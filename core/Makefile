@@ -131,6 +131,9 @@ InterruptHandler.o: InterruptHandler.cpp
 MemoryBus.o: MemoryBus.cpp
 	$(CC) $(FLAGS) $(CFLAGS) MemoryBus.cpp -o MemoryBus.o
 
+Serializable.o: Serializable.cpp
+	$(CC) $(FLAGS) $(CFLAGS) Serializable.cpp -o Serializable.o
+
 James.o: James.cpp
 	$(CC) $(FLAGS) $(CFLAGS) James.cpp -o James.o
 
