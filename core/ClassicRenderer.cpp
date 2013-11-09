@@ -1,7 +1,7 @@
 #include "ClassicRenderer.hpp"
 
 ClassicRenderer::ClassicRenderer()
-	: Renderer(), _vBlankInterruptAlreadyRequested(false)
+	: Renderer(), _vBlankInterruptAlreadyRequested(false), _frameBuffer()
 {
 }
 
