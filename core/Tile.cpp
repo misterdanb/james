@@ -24,8 +24,8 @@ void Tile::SetData(Array<int, DATA_SIZE> tileData)
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
-			_matrixElements[x][y] = (((tileData[y] >> (7 - x)) & 0x01) << 1) |
-			                        ((tileData[y + 1] >> (7 - x)) & 0x01);
+			_matrixElements[x][y] = (((tileData[y * 2] >> (7 - x)) & 0x01) << 1) |
+			                        ((tileData[y * 2 + 1] >> (7 - x)) & 0x01);
 		}
 	}
 }
@@ -38,8 +38,8 @@ Array<int, Tile::DATA_SIZE> Tile::GetData()
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
-			tileData[y] |= (((_matrixElements[x][y] >> 1) & 0x01) << (7 - x));
-			tileData[y + 1] |= (_matrixElements[x][y] & 0x01) << (7 - x);
+			tileData[y * 2] |= (((_matrixElements[x][y] >> 1) & 0x01) << (7 - x));
+			tileData[y * 2 + 1] |= (_matrixElements[x][y] & 0x01) << (7 - x);
 		}
 	}
 	
