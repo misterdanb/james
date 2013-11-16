@@ -30,7 +30,7 @@ void Tile::SetData(Array<int, DATA_SIZE> tileData)
 	}
 }
 
-Array<int, 16> Tile::GetData()
+Array<int, Tile::DATA_SIZE> Tile::GetData()
 {
 	Array<int, DATA_SIZE> tileData;
 	
