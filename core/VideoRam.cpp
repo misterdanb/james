@@ -114,4 +114,5 @@ BackgroundAttributeMap VideoRam::GetBackgroundAttributeMap(int index)
 	{
 		backgroundAttributeMapData[i] = ReadByteFromBank(1, address);
 	}
+	return backgroundAttributeMapData;
 }
