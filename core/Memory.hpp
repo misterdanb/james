@@ -75,6 +75,8 @@ namespace james
 			IOPorts *_ioPorts;
 			HighRam *_highRam;
 			int _interruptEnableRegister;
+			Memory(const james::core::Memory&); 
+			Memory &operator=(const james::core::Memory&);
 		};
 	}
 }

@@ -91,6 +91,9 @@ namespace james
 			int _dividerTicks;
 			
 			std::unique_ptr<Renderer> _renderer;
+
+			Emulator(const james::core::Emulator&);
+			Emulator& operator=(const james::core::Emulator&);
 		};
 	}
 }

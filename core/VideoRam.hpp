@@ -50,6 +50,8 @@ namespace james
 		
 		private:
 			IOPorts *_ioPorts;
+			VideoRam(const james::core::VideoRam&);
+			VideoRam& operator=(const james::core::VideoRam&);
 		};
 	}
 }

@@ -47,6 +47,8 @@ namespace james
 		
 		private:
 			MemoryBus *_bus;
+			InterruptHandler(const InterruptHandler&);
+			InterruptHandler& operator=(const InterruptHandler&);
 		};
 	}
 }

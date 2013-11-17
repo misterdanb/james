@@ -49,6 +49,8 @@ namespace james
 			VideoRam *_videoRam;
 			SpriteAttributeRam *_spriteAttributeRam;
 			IOPorts *_ioPorts;
+			Renderer(const james::core::Renderer&);
+			Renderer& operator=(const james::core::Renderer&);
 		};
 	}
 }

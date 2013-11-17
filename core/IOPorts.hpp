@@ -213,6 +213,9 @@ namespace james
 			
 			int _colorSpritePaletteIndexAutoIncrement;
 			Array2<Color<int>, 8, 4> _colorSpritePalettes;
+
+			IOPorts(const IOPorts&);
+			IOPorts& operator=(const IOPorts&);
 		};
 	}
 }

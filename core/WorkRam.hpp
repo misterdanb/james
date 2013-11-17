@@ -35,6 +35,8 @@ namespace james
 			
 		private:
 			IOPorts *_ioPorts;
+			WorkRam(const james::core::WorkRam&);
+			WorkRam& operator=(const james::core::WorkRam&);
 		};
 	}
 }
