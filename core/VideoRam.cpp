@@ -4,7 +4,7 @@ using namespace james;
 using namespace james::core;
 
 VideoRam::VideoRam()
-	: MemoryBlock(VIDEO_RAM_BANKS, VIDEO_RAM_BANK_SIZE)
+	: MemoryBlock(VIDEO_RAM_BANKS, VIDEO_RAM_BANK_SIZE), _ioPorts(nullptr)
 {
 }
 

@@ -1,6 +1,10 @@
 #include "Renderer.hpp"
 
-Renderer::Renderer()
+Renderer::Renderer() : _memory(nullptr),
+		       _interruptHandler(nullptr),
+		       _videoRam(nullptr),
+		       _spriteAttributeRam(nullptr),
+		       _ioPorts(nullptr)
 {
 }
 

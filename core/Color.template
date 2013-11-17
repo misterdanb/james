@@ -11,11 +11,11 @@ namespace james
 		class Color
 		{
 		public:
-			Color()
+			Color() : _red(), _green(), _blue()
 			{
 			}
 			
-			Color(T red, T green, T blue)
+			Color(T red, T green, T blue) : _red(), _green(), _blue()
 			{
 				SetRed(red);
 				SetGreen(green);

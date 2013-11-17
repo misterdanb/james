@@ -1,6 +1,7 @@
 #include "InterruptHandler.hpp"
 
 InterruptHandler::InterruptHandler()
+ : _bus()
 {
 }
 

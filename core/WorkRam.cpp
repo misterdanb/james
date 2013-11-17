@@ -4,7 +4,7 @@ using namespace james;
 using namespace james::core;
 
 WorkRam::WorkRam()
-	: MemoryBlock(WORK_RAM_BANKS, WORK_RAM_BANK_SIZE)
+	: MemoryBlock(WORK_RAM_BANKS, WORK_RAM_BANK_SIZE), _ioPorts(nullptr)
 {
 }
 

@@ -3,7 +3,13 @@
 using namespace james;
 using namespace james::core;
 
-Memory::Memory()
+Memory::Memory() : _cartridge(nullptr),
+		   _videoRam(nullptr),
+		   _workRam(nullptr),
+		   _spriteAttributeRam(nullptr),
+		   _ioPorts(nullptr),
+		   _highRam(nullptr),
+		   _interruptEnableRegister()
 {
 }
 

@@ -4,6 +4,7 @@ using namespace james;
 using namespace james::core;
 
 Frontend::Frontend()
+ : _emulator ()
 {
 }
 

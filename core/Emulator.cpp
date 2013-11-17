@@ -11,6 +11,7 @@ Emulator::Emulator()
 	  _spriteAttributeRam(nullptr),
 	  _ioPorts(nullptr),
 	  _highRam(nullptr),
+	  _interruptHandler(),
 	  _paused(true),
 	  _pendingClocks(0),
 	  _speedFactor(1),
