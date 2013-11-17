@@ -714,7 +714,10 @@ void IOPorts::SetLCDMode(LCDMode lcdMode)
 {
 	_lcdMode = lcdMode;
 	
-	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, (ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET) & 0xFC) | GetEnumValue(lcdMode) & 0x03);
+	WriteByteToBank(0,
+	                0xFF41 - IO_PORTS_OFFSET,
+			((ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET) & 0xFC)
+			        | (GetEnumValue(lcdMode) & 0x03)));
 }
 
 void IOPorts::SetCoincidenceFlag(bool coincidenceFlag)
