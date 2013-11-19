@@ -14,12 +14,12 @@ SpriteAttributeRam::~SpriteAttributeRam()
 
 int SpriteAttributeRam::ReadByte(int address)
 {
-	return ReadByteFromBank(0, address);
+	return ReadByteFromBank(0, address - SPRITE_ATTRIBUTE_RAM_OFFSET);
 }
 
 void SpriteAttributeRam::WriteByte(int address, int value)
 {
-	WriteByteToBank(0, address, value);
+	WriteByteToBank(0, address - SPRITE_ATTRIBUTE_RAM_OFFSET, value);
 }
 
 void SpriteAttributeRam::SetSpriteAttribute(int index, SpriteAttribute spriteAttribute)

@@ -14,10 +14,10 @@ HighRam::~HighRam()
 
 int HighRam::ReadByte(int address)
 {
-	return ReadByteFromBank(0, address);
+	return ReadByteFromBank(0, address - HIGH_RAM_OFFSET);
 }
 
 void HighRam::WriteByte(int address, int value)
 {
-	WriteByteToBank(0, address, value);
+	WriteByteToBank(0, address - HIGH_RAM_OFFSET, value);
 }
