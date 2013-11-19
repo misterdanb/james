@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
 		float lastTime = 0;
 		float frames = 0;
 		
-		//window.ShowTileMap(0);
-		//window.ShowTileMap(1);
+		window.ShowTileMap(0);
+		window.ShowTileMap(1);
 		
 		while (window.isOpen())
 		{

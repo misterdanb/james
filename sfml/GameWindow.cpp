@@ -17,15 +17,15 @@ GameWindow::GameWindow(int width, int height, std::string rom)
 	  _selectPressed(false),
 	  _startPressed(false)
 #ifdef DEBUG
-	  /*,_tileMap0WindowVisible(GBC_FALSE),
-	  _tileMap1WindowVisible(GBC_FALSE),
+	  ,_tileMap0WindowVisible(false),
+	  _tileMap1WindowVisible(false),
 	  _tileMap0Window(0, GetDevice()),
-	  _tileMap1Window(1, GetDevice())*/
+	  _tileMap1Window(1, GetDevice())
 #endif
 {
 #ifdef DEBUG
-	/*_tileMap0Window.setVisible(GBC_FALSE);
-	_tileMap1Window.setVisible(GBC_FALSE);*/
+	_tileMap0Window.setVisible(false);
+	_tileMap1Window.setVisible(false);
 #endif
 	LoadRom(rom);
 	
@@ -188,7 +188,7 @@ void GameWindow::Render()
 	display();
 	
 #ifdef DEBUG
-/*	if (_tileMap0WindowVisible)
+	if (_tileMap0WindowVisible)
 	{
 		_tileMap0Window.Render();
 	}
@@ -196,7 +196,7 @@ void GameWindow::Render()
 	if (_tileMap1WindowVisible)
 	{
 		_tileMap1Window.Render();
-	}*/
+	}
 #endif
 }
 
@@ -261,7 +261,7 @@ bool GameWindow::GetStart()
 }
 
 #ifdef DEBUG
-/*void GameWindow::ShowTileMap(int tileMapNumber)
+void GameWindow::ShowTileMap(int tileMapNumber)
 {
 	if (tileMapNumber == 0)
 	{
@@ -279,12 +279,12 @@ void GameWindow::HideTileMap(int tileMapNumber)
 {
 	if (tileMapNumber == 0)
 	{
-		_tileMap0WindowVisible = GBC_FALSE;
+		_tileMap0WindowVisible = false;
 		_tileMap0Window.setVisible(_tileMap0WindowVisible);
 	}
 	else if (tileMapNumber == 1)
 	{
-		_tileMap1WindowVisible = GBC_FALSE;
+		_tileMap1WindowVisible = false;
 		_tileMap1Window.setVisible(_tileMap1WindowVisible);
 	}
 	
@@ -293,7 +293,7 @@ void GameWindow::HideTileMap(int tileMapNumber)
 }
 #endif
 
-void GameWindow::ThrowTilemaps()
+/*void GameWindow::ThrowTilemaps()
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -415,4 +415,3 @@ void GameWindow::ThrowSprAttr()
 		std::cout << std::endl;
 	}
 }*/
-#endif
