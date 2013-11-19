@@ -20,10 +20,10 @@ TileMapWindow::~TileMapWindow()
 
 void TileMapWindow::Render()
 {
-	/*sf::Event event;
+	sf::Event event;
 	sf::Texture texture;
 	
-	auto rendererTileMap = _gbc.GetRenderer().GetRenderedTileMap(_tileMapNumber);
+	auto rendererTileMap = _gbc.GetRenderer().GetRenderedBackground(_tileMapNumber);
 	
 	int tileMapPixelWidth = core::BackgroundTileNumberMap::WIDTH * core::Tile::WIDTH;
 	int tileMapPixelHeight = core::BackgroundTileNumberMap::HEIGHT * core::Tile::HEIGHT;
@@ -36,7 +36,7 @@ void TileMapWindow::Render()
 			
 			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rendererTileMap.GetArray()[x][y].GetRed());
 			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rendererTileMap.GetArray()[x][y].GetGreen());
-			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rendererTileMap.GetArray()[x][y].getBlue());
+			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rendererTileMap.GetArray()[x][y].GetBlue());
 			_rawFrame[pixelIndex * 4 + 3] = (sf::Uint8) (0xFF);
 		}
 	}
@@ -53,5 +53,5 @@ void TileMapWindow::Render()
 	
 	clear();
 	draw(sprite);
-	display();*/
+	display();
 }

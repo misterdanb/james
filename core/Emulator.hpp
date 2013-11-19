@@ -54,6 +54,8 @@ namespace james
 			Joypad &GetJoypad();
 			SerialPort &GetSerialPort();
 			Cartridge &GetCartridge();
+
+            Renderer &GetRenderer();
 		
 		private:
 			void ExecuteMachineClocks(int);

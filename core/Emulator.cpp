@@ -232,6 +232,11 @@ Cartridge &Emulator::GetCartridge()
 	return (*_cartridge);
 }
 
+Renderer &Emulator::GetRenderer()
+{
+    return (*_renderer);
+}
+
 void Emulator::ExecuteMachineClocks(int clocks)
 {
 	_pendingClocks += clocks;
