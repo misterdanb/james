@@ -39,14 +39,14 @@ void VideoRam::SetTile(int tileIndex, Tile tile)
 
 void VideoRam::SetBackgroundTileNumber(int backgroundIndex, int backgroundTileNumberIndex, int backgroundTileNumber)
 {
-	WriteByteToBank(0, 0x9800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE + backgroundTileNumberIndex, backgroundTileNumber);
+	WriteByteToBank(0, 0x1800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE + backgroundTileNumberIndex, backgroundTileNumber);
 }
 
 void VideoRam::SetBackgroundTileNumberMap(int backgroundIndex, BackgroundTileNumberMap backgroundTileNumberMap)
 {
 	Array<int, BackgroundTileNumberMap::DATA_SIZE> backgroundTileNumberMapData = backgroundTileNumberMap.GetData();
 	
-	for (int address = 0x9800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE, i = 0; i < BackgroundTileNumberMap::DATA_SIZE; address++, i++)
+	for (int address = 0x1800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE, i = 0; i < BackgroundTileNumberMap::DATA_SIZE; address++, i++)
 	{
 		WriteByteToBank(0, address, backgroundTileNumberMapData[i]);
 	}
@@ -54,14 +54,14 @@ void VideoRam::SetBackgroundTileNumberMap(int backgroundIndex, BackgroundTileNum
 
 void VideoRam::SetBackgroundAttribute(int backgroundIndex, int backgroundAttributeIndex, BackgroundAttribute backgroundAttribute)
 {
-	WriteByteToBank(1, 0x9800 + backgroundIndex * BackgroundAttributeMap::DATA_SIZE + backgroundAttributeIndex, backgroundAttribute.GetData());
+	WriteByteToBank(1, 0x1800 + backgroundIndex * BackgroundAttributeMap::DATA_SIZE + backgroundAttributeIndex, backgroundAttribute.GetData());
 }
 
 void VideoRam::SetBackgroundAttributeMap(int index, BackgroundAttributeMap backgroundAttributeMap)
 {
 	Array<int, BackgroundAttributeMap::DATA_SIZE> backgroundAttributeMapData = backgroundAttributeMap.GetData();
 	
-	for (int address = 0x9800 + index * BackgroundAttributeMap::DATA_SIZE, i = 0; i < BackgroundAttributeMap::DATA_SIZE; address++, i++)
+	for (int address = 0x1800 + index * BackgroundAttributeMap::DATA_SIZE, i = 0; i < BackgroundAttributeMap::DATA_SIZE; address++, i++)
 	{
 		WriteByteToBank(1, address, backgroundAttributeMapData[i]);
 	}
@@ -86,14 +86,14 @@ Tile VideoRam::GetTile(int tileIndex)
 
 int VideoRam::GetBackgroundTileNumber(int backgroundIndex, int backgroundTileNumberIndex)
 {
-	return ReadByteFromBank(0, 0x9800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE + backgroundTileNumberIndex);
+	return ReadByteFromBank(0, 0x1800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE + backgroundTileNumberIndex);
 }
 
 BackgroundTileNumberMap VideoRam::GetBackgroundTileNumberMap(int backgroundIndex)
 {
 	Array<int, BackgroundTileNumberMap::DATA_SIZE> backgroundTileNumberMapData;
 	
-	for (int address = 0x9800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE, i = 0; i < BackgroundTileNumberMap::DATA_SIZE; address++, i++)
+	for (int address = 0x1800 + backgroundIndex * BackgroundTileNumberMap::DATA_SIZE, i = 0; i < BackgroundTileNumberMap::DATA_SIZE; address++, i++)
 	{
 		backgroundTileNumberMapData[i] = ReadByteFromBank(0, address);
 	}
@@ -103,14 +103,14 @@ BackgroundTileNumberMap VideoRam::GetBackgroundTileNumberMap(int backgroundIndex
 
 BackgroundAttribute VideoRam::GetBackgroundAttribute(int backgroundIndex, int backgroundAttributeIndex)
 {
-	return ReadByteFromBank(1, 0x9800 + backgroundIndex * BackgroundAttributeMap::DATA_SIZE + backgroundAttributeIndex);
+	return ReadByteFromBank(1, 0x1800 + backgroundIndex * BackgroundAttributeMap::DATA_SIZE + backgroundAttributeIndex);
 }
 
 BackgroundAttributeMap VideoRam::GetBackgroundAttributeMap(int index)
 {
 	Array<int, BackgroundAttributeMap::DATA_SIZE> backgroundAttributeMapData;
 	
-	for (int address = 0x9800 + index * BackgroundAttributeMap::DATA_SIZE, i = 0; i < BackgroundAttributeMap::DATA_SIZE; address++, i++)
+	for (int address = 0x1800 + index * BackgroundAttributeMap::DATA_SIZE, i = 0; i < BackgroundAttributeMap::DATA_SIZE; address++, i++)
 	{
 		backgroundAttributeMapData[i] = ReadByteFromBank(1, address);
 	}
