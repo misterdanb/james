@@ -232,6 +232,11 @@ Cartridge &Emulator::GetCartridge()
 	return (*_cartridge);
 }
 
+Memory &Emulator::GetMemory()
+{
+    return _memory;
+}
+
 Renderer &Emulator::GetRenderer()
 {
     return (*_renderer);

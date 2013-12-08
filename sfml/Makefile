@@ -2,7 +2,7 @@ SHELL = /bin/sh
 CC    = g++
 
 INCLUDE      = -I .
-LIBS         =  -ljames -lsfml-window -lsfml-system -lsfml-graphics
+LIBS         = -ljames -lsfml-window -lsfml-system -lsfml-graphics
 FLAGS        = -std=c++11
 CFLAGS       = -O3 -c
 LDFLAGS      = -L../core
@@ -29,6 +29,9 @@ main.o: main.cpp
 
 GameWindow.o: GameWindow.cpp
 	$(CC) $(FLAGS) $(CFLAGS) GameWindow.cpp -o GameWindow.o
+
+TileViewerWindow.o: TileViewerWindow.cpp
+	$(CC) $(FLAGS) $(CFLAGS) TileViewerWindow.cpp -o TileViewerWindow.o
 
 TileMapWindow.o: TileMapWindow.cpp
 	$(CC) $(FLAGS) $(CFLAGS) TileMapWindow.cpp -o TileMapWindow.o

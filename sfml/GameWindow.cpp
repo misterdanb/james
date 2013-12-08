@@ -20,12 +20,15 @@ GameWindow::GameWindow(int width, int height, std::string rom)
 	  ,_tileMap0WindowVisible(false),
 	  _tileMap1WindowVisible(false),
 	  _tileMap0Window(0, GetDevice()),
-	  _tileMap1Window(1, GetDevice())
+	  _tileMap1Window(1, GetDevice()),
+      _tileViewerWindowVisible(false),
+      _tileViewerWindow(GetDevice())
 #endif
 {
 #ifdef DEBUG
 	_tileMap0Window.setVisible(false);
 	_tileMap1Window.setVisible(false);
+    _tileViewerWindow.setVisible(false);
 #endif
 	LoadRom(rom);
 	
@@ -197,6 +200,11 @@ void GameWindow::Render()
 	{
 		_tileMap1Window.Render();
 	}
+
+    if (_tileViewerWindowVisible)
+    {
+        _tileViewerWindow.Render();
+    }
 #endif
 }
 
@@ -291,6 +299,19 @@ void GameWindow::HideTileMap(int tileMapNumber)
 	_tileMap1Window.setVisible(false);
 	_tileMap0Window.setVisible(false);
 }
+
+void GameWindow::ShowTileViewer()
+{
+    _tileViewerWindowVisible = true;
+    _tileViewerWindow.setVisible(_tileViewerWindowVisible);
+}
+
+void GameWindow::HideTileViewer()
+{
+    _tileViewerWindowVisible = false;
+    _tileViewerWindow.setVisible(_tileViewerWindowVisible);
+}
+
 #endif
 
 /*void GameWindow::ThrowTilemaps()

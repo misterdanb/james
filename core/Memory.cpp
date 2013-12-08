@@ -69,7 +69,7 @@ void Memory::WriteByte(int address, int value)
 	}
 	else if (address <= 0x9FFF)
 	{
-		if ((*_ioPorts).GetLCDMode() != LCDMode::TRANSFERRING_DATA)
+		//if ((*_ioPorts).GetLCDMode() != LCDMode::TRANSFERRING_DATA)
 		{
 			_videoRam->WriteByte(address, value);
 		}
@@ -84,8 +84,8 @@ void Memory::WriteByte(int address, int value)
 	}
 	else if (address <= 0xFE9F)
 	{
-		if ((*_ioPorts).GetLCDMode() != LCDMode::SEARCHING_OAM &&
-		    (*_ioPorts).GetLCDMode() != LCDMode::TRANSFERRING_DATA)
+		//if ((*_ioPorts).GetLCDMode() != LCDMode::SEARCHING_OAM &&
+		//    (*_ioPorts).GetLCDMode() != LCDMode::TRANSFERRING_DATA)
 		{
 			_spriteAttributeRam->WriteByte(address, value);
 		}

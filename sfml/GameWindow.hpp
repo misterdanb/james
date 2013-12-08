@@ -5,6 +5,7 @@
 #include "../core/Frontend.hpp"
 
 #include "TileMapWindow.hpp"
+#include "TileViewerWindow.hpp"
 
 #define DEBUG
 
@@ -35,6 +36,9 @@ namespace james
 			
 			void ShowTileMap(int);
 			void HideTileMap(int);
+
+            void ShowTileViewer();
+            void HideTileViewer();
 		
 		private:
 			void ThrowTilemaps();
@@ -59,6 +63,10 @@ namespace james
 			
 			TileMapWindow _tileMap0Window;
 			TileMapWindow _tileMap1Window;
+
+            bool _tileViewerWindowVisible;
+
+            TileViewerWindow _tileViewerWindow;
 #endif
 		};
 	}

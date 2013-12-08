@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
 		
 		window.ShowTileMap(0);
 		window.ShowTileMap(1);
+
+        window.ShowTileViewer();
 		
 		while (window.isOpen())
 		{
