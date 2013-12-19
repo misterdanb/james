@@ -285,7 +285,7 @@ void ClassicRenderer::DrawBackgroundMapTile(int mapX, int enabledColors)
 		position.SetX(position.GetX() + BackgroundTileNumberMap::WIDTH * Tile::WIDTH); // IAW: 256, eeyup
 	}
 	
-	position.SetX(position.GetX() % BackgroundTileNumberMap::WIDTH * Tile::WIDTH);
+	position.SetX(position.GetX() % (BackgroundTileNumberMap::WIDTH * Tile::WIDTH));
 	
 	int mapElementX = mapX;
 	int mapElementY = ((*_ioPorts).GetLCDY() + (*_ioPorts).GetScrollY()) / Tile::HEIGHT;
