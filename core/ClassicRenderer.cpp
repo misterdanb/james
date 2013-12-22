@@ -122,7 +122,7 @@ PixelMap<Renderer::RENDERED_BACKGROUND_WIDTH, Renderer::RENDERED_BACKGROUND_HEIG
 				tileIndex = (0x8000 - 0x8000) / Tile::DATA_SIZE + backgroundTileNumber;
 			}
 			
-			Array2<int, Tile::WIDTH, Tile::HEIGHT> &tileArray = (*_videoRam).GetTile(tileIndex).GetArray();
+            Tile tile = (*_videoRam).GetTile(tileIndex);
 			Array<Color<int>, 4> &backgroundPalette = (*_ioPorts).GetMonochromeBackgroundPalette();
 			
 			for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
@@ -131,7 +131,7 @@ PixelMap<Renderer::RENDERED_BACKGROUND_WIDTH, Renderer::RENDERED_BACKGROUND_HEIG
 				{
 					Color<int> &pixel = renderedBackground.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
 					
-					pixel = backgroundPalette[tileArray[tileX][tileY]];
+					pixel = backgroundPalette[tile.GetArray()[tileX][tileY]];
 					
 					pixel.SetRed(((pixel.GetRed() << 3) | (pixel.GetRed() >> 2)) & 0xFF),
 					pixel.SetGreen(((pixel.GetGreen() << 3) | (pixel.GetGreen() >> 2)) & 0xFF),
@@ -371,9 +371,7 @@ void ClassicRenderer::DrawTile(Vector2<int> position,
 	int tileY = (*_ioPorts).GetLCDY() - position.GetY();
 	
 	if (tileY >= 0 && tileY < Tile::HEIGHT)
-	{
-		Array2<int, Tile::WIDTH, Tile::HEIGHT> &tileArray = tile.GetArray();
-		
+	{	
 		for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
 		{
 			int scanlinePosition = position.GetX() + tileX;
@@ -394,7 +392,7 @@ void ClassicRenderer::DrawTile(Vector2<int> position,
 					realTileY = 7 - tileY;
 				}
 				
-				int colorNumber = tileArray[realTileX][realTileY];
+				int colorNumber = tile.GetArray()[realTileX][realTileY];
 				
 				if (((colorNumber == 0) && (enabledColors & COLOR_0)) ||
 				    ((colorNumber == 1) && (enabledColors & COLOR_1)) ||
