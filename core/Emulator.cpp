@@ -232,6 +232,11 @@ Cartridge &Emulator::GetCartridge()
 	return (*_cartridge);
 }
 
+Processor &Emulator::GetProcessor()
+{
+    return _hybr1s80;
+}
+
 Memory &Emulator::GetMemory()
 {
     return _memory;

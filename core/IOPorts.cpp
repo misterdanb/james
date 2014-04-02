@@ -93,10 +93,18 @@ int IOPorts::ReadByte(int address)
 		//case 0xFF00: return 0xFF;
 		case 0xFF00:
 			// joypad
-			return ((!(_directionKeysSelected ? (*_joypad).GetRight() : (*_joypad).GetButtonA())) ? 0x01 : 0) |
-			       ((!(_directionKeysSelected ? (*_joypad).GetLeft() : (*_joypad).GetButtonB())) ? 0x02 : 0) |
-			       ((!(_directionKeysSelected ? (*_joypad).GetUp() : (*_joypad).GetSelect())) ? 0x04 : 0) |
-			       ((!(_directionKeysSelected ? (*_joypad).GetDown() : (*_joypad).GetStart())) ? 0x08 : 0) |
+			return ((!(_directionKeysSelected ?
+                    (*_joypad).GetRight() :
+                    (*_joypad).GetButtonA())) ? 0x01 : 0) |
+			       ((!(_directionKeysSelected ?
+                    (*_joypad).GetLeft() :
+                    (*_joypad).GetButtonB())) ? 0x02 : 0) |
+			       ((!(_directionKeysSelected ?
+                    (*_joypad).GetUp() :
+                    (*_joypad).GetSelect())) ? 0x04 : 0) |
+			       ((!(_directionKeysSelected ?
+                    (*_joypad).GetDown() :
+                    (*_joypad).GetStart())) ? 0x08 : 0) |
 			       ((!_directionKeysSelected) ? 0x10 : 0) |
 			       ((!_buttonKeysSelected) ? 0x20 : 0);
 			
@@ -130,7 +138,11 @@ void IOPorts::WriteByte(int address, int value)
 		case 0xFF00:
 			// joypad input
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
-			
+
+            // if bit number 4 is set to 0, the direction keys are
+            // selected; if bit number 5 is set to 0 the button keys
+            // are selected; accordingly each of these is not selected
+            // as long as it is 1
 			_directionKeysSelected = !GetBit(value, 4);
 			_buttonKeysSelected = !GetBit(value, 5);
 			
@@ -139,30 +151,45 @@ void IOPorts::WriteByte(int address, int value)
 		case 0xFF01:
 			// serial transfer data
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
+
+            // TODO
 			
 			break;
 			
 		case 0xFF02:
 			// serial transfer control
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
+
+            // TODO
 			
 			break;
 			
 		case 0xFF04:
-			// write to devider register
-			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
+			// write to divider register
+
+            // writing any value to the divider register resets it to 0
+			WriteByteToBank(0, address - IO_PORTS_OFFSET, 0);
+
+            _divider = 0;
 			
 			break;
 			
 		case 0xFF05:
 			// timer counter
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
-			
+
+            // not sure if the value written to this address is actually
+            // loaded into the timer countrer, as this should be the duty
+            // of the counter; anyway, let's just load it
+            _timerCounter = value;
+
 			break;
 			
 		case 0xFF06:
 			// timer modulo
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
+
+            _timerModulo = value;
 			
 			break;
 			
@@ -170,6 +197,12 @@ void IOPorts::WriteByte(int address, int value)
 			// timer control
 			WriteByteToBank(0, address - IO_PORTS_OFFSET, value);
 			
+            // determine the clock frequency and store it;
+            // 
+            // 00 -   4096 Hz - 1024 machine clocks
+            // 01 - 262144 Hz -   16 machine clocks
+            // 10 -  65536 Hz -   64 machine clocks
+            // 11 -  16384 Hz -  256 machine clocks
 			switch (value & 0x03)
 			{
 				case 0x00:
@@ -192,6 +225,8 @@ void IOPorts::WriteByte(int address, int value)
 					break;
 			}
 			
+            // if bit number 2 is set to 0, the timer is stoppd; otherwise it
+            // runs as normal
 			_timerStopped = !GetBit(value, 2);
 			
 			break;
@@ -539,9 +574,16 @@ void IOPorts::Deserialize(std::istream &is)
 
 void IOPorts::ExecuteOAMDMATransfer()
 {
-	for (int i = 0; i < 0x0100; i++)
+    int offset = 0;
+
+    while (offset < 0x0100)
 	{
-		(*_bus).WriteByte(SpriteAttributeRam::SPRITE_ATTRIBUTE_RAM_OFFSET + i, (*_bus).ReadByte(_oamDMATransferAddress + i));
+        int sourceByte = (*_bus).ReadByte(_oamDMATransferAddress + offset);
+
+		(*_bus).WriteByte(SpriteAttributeRam::SPRITE_ATTRIBUTE_RAM_OFFSET + offset,
+                          sourceByte);
+
+        offset++;
 	}
 }
 
@@ -549,11 +591,18 @@ void IOPorts::ExecuteHDMATransfer()
 {
 	if (_hdmaMode == HDMAMode::GENERAL_PURPOSE_HDMA)
 	{
-		for (int offset = 0; offset < _hdmaTransferLength; offset++)
+        int offset = 0;
+
+        while (offset < _hdmaTransferLength)
 		{
-			WriteByte(_hdmaTransferDestinationAddress + offset, (*_bus).ReadByte(_hdmaTransferSourceAddress + offset));
+            int sourceByte = (*_bus).ReadByte(_hdmaTransferSourceAddress + offset);
+
+			(*_bus).WriteByte(_hdmaTransferDestinationAddress + offset,
+                              sourceByte);
+
+            offset++;
 		}
-		
+
 		// emulate bit 7 for reading, so the dma transfer "takes some time"
 		// _rc.ioPorts[0xFF55 - 0xFF00] = SetBit(_rc.ioPorts[0xFF55 - 0xFF00], 7, GBC_TRUE);
 		//_rc.ioPorts[address - 0xFF00] = 0xFF;
@@ -561,9 +610,16 @@ void IOPorts::ExecuteHDMATransfer()
 	}
 	else if (_hdmaMode == HDMAMode::HBLANK_HDMA)
 	{
-		for (int offset = _hBlankHDMATransferCurrentOffset; offset < _hBlankHDMATransferCurrentOffset + 0x10; offset++)
+        int offset = _hBlankHDMATransferCurrentOffset;
+
+        while (offset < _hBlankHDMATransferCurrentOffset + 0x10)
 		{
-			(*_bus).WriteByte(_hdmaTransferDestinationAddress + offset, (*_bus).ReadByte(_hdmaTransferSourceAddress + offset));
+            int sourceByte = (*_bus).ReadByte(_hdmaTransferSourceAddress + offset);
+
+			(*_bus).WriteByte(_hdmaTransferDestinationAddress + offset,
+                              sourceByte);
+
+            offset++;
 		}
 		
 		_hBlankHDMATransferCurrentOffset += 0x10;
@@ -593,8 +649,11 @@ void IOPorts::SetSerialPort(SerialPort &serialPort)
 void IOPorts::SetHDMATransferActive(bool hdmaTransferActive)
 {
 	_hdmaTransferActive = hdmaTransferActive;
+
+    int currentByte = ReadByteFromBank(0, 0xFF55 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 7, !_hdmaTransferActive);
 	
-	WriteByteToBank(0, 0xFF55 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF55 - IO_PORTS_OFFSET), 7, !_hdmaTransferActive));
+	WriteByteToBank(0, 0xFF55 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetHDMAMode(HDMAMode hdmaMode)
@@ -643,116 +702,161 @@ void IOPorts::SetSelectedVideoRamBank(bool selectedVideoRamBank)
 void IOPorts::SetDirectionKeysSelected(bool directionKeysSelected)
 {
 	_directionKeysSelected = directionKeysSelected;
+
+    int currentByte = ReadByteFromBank(0, 0xFF00 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 4, directionKeysSelected);
 	
-	WriteByteToBank(0, 0xFF00 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF00 - IO_PORTS_OFFSET), 4, directionKeysSelected));
+	WriteByteToBank(0, 0xFF00 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetButtonKeysSelected(bool buttonKeysSelected)
 {
 	_buttonKeysSelected = buttonKeysSelected;
 	
-	WriteByteToBank(0, 0xFF00 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF00 - IO_PORTS_OFFSET), 5, buttonKeysSelected));
+    int currentByte = ReadByteFromBank(0, 0xFF00 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 5, buttonKeysSelected);
+
+	WriteByteToBank(0, 0xFF00 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetLCDDisplayEnabled(bool lcdDisplayEnabled)
 {
 	_lcdDisplayEnabled = lcdDisplayEnabled;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 7, lcdDisplayEnabled);
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 7, lcdDisplayEnabled));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetWindowMapDisplaySelect(bool windowMapDisplaySelect)
 {
 	_windowMapDisplaySelect = windowMapDisplaySelect;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 6, windowMapDisplaySelect);
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 6, windowMapDisplaySelect));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetWindowDisplayEnabled(bool windowDisplayEnabled)
 {
 	_windowDisplayEnabled = windowDisplayEnabled;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 5, windowDisplayEnabled);
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 5, windowDisplayEnabled));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetBackgroundAndWindowTileDataSelect(bool backgroundAndWindowTileDataSelect)
 {
 	_backgroundAndWindowTileDataSelect = backgroundAndWindowTileDataSelect;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 4, backgroundAndWindowTileDataSelect);
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 4, backgroundAndWindowTileDataSelect));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetBackgroundMapDisplaySelect(bool backgroundMapDisplaySelect)
 {
 	_backgroundMapDisplaySelect = backgroundMapDisplaySelect;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 3, backgroundMapDisplaySelect);
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 3, backgroundMapDisplaySelect));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetSpriteSize(SpriteSize spriteSize)
 {
 	_spriteSize = spriteSize;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 2, GetEnumValue(spriteSize));
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 2, GetEnumValue(spriteSize)));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetSpriteDisplayEnabled(bool spriteDisplayEnabled)
 {
 	_spriteDisplayEnabled = spriteDisplayEnabled;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 1, spriteDisplayEnabled);
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 1, spriteDisplayEnabled));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetBackgroundDisplayEnabled(bool backgroundDisplayEnabled)
 {
 	_backgroundDisplayEnabled = backgroundDisplayEnabled;
+
+    int currentByte = ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 0, backgroundDisplayEnabled);
 	
-	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF40 - IO_PORTS_OFFSET), 0, backgroundDisplayEnabled));
+	WriteByteToBank(0, 0xFF40 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetLCDMode(LCDMode lcdMode)
 {
 	_lcdMode = lcdMode;
-	
-	WriteByteToBank(0,
-	                0xFF41 - IO_PORTS_OFFSET,
-			((ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET) & 0xFC)
-			        | (GetEnumValue(lcdMode) & 0x03)));
+
+    int currentByte = ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET);
+    int newByte = (currentByte & 0xFC) | (GetEnumValue(lcdMode) & 0x03);
+
+    WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetCoincidenceFlag(bool coincidenceFlag)
 {
 	_coincidenceFlag = coincidenceFlag;
-	
-	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET), 2, coincidenceFlag));
+
+    int currentByte = ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 2, coincidenceFlag);
+
+    WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetHBlankInterruptEnabled(bool hBlankInterruptEnabled)
 {
 	_hBlankInterruptEnabled = hBlankInterruptEnabled;
-	
-	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET), 3, hBlankInterruptEnabled));
+
+    int currentByte = ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 3, hBlankInterruptEnabled);
+
+    WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetVBlankInterruptEnabledInLCD(bool vBlankInterruptEnabledInLCD)
 {
 	_vBlankInterruptEnabledInLCD = vBlankInterruptEnabledInLCD;
-	
-	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET), 4, vBlankInterruptEnabledInLCD));
+
+    int currentByte = ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 4, vBlankInterruptEnabledInLCD);
+
+    WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetOAMInterruptEnabled(bool oamInterruptEnabled)
 {
 	_oamInterruptEnabled = oamInterruptEnabled;
-	
-	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET), 5, oamInterruptEnabled));
+
+    int currentByte = ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 5, oamInterruptEnabled);
+
+    WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetCoincidenceInterruptEnabled(bool coincidenceInterruptEnabled)
 {
 	_coincidenceInterruptEnabled = coincidenceInterruptEnabled;
+
+    int currentByte = ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 6, coincidenceInterruptEnabled);
 	
-	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF41 - IO_PORTS_OFFSET), 6, coincidenceInterruptEnabled));
+	WriteByteToBank(0, 0xFF41 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetScrollX(int scrollX)
@@ -846,15 +950,21 @@ void IOPorts::SetTimerClockFrequency(int timerClockFrequency)
 			bitValue = 0;
 			break;
 	}
-	
-	WriteByteToBank(0, 0xFF07 - IO_PORTS_OFFSET, (ReadByteFromBank(0, 0xFF07 - IO_PORTS_OFFSET) & 0xFC) | bitValue);
+
+    int currentByte = ReadByteFromBank(0, 0xFF07 - IO_PORTS_OFFSET);
+    int newByte = (currentByte & 0xFC) | bitValue;
+
+	WriteByteToBank(0, 0xFF07 - IO_PORTS_OFFSET, newByte);
 }
 
 void IOPorts::SetTimerStopped(bool timerStopped)
 {
 	_timerStopped = timerStopped;
+
+    int currentByte = ReadByteFromBank(0, 0xFF07 - IO_PORTS_OFFSET);
+    int newByte = SetBit(currentByte, 2, timerStopped);
 	
-	WriteByteToBank(0, 0xFF07 - IO_PORTS_OFFSET, SetBit(ReadByteFromBank(0, 0xFF07 - IO_PORTS_OFFSET), 2, timerStopped));
+	WriteByteToBank(0, 0xFF07 - IO_PORTS_OFFSET, newByte);
 }
 
 MemoryBus &IOPorts::GetMemoryBus()

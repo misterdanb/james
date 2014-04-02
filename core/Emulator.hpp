@@ -55,6 +55,7 @@ namespace james
 			SerialPort &GetSerialPort();
 			Cartridge &GetCartridge();
 
+            Processor &GetProcessor();
             Memory &GetMemory();
 
             Renderer &GetRenderer();

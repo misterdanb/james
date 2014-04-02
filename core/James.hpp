@@ -22,6 +22,8 @@
 #include "Vector.template"
 #include "Vector2.template"
 
+#include "NonCopyable.hpp"
+
 #define LOG_LEVEL_2
 
 #ifdef DEBUG
