@@ -1,17 +1,13 @@
 #include "Renderer.hpp"
 
-Renderer::Renderer() : _memory(nullptr),
-		       _interruptHandler(nullptr),
-		       _videoRam(nullptr),
-		       _spriteAttributeRam(nullptr),
-		       _ioPorts(nullptr)
+Renderer::Renderer()
+    : _memory(nullptr),
+      _interruptHandler(nullptr),
+      _videoRam(nullptr),
+      _spriteAttributeRam(nullptr),
+      _ioPorts(nullptr)
 {
 }
-
-Renderer::~Renderer()
-{
-}
-
 
 void Renderer::SetMemory(Memory &memory)
 {

@@ -15,10 +15,10 @@ Emulator::Emulator()
 	  _paused(true),
 	  _pendingClocks(0),
 	  _speedFactor(1),
-	  _lcd(NULL),
-	  _joypad(NULL),
-	  _serialPort(NULL),
-	  _cartridge(NULL),
+	  _lcd(nullptr),
+	  _joypad(nullptr),
+	  _serialPort(nullptr),
+	  _cartridge(nullptr),
 	  _forceClassicGameboy(true), // for testing
 	  _timerTicks(0),
 	  _dividerTicks(0),
@@ -28,19 +28,28 @@ Emulator::Emulator()
 
 Emulator::~Emulator()
 {
+    delete _videoRam;
+    delete _workRam;
+    delete _spriteAttributeRam;
+    delete _ioPorts;
+    delete _highRam;
+    
+    delete _interruptHandler;
+    
+    delete _renderer;
 }
 
 void Emulator::Initialize()
 {
 	LOG("Initializing.");
 	
-	_videoRam.reset(new VideoRam());
-	_workRam.reset(new WorkRam());
-	_spriteAttributeRam.reset(new SpriteAttributeRam());
-	_ioPorts.reset(new IOPorts());
-	_highRam.reset(new HighRam());
+	_videoRam = new VideoRam();
+	_workRam = new WorkRam();
+	_spriteAttributeRam = new SpriteAttributeRam();
+	_ioPorts = new IOPorts();
+	_highRam = new HighRam();
 	
-	_interruptHandler.reset(new InterruptHandler());
+	_interruptHandler = new InterruptHandler();
 	
 	_memory.SetVideoRam(*_videoRam);
 	_memory.SetWorkRam(*_workRam);
@@ -51,7 +60,7 @@ void Emulator::Initialize()
 	if (_cartridge->GetHeader().platformSupport == PlatformSupport::GAMEBOY_COLOR_SUPPORT ||
 	    _cartridge->GetHeader().platformSupport != PlatformSupport::GAMEBOY_COLOR_ONLY)
 	{
-		_renderer.reset(new ClassicRenderer());
+		_renderer = new ClassicRenderer();
 		
 		(*_renderer).SetMemory(_memory);
 		(*_renderer).SetInterruptHandler(*_interruptHandler);
@@ -95,11 +104,11 @@ bool Emulator::IsPaused()
 
 void Emulator::Reset()
 {
-	(*_videoRam).Reset();
-	(*_workRam).Reset();
-	(*_spriteAttributeRam).Reset();
-	(*_ioPorts).Reset();
-	(*_highRam).Reset();
+	_videoRam->Reset();
+	_workRam->Reset();
+	_spriteAttributeRam->Reset();
+	_ioPorts->Reset();
+	_highRam->Reset();
 	
 	_hybr1s80.PowerUp();
 }
@@ -185,7 +194,7 @@ void Emulator::SetRom(DynamicArray<int> &rom)
 //
 //		LOG("Using Gameboy Classic rendering method.");
 //	}
-	_memory.SetCartridge(_cartridge);
+	_memory.SetCartridge(*_cartridge);
 }
 
 void Emulator::SetLCD(LCD &lcd)

@@ -100,9 +100,9 @@ Frame ClassicRenderer::GetFrame()
 	return Frame(_frameBuffer);
 }
 
-PixelMap<Renderer::RENDERED_BACKGROUND_WIDTH, Renderer::RENDERED_BACKGROUND_HEIGHT> ClassicRenderer::GetRenderedBackground(int backgroundIndex)
+PixelMap<Renderer::BG_WIDTH, Renderer::BG_HEIGHT> ClassicRenderer::GetRenderedBackground(int backgroundIndex)
 {
-	PixelMap<RENDERED_BACKGROUND_WIDTH, RENDERED_BACKGROUND_HEIGHT> renderedBackground;
+	PixelMap<BG_WIDTH, BG_HEIGHT> renderedBackground;
 	
 	for (int mapX = 0; mapX < BackgroundTileNumberMap::WIDTH; mapX++)
 	{

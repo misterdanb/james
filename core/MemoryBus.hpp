@@ -24,6 +24,8 @@ namespace james
              * 
              * @param address The address from which the byte is read.
              * @return The byte which has been read.
+             * 
+             * @see WriteByte
              */
             virtual int ReadByte(int address) = 0;
             
@@ -32,6 +34,8 @@ namespace james
              * 
              * @param address The address to which the byte is written.
              * @param value The byte which is written.
+             * 
+             * @see ReadByte
              */
             virtual void WriteByte(int address, int value) = 0;
         };

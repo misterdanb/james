@@ -8,12 +8,13 @@ namespace james
         /**
          * @class NonCopyable
          * 
-         * NonCopyable is an abstract implementation for all classes
-         * that must not be copied.
+         * NonCopyable is an implementation for all classes that must
+         * not be copied.
          */
         class NonCopyable
         {
         public:
+            NonCopyable() = default;
             NonCopyable(const NonCopyable&) = delete;
             NonCopyable& operator=(const NonCopyable&) = delete;
         };

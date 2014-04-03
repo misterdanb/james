@@ -11,8 +11,8 @@ namespace james
         /**
          * @class MemoryBlock
          * 
-         * MemoryBlock is an abstract implementation for all classes
-         * that use banked or non-banked memory.
+         * MemoryBlock is an implementation for all classes that use
+         * banked or non-banked memory.
          */
         class MemoryBlock : public Serializable
         {
@@ -30,9 +30,9 @@ namespace james
             MemoryBlock(int banks, int size);
             
             /**
-             * Decstructor of Memory.
+             * Destructor of MemoryBlock.
              */
-            ~MemoryBlock();
+            ~MemoryBlock() = default;
             
             /**
              * Reads a byte.

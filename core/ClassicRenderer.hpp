@@ -25,7 +25,7 @@ namespace james
 			void RenderVBlank();
 			
 			Frame GetFrame();
-			PixelMap<Renderer::RENDERED_BACKGROUND_WIDTH, Renderer::RENDERED_BACKGROUND_HEIGHT> GetRenderedBackground(int);
+			PixelMap<Renderer::BG_WIDTH, Renderer::BG_HEIGHT> GetRenderedBackground(int);
 		
 		private:
 			void DrawSprites(int, SpriteToBackgroundPriority);

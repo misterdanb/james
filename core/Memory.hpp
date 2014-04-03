@@ -29,20 +29,20 @@ namespace james
          * on the bus must be done on this class, if they shell behave
          * like on an actual game boy.
          */
-        class Memory : public NonCopyable, MemoryBus, public Serializable
+        class Memory : public NonCopyable, public MemoryBus, public Serializable
         {
         public:
             /**
              * Constructor of Memory.
              * 
-             * Initializes all members with their default values.
+             * Initializes with the default values.
              */
             Memory();
             
             /**
-             * Decstructor of Memory.
+             * Destructor of Memory.
              */
-            ~Memory();
+            ~Memory() = default;
             
             int ReadByte(int);
             void WriteByte(int, int);
@@ -51,233 +51,213 @@ namespace james
             void Deserialize(std::istream &);
             
             /**
-             * Sets the cartridge.
+             * Modifies the cartridge.
              * 
-             * @param cartrige Reference of the cartridge.
+             * @param cartrige New value of the cartridge.
              */
             void SetCartridge(Cartridge &cartridge);
             
             /**
-             * Sets the video ram.
+             * Modifies the video ram.
              * 
-             * @param videoRam Reference of the video ram.
+             * @param videoRam New  video ram.
              */
             void SetVideoRam(VideoRam &videoRam);
             
             /**
-             * Sets the work ram.
+             * Modifies the work ram.
              * 
-             * @param workRam Reference of the work ram.
+             * @param workRam New work ram.
              */
             void SetWorkRam(WorkRam &workRam);
             
             /**
-             * Sets the sprite attribute ram.
+             * Modifies the sprite attribute ram.
              * 
-             * @param spriteAttributeRam Reference of the sprite
-             *                           attribute ram.
+             * @param spriteAttributeRam New sprite attribute ram.
              */
             void SetSpriteAttributeRam(SpriteAttributeRam &spriteAttributeRam);
             
             /**
-             * Sets the io ports.
+             * Modifies the io ports.
              * 
-             * @param ioPorts Reference of the io ports.
+             * @param ioPorts New io ports.
              */
             void SetIOPorts(IOPorts &ioPorts);
             
             /**
-             * Sets the high ram
+             * Modifies the high ram
              * 
-             * @param highRam Reference of the high ram.
+             * @param highRam New the high ram.
              */
             void SetHighRam(HighRam &highRam);
             
             /**
-             * Sets the interrupt enable register.
+             * Modifies the interrupt enable register.
              * 
-             * @param interruptEnableRegister New value of the interrupt
-             *                                enable register.
+             * @param interruptEnableRegister New interrupt enable
+             *        register.
              */
             void SetInterruptEnableRegister(int interruptEnableRegister);
             
             /**
-             * Sets the vblank interrupt enabled bit of the interrupt
-             * enable register.
+             * Modifies the vblank interrupt enabled bit of the
+             * interrupt enable register.
              * 
-             * @param vBlankInterruptEnabled New value of the vblank
-             *                               interrupt enabled bit.
+             * @param vBlankInterruptEnabled New vblank interrupt
+             *        enabled bit.
              */
             void SetVBlankInterruptEnabled(bool vBlankInterruptEnabled);
             
             /**
-             * Sets the lcd status interrupt enabled bit of the
+             * Modifies the lcd status interrupt enabled bit of the
              * interrupt enable register.
              * 
-             * @param lcdStatusInterruptEnabled New value of the lcd
-             *                                  status interrupt enabled
-             *                                  bit.
+             * @param lcdStatusInterruptEnabled New lcd status interrupt
+             *        enabled bit.
              */
             void SetLCDStatusInterruptEnabled(bool lcdStatusInterruptEnabled);
             
             /**
-             * Sets the timer interrupt enabled bit of the interrupt
+             * Modifies the timer interrupt enabled bit of the interrupt
              * enable register.
              * 
-             * @param timerInterruptEnabled New value of the timer
-             *                              interrupt enabled bit.
+             * @param timerInterruptEnabled New timer interrupt enabled
+             *        bit.
              */
             void SetTimerInterruptEnabled(bool timerInterruptEnabled);
             
             /**
-             * Sets the serial interrupt enabled bit of the interrupt
-             * enable register.
+             * Modifies the serial interrupt enabled bit of the
+             * interrupt enable register.
              * 
              * @param serialInterruptEnabled New value of the serial
-             *                               interrupt enabled bit.
+             *        interrupt enabled bit.
              */
             void SetSerialInterruptEnabled(bool serialInterruptEnabled);
             
             /**
-             * Sets the joypad interrupt enabled bit of the interrupt
-             * enable register.
+             * Modifies the joypad interrupt enabled bit of the
+             * interrupt enable register.
              * 
-             * @param joypadInterruptEnabled New value of the joypad
-             *                               interrupt enabled bit.
+             * @param joypadInterruptEnabled New joypad interrupt
+             *        enabled bit.
              */
             void SetJoypadInterruptEnabled(bool);
             
             /**
-             * Gets the cartridge.
+             * Returns the cartridge.
              * 
-             * @return Reference of the cartridge.
+             * @return The cartridge.
              */
             Cartridge &GetCartridge();
             
             /**
-             * Gets the video ram.
+             * Returns the video ram.
              * 
-             * @return Reference of the video ram.
+             * @return The video ram.
              */
             VideoRam &GetVideoRam();
             
             /**
-             * Gets the work ram.
+             * Returns the work ram.
              * 
-             * @return Reference of the work ram.
+             * @return The work ram.
              */
             WorkRam &GetWorkRam();
             
             /**
-             * Gets the sprite attribute table.
+             * Returns the sprite attribute table.
              * 
-             * @return Reference of the sprite attribute table.
+             * @return The sprite attribute table.
              */
             SpriteAttributeRam &GetSpriteAttributeRam();
             
             /**
-             * Gets the io ports.
+             * Returns the io ports.
              * 
-             * @return Reference of the io ports.
+             * @return The io ports.
              */
             IOPorts &GetIOPorts();
             
             /**
-             * Gets the high ram.
+             * Returns the high ram.
              * 
-             * @return Reference of the high ram.
+             * @return The high ram.
              */
             HighRam &GetHighRam();
             
             /**
-             * Gets the interrupt enable register.
+             * Returns the interrupt enable register.
              * 
-             * @return Value of the interrupt enable register.
+             * @return The interrupt enable register.
              */
             int GetInterruptEnableRegister();
             
             /**
-             * Gets the vblank interrupt enabled bit of the interrupt
+             * Returns the vblank interrupt enabled bit of the interrupt
              * enable register.
              * 
-             * @return Value of the vblank interrupt enabled bit.
+             * @return The vblank interrupt enabled bit.
              */
             bool GetVBlankInterruptEnabled();
             
             /**
-             * Gets the lcd status interrupt enabled bit of the
+             * Returns the lcd status interrupt enabled bit of the
              * interrupt enable register.
              * 
-             * @return Value of the lcd status interrupt enabled bit.
+             * @return The lcd status interrupt enabled bit.
              */
             bool GetLCDStatusInterruptEnabled();
             
             /**
-             * Gets the timer interrupt enabled bit of the interrupt
+             * Returns the timer interrupt enabled bit of the interrupt
              * enable register.
              * 
-             * @return Value of the timer interrupt enabled bit.
+             * @return The timer interrupt enabled bit.
              */
             bool GetTimerInterruptEnabled();
             
             /**
-             * Gets the serial interrupt enabled bit of the interrupt
+             * Returns the serial interrupt enabled bit of the interrupt
              * enable register.
              * 
-             * @return Value of the serial interrupt enabled bit.
+             * @return The serial interrupt enabled bit.
              */
             bool GetSerialInterruptEnabled();
             
             /**
-             * Gets the joybad interrupt enabled bit of the interrupt
+             * Returns the joybad interrupt enabled bit of the interrupt
              * enable register.
              * 
-             * @return Value of the joybad interrupt enabled bit.
+             * @return The joybad interrupt enabled bit.
              */
             bool GetJoypadInterruptEnabled();
         
         private:
-            /**
-             * The cartridge bound into the system bus.
-             */
             Cartridge *_cartridge;
-            
-            /**
-             * The video ram bound into the system bus.
-             */
             VideoRam *_videoRam;
-            
-            /**
-             * The work ram bound into the system bus.
-             */
             WorkRam *_workRam;
-            
-            /**
-             * The sprite attribute table bound into the system bus.
-             */
             SpriteAttributeRam *_spriteAttributeRam;
-            
-            /**
-             * The io ports bound into the system bus.
-             */
             IOPorts *_ioPorts;
-            
-            /**
-             * The high ram bound into the system bus.
-             */
             HighRam *_highRam;
             
             /**
-             * Register in which the physically different interrupts
+             * The Register in which the physically different interrupts
              * are enabled or disabled. The format of this register
              * looks like this where a 1 means the corresponding
              * interrupt is enabled and 0 means it is disabled:
              * 
-             * Bit 0: VBlankInterruptEnabled (interrupt vector is 0x40)
-             * Bit 1: LCDStatusInterruptEnabled (interrupt vector is 0x48)
-             * Bit 2: TimerInterruptEnabled (interrupt vector is 0x50)
-             * Bit 3: SerialInterruptEnabled (interrupt vector is 0x58)
-             * Bit 4: JoypadInterruptEnabled (interrupt vector is 0x60)
+             * <code>
+             * Bit 0: vBlankInterruptEnabled (interrupt vector is 0x40)
+             * Bit 1: lcdStatusInterruptEnabled (interrupt vector is 0x48)
+             * Bit 2: timerInterruptEnabled (interrupt vector is 0x50)
+             * Bit 3: serialInterruptEnabled (interrupt vector is 0x58)
+             * Bit 4: joypadInterruptEnabled (interrupt vector is 0x60)
+             * Bit 5: not used
+             * Bit 6: not used
+             * Bit 7: not used
+             * </code>
              */
             int _interruptEnableRegister;
         };

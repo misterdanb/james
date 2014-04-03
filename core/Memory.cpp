@@ -3,17 +3,14 @@
 using namespace james;
 using namespace james::core;
 
-Memory::Memory() : _cartridge(nullptr),
-           _videoRam(nullptr),
-           _workRam(nullptr),
-           _spriteAttributeRam(nullptr),
-           _ioPorts(nullptr),
-           _highRam(nullptr),
-           _interruptEnableRegister()
-{
-}
-
-Memory::~Memory()
+Memory::Memory()
+    : _cartridge(nullptr),
+      _videoRam(nullptr),
+      _workRam(nullptr),
+      _spriteAttributeRam(nullptr),
+      _ioPorts(nullptr),
+      _highRam(nullptr),
+      _interruptEnableRegister()
 {
 }
 
@@ -142,7 +139,7 @@ void Memory::Deserialize(std::istream &is)
 
 void Memory::SetCartridge(cartridges::Cartridge &cartridge)
 {
-    _cartridge = cartridge;
+    _cartridge = &cartridge;
 }
 
 void Memory::SetVideoRam(VideoRam &videoRam)
@@ -208,11 +205,6 @@ void Memory::SetJoypadInterruptEnabled(bool joypadInterruptEnabled)
     _interruptEnableRegister = SetBit(_interruptEnableRegister,
                                       InterruptHandler::JOYPAD_INTERRUPT_BIT_NUMBER,
                                       joypadInterruptEnabled);
-}
-
-void Memory::SetInterruptEnableRegister(int interruptEnableRegister)
-{
-    _interruptEnableRegister = interruptEnableRegister;
 }
 
 cartridges::Cartridge &Memory::GetCartridge()

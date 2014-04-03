@@ -24,8 +24,8 @@ namespace james
                 return is;
             }
 			
-			virtual void Serialize(std::ostream &) = GBC_NULL;
-			virtual void Deserialize(std::istream &) = GBC_NULL;
+			virtual void Serialize(std::ostream &) = 0;
+			virtual void Deserialize(std::istream &) = 0;
 		};
 	}
 }

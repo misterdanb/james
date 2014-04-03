@@ -14,10 +14,6 @@ MemoryBlock::MemoryBlock(int banks, int size)
     }
 }
 
-MemoryBlock::~MemoryBlock()
-{
-}
-
 int MemoryBlock::ReadByteFromBank(int bank, int address)
 {
     return _data[bank][address];

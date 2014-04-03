@@ -26,8 +26,8 @@ namespace james
 				
 				Header GetHeader();
 				
-				virtual int ReadByte(int) = GBC_NULL;
-				virtual void WriteByte(int, int) = GBC_NULL;
+				virtual int ReadByte(int) = 0;
+				virtual void WriteByte(int, int) = 0;
 				
 				std::string Info();
 				

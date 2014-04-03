@@ -18,7 +18,7 @@ namespace james
 {
 	namespace core
 	{
-		class Emulator
+		class Emulator : public NonCopyable
 		{
 		public:
 			// clock speed over 256 will cause timer inaccuracies
@@ -69,14 +69,14 @@ namespace james
 			Memory _memory;
 			
 			// memory parts
-			std::unique_ptr<VideoRam> _videoRam;
-			std::unique_ptr<WorkRam> _workRam;
-			std::unique_ptr<SpriteAttributeRam> _spriteAttributeRam;
-			std::unique_ptr<IOPorts> _ioPorts;
-			std::unique_ptr<HighRam> _highRam;
+			VideoRam *_videoRam;
+			WorkRam *_workRam;
+			SpriteAttributeRam *_spriteAttributeRam;
+			IOPorts *_ioPorts;
+			HighRam *_highRam;
 			
 			// interrupt handler
-			std::unique_ptr<InterruptHandler> _interruptHandler;
+			InterruptHandler *_interruptHandler;
 			
 			// emulation stats
 			bool _paused;
@@ -95,10 +95,7 @@ namespace james
 			int _timerTicks;
 			int _dividerTicks;
 			
-			std::unique_ptr<Renderer> _renderer;
-
-			Emulator(const james::core::Emulator&);
-			Emulator& operator=(const james::core::Emulator&);
+			Renderer *_renderer;
 		};
 	}
 }
