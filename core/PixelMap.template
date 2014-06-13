@@ -13,35 +13,35 @@ namespace james
 		template<int width, int height>
 		class PixelMap : public Matrix<Color<int>, width, height>
 		{
-		public:
+		  public:
 			PixelMap()
-				: Matrix<Color<int>, width, height>(), map(_matrixElements)
+				: Matrix<Color<int>, width, height>(), map (_matrixElements)
 			{
 				Color<int> nullColor;
-				
+
 				nullColor.red = 0;
 				nullColor.green = 0;
 				nullColor.blue = 0;
-				
-				Clear(nullColor);
+
+				Clear (nullColor);
 			}
-			
+
 			virtual ~PixelMap()
 			{
 			}
-			
-			Color<int> GetPixel(int x, int y)
+
+			Color<int> GetPixel (int x, int y)
 			{
 				return _matrixElements[x][y];
 			}
-		
-		public:
-			Array2<Color<int>, width, height> &map;
-		
-		protected:
+
+		  public:
+			Array2<Color<int>, width, height>& map;
+
+		  protected:
 			using Matrix<Color<int>, width, height>::Clear;
-		
-		protected:
+
+		  protected:
 			using Matrix<Color<int>, width, height>::_matrixElements;
 		};
 	}

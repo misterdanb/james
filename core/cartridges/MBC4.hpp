@@ -15,12 +15,12 @@ namespace james
 		{
 			class MBC4 : public Cartridge
 			{
-			public:
-				MBC4(DynamicArray<int>);
+			  public:
+				MBC4 (DynamicArray<int>);
 				~MBC4();
-				
-				int ReadByte(int);
-				void WriteByte(int, int);
+
+				int ReadByte (int);
+				void WriteByte (int, int);
 			};
 		}
 	}

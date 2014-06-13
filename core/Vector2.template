@@ -10,23 +10,23 @@ namespace james
 		template<class T>
 		class Vector2 : public Vector<T, 2>
 		{
-		public:
-			Vector2(T newX, T newY)
-				: Vector<T, 2>(), x(_vectorElements[0]), y(_vectorElements[1])
+		  public:
+			Vector2 (T newX, T newY)
+				: Vector<T, 2>(), x (_vectorElements[0]), y (_vectorElements[1])
 			{
 				x = newX;
 				y = newY;
 			}
-			
+
 			~Vector2()
 			{
 			}
-		
-		public:
-			T &x;
-			T &y;
-		
-		protected:
+
+		  public:
+			T& x;
+			T& y;
+
+		  protected:
 			using Vector<T, 2>::_vectorElements;
 		};
 	}

@@ -10,21 +10,21 @@ namespace james
 	namespace sfml
 	{
 		using namespace core;
-		
+
 		class TileMapWindow : public sf::RenderWindow
 		{
-		public:
-			TileMapWindow(int, GameboyColor &);
+		  public:
+			TileMapWindow (int, GameboyColor&);
 			~TileMapWindow();
-			
+
 			void Render();
-		
-		private:
+
+		  private:
 			int _tileMapNumber;
-			GameboyColor &_gbc;
-			
+			GameboyColor& _gbc;
+
 			sf::Image _frame;
-			Array<sf::Uint8, core::TileMap::WIDTH * core::Tile::WIDTH * core::TileMap::HEIGHT * core::Tile::HEIGHT * 4> _rawFrame;
+			Array<sf::Uint8, core::TileMap::WIDTH* core::Tile::WIDTH* core::TileMap::HEIGHT* core::Tile::HEIGHT * 4> _rawFrame;
 		};
 	}
 }

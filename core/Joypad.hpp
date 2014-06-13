@@ -9,9 +9,9 @@ namespace james
 	{
 		class IJoypad
 		{
-		public:
+		  public:
 			virtual ~IJoypad();
-			
+
 			virtual int GetRight() = GBC_NULL;
 			virtual int GetLeft() = GBC_NULL;
 			virtual int GetUp() = GBC_NULL;

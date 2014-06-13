@@ -9,25 +9,25 @@ namespace james
 	{
 		class ColorPalette : public Vector<Color<int>, 4>
 		{
-		public:
+		  public:
 			static const int COLOR_PALETTE_SIZE = 4;
-			
+
 			typedef Array<Color<int>, COLOR_PALETTE_SIZE> ColorPaletteArray;
-		
-		public:
+
+		  public:
 			ColorPalette()
-				: Vector<Color<int>, COLOR_PALETTE_SIZE>(), colors(_vectorElements)
+				: Vector<Color<int>, COLOR_PALETTE_SIZE>(), colors (_vectorElements)
 			{
 			}
-			
+
 			~ColorPalette()
 			{
 			}
-		
-		public:
-			ColorPaletteArray &colors;
-		
-		protected:
+
+		  public:
+			ColorPaletteArray& colors;
+
+		  protected:
 			using Vector<Color<int>, COLOR_PALETTE_SIZE>::_vectorElements;
 		};
 	}

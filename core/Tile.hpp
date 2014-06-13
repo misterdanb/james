@@ -12,20 +12,20 @@ namespace james
 	{
 		class Tile : public ByteMap<8, 8>
 		{
-		public:
+		  public:
 			static const int WIDTH = 8;
 			static const int HEIGHT = 8;
-			
+
 			typedef Array2<int, WIDTH, HEIGHT> TileArray2;
-		
-		public:
+
+		  public:
 			Tile();
 			~Tile();
-		
-		public:
-			TileArray2 &data;
-		
-		protected:
+
+		  public:
+			TileArray2& data;
+
+		  protected:
 			using ByteMap<WIDTH, HEIGHT>::_matrixElements;
 		};
 	}

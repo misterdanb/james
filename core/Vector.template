@@ -10,20 +10,20 @@ namespace james
 		template<class T, const int size>
 		class Vector : public Matrix<T, 1, size>
 		{
-		public:
+		  public:
 			Vector()
-				: Matrix<T, 1, size>(), _vectorElements(_matrixElements[0])
+				: Matrix<T, 1, size>(), _vectorElements (_matrixElements[0])
 			{
 			}
-			
+
 			virtual ~Vector()
 			{
 			}
-		
-		protected:
+
+		  protected:
 			using Matrix<T, 1, size>::_matrixElements;
-			
-			Array<T, size> &_vectorElements;
+
+			Array<T, size>& _vectorElements;
 		};
 	}
 }

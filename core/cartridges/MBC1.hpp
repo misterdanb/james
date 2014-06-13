@@ -15,14 +15,14 @@ namespace james
 		{
 			class MBC1 : public Cartridge
 			{
-			public:
-				MBC1(DynamicArray<int>);
+			  public:
+				MBC1 (DynamicArray<int>);
 				~MBC1();
-				
-				int ReadByte(int);
-				void WriteByte(int, int);
-			
-			private:
+
+				int ReadByte (int);
+				void WriteByte (int, int);
+
+			  private:
 				int _ramEnabled;
 				int _romRamMode;
 			};

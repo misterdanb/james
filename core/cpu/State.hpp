@@ -9,16 +9,16 @@ namespace james
 		{
 			class State
 			{
-			public:
+			  public:
 				int a, f;
 				int b, c;
 				int d, e;
 				int h, l;
 				int pc;
 				int sp;
-	
+
 				int ticks;
-	
+
 				bool interruptsEnabled;
 				bool stopped;
 				bool halted;

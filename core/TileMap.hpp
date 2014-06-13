@@ -9,26 +9,26 @@ namespace james
 	{
 		class TileMap : public ByteMap<32, 32>
 		{
-		public:
+		  public:
 			static const int WIDTH = 32;
 			static const int HEIGHT = 32;
-			
+
 			typedef Array2<int, WIDTH, HEIGHT> TileMapArray2;
-		
-		public:
+
+		  public:
 			TileMap()
-				: ByteMap<WIDTH, HEIGHT>(), data(_matrixElements)
+				: ByteMap<WIDTH, HEIGHT>(), data (_matrixElements)
 			{
 			}
-			
+
 			~TileMap()
 			{
 			}
-		
-		public:
-			TileMapArray2 &data;
-		
-		public:
+
+		  public:
+			TileMapArray2& data;
+
+		  public:
 			using ByteMap<WIDTH, HEIGHT>::_matrixElements;
 		};
 	}

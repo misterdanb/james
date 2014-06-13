@@ -4,8 +4,8 @@ using namespace james;
 using namespace james::core;
 using namespace james::core::cartridges;
 
-MBC5::MBC5(DynamicArray<int> rom)
-	: Cartridge(rom),
+MBC5::MBC5 (DynamicArray<int> rom)
+	: Cartridge (rom),
 	  _ramEnabled(),
 	  _romRamMode()
 {
@@ -15,9 +15,9 @@ MBC5::~MBC5()
 {
 }
 
-int MBC5::ReadByte(int address)
+int MBC5::ReadByte (int address)
 {
-	if (address <= 0x3FFF) 
+	if (address <= 0x3FFF)
 	{
 		return _rom[address];
 	}
@@ -36,13 +36,13 @@ int MBC5::ReadByte(int address)
 			return 0x00;
 		}
 	}
-	
-	ERROR("MBC5: Address out of range!");
-	
+
+	ERROR ("MBC5: Address out of range!");
+
 	return 0x00;
 }
 
-void MBC5::WriteByte(int address, int value)
+void MBC5::WriteByte (int address, int value)
 {
 	if (address <= 0x1FFF)
 	{
@@ -52,7 +52,7 @@ void MBC5::WriteByte(int address, int value)
 	{
 		_selectedRomBank &= 0x0100;
 		_selectedRomBank = (value & 0xFF);
-		
+
 		if (_selectedRomBank == 0x20)
 		{
 			_selectedRomBank = 0x21;
@@ -61,7 +61,7 @@ void MBC5::WriteByte(int address, int value)
 		{
 			_selectedRomBank = 0x41;
 		}
-		else if (_selectedRomBank == 0x60) 
+		else if (_selectedRomBank == 0x60)
 		{
 			_selectedRomBank = 0x61;
 		}
@@ -90,6 +90,6 @@ void MBC5::WriteByte(int address, int value)
 	}
 	else
 	{
-		ERROR("MBC5: Address out of range!");
+		ERROR ("MBC5: Address out of range!");
 	}
 }

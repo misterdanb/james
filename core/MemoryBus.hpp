@@ -12,11 +12,11 @@ namespace james
 	{
 		class IMemoryBus
 		{
-		public:
+		  public:
 			virtual ~IMemoryBus();
-			
-			virtual int ReadByte(int) = GBC_NULL;
-			virtual void WriteByte(int, int) = GBC_NULL;
+
+			virtual int ReadByte (int) = GBC_NULL;
+			virtual void WriteByte (int, int) = GBC_NULL;
 		};
 	}
 }

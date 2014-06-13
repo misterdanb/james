@@ -15,12 +15,12 @@ namespace james
 		{
 			class MMM01 : public Cartridge
 			{
-			public:
-				MMM01(DynamicArray<int>);
+			  public:
+				MMM01 (DynamicArray<int>);
 				~MMM01();
-				
-				int ReadByte(int);
-				void WriteByte(int, int);
+
+				int ReadByte (int);
+				void WriteByte (int, int);
 			};
 		}
 	}

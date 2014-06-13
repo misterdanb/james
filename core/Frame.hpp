@@ -12,21 +12,21 @@ namespace james
 	{
 		class Frame : public PixelMap<160, 144>
 		{
-		public:
+		  public:
 			static const int WIDTH = 160;
 			static const int HEIGHT = 144;
-			
+
 			typedef Array2<Color<int>, WIDTH, HEIGHT> FrameArray2;
-		
-		public:
+
+		  public:
 			Frame();
-			Frame(Color<int>[]);
+			Frame (Color<int>[]);
 			~Frame();
-		
-		public:
-			FrameArray2 &data;
-		
-		protected:
+
+		  public:
+			FrameArray2& data;
+
+		  protected:
 			using PixelMap<WIDTH, HEIGHT>::_matrixElements;
 		};
 	}

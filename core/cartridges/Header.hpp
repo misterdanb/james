@@ -19,9 +19,9 @@ namespace james
 		{
 			class Header
 			{
-			public:
+			  public:
 				static const int TOTAL_OFFSET = 0x0100;
-				
+
 				static const int ENTRY_POINT_LENGTH = 4;
 				static const int NINTENDO_LOGO_LENGTH = 48;
 				static const int OLD_TITLE_LENGTH = 16;
@@ -38,7 +38,7 @@ namespace james
 				static const int ROM_VERSION_NUMBER_LENGTH = 1;
 				static const int HEADER_CHECKSUM_LENGTH = 1;
 				static const int GLOBAL_CHECKSUM_LENGTH = 2;
-				
+
 				static const int ENTRY_POINT_ADDRESS = TOTAL_OFFSET;
 				static const int NINTENDO_LOGO_ADDRESS = TOTAL_OFFSET + 0x04;
 				static const int OLD_TITLE_ADDRESS = TOTAL_OFFSET + 0x34;
@@ -55,11 +55,11 @@ namespace james
 				static const int ROM_VERSION_NUMBER_ADDRESS = TOTAL_OFFSET + 0x4C;
 				static const int HEADER_CHECKSUM_ADDRESS = TOTAL_OFFSET + 0x4D;
 				static const int GLOBAL_CHECKSUM_ADDRESS = TOTAL_OFFSET + 0x4E;
-			
-			public:
-				Header(DynamicArray<int> &);
+
+			  public:
+				Header (DynamicArray<int>&);
 				~Header();
-				
+
 				Array<int, ENTRY_POINT_LENGTH> entryPoint;
 				Array<int, NINTENDO_LOGO_LENGTH> nintendoLogo;
 				Array<int, OLD_TITLE_LENGTH> oldTitle;

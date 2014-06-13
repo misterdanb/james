@@ -17,27 +17,27 @@ namespace james
 		{
 			class Cartridge : public IMemoryBus, public Serializable
 			{
-			public:
-				Cartridge(DynamicArray<int> &);
+			  public:
+				Cartridge (DynamicArray<int>&);
 				virtual ~Cartridge();
-				
-				void Serialize(std::ostream &);
-				void Deserialize(std::istream &);
-				
+
+				void Serialize (std::ostream&);
+				void Deserialize (std::istream&);
+
 				Header GetHeader();
-				
-				virtual int ReadByte(int) = GBC_NULL;
-				virtual void WriteByte(int, int) = GBC_NULL;
-				
-				static Cartridge *Create(DynamicArray<int>);
-				
-			protected:
+
+				virtual int ReadByte (int) = GBC_NULL;
+				virtual void WriteByte (int, int) = GBC_NULL;
+
+				static Cartridge* Create (DynamicArray<int>);
+
+			  protected:
 				// dynamic array, because of size is not known at compile time
 				DynamicArray<int> _rom;
 				DynamicArray<int> _ram;
-				
+
 				Header _header;
-				
+
 				int _selectedRomBank;
 				int _selectedRamBank;
 			};

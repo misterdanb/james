@@ -9,10 +9,10 @@ namespace james
 		{
 			class RomDimensions
 			{
-			public:
-				RomDimensions(int);
+			  public:
+				RomDimensions (int);
 				~RomDimensions();
-				
+
 				int size;
 				int banks;
 				int bankSize;

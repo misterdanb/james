@@ -15,12 +15,12 @@ namespace james
 		{
 			class RomOnly : public Cartridge
 			{
-			public:
-				RomOnly(DynamicArray<int>);
+			  public:
+				RomOnly (DynamicArray<int>);
 				~RomOnly();
-				
-				int ReadByte(int);
-				void WriteByte(int, int);
+
+				int ReadByte (int);
+				void WriteByte (int, int);
 			};
 		}
 	}

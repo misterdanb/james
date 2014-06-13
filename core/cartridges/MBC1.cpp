@@ -4,8 +4,8 @@ using namespace james;
 using namespace james::core;
 using namespace james::core::cartridges;
 
-MBC1::MBC1(DynamicArray<int> rom)
-	: Cartridge(rom), _ramEnabled(GBC_FALSE), _romRamMode(0x00)
+MBC1::MBC1 (DynamicArray<int> rom)
+	: Cartridge (rom), _ramEnabled (GBC_FALSE), _romRamMode (0x00)
 {
 }
 
@@ -13,9 +13,9 @@ MBC1::~MBC1()
 {
 }
 
-int MBC1::ReadByte(int address)
+int MBC1::ReadByte (int address)
 {
-	if (address <= 0x3FFF) 
+	if (address <= 0x3FFF)
 	{
 		return _rom[address];
 	}
@@ -23,9 +23,9 @@ int MBC1::ReadByte(int address)
 	{
 		if (_selectedRomBank >= _header.romDimensions.banks)
 		{
-			ERROR(std::string("MBC1: Rom bank ") + ToDec(_selectedRomBank) + std::string("out of range!"));
+			ERROR (std::string ("MBC1: Rom bank ") + ToDec (_selectedRomBank) + std::string ("out of range!"));
 		}
-		
+
 		return _rom[_selectedRomBank * _header.romDimensions.bankSize + address - 0x4000];
 	}
 	else if (address <= 0xBFFF)
@@ -34,9 +34,9 @@ int MBC1::ReadByte(int address)
 		{
 			if (_selectedRamBank >= _header.ramDimensions.banks)
 			{
-				ERROR(std::string("MBC1: Ram bank ") + ToDec(_selectedRamBank) + std::string("out of range!"));
+				ERROR (std::string ("MBC1: Ram bank ") + ToDec (_selectedRamBank) + std::string ("out of range!"));
 			}
-			
+
 			return _ram[_selectedRamBank * _header.ramDimensions.bankSize + address - 0xA000];
 		}
 		else
@@ -44,13 +44,13 @@ int MBC1::ReadByte(int address)
 			return 0x00;
 		}
 	}
-	
-	ERROR("MBC1: Address out of range!");
-	
+
+	ERROR ("MBC1: Address out of range!");
+
 	return 0x00;
 }
 
-void MBC1::WriteByte(int address, int value)
+void MBC1::WriteByte (int address, int value)
 {
 	if (address <= 0x1FFF)
 	{
@@ -60,12 +60,12 @@ void MBC1::WriteByte(int address, int value)
 	{
 		_selectedRomBank &= 0xE0;
 		_selectedRomBank |= (value & 0x1F);
-		
+
 		if (_selectedRomBank == 0)
 		{
 			_selectedRomBank = 1;
 		}
-		
+
 		_selectedRomBank %= _header.romDimensions.banks;
 	}
 	else if (address <= 0x5FFF)
@@ -74,7 +74,7 @@ void MBC1::WriteByte(int address, int value)
 		{
 			_selectedRomBank &= 0x1F;
 			_selectedRomBank |= (value << 5) & 0x60;
-			
+
 			if (_selectedRomBank == 0x20)
 			{
 				_selectedRomBank = 0x21;
@@ -83,11 +83,11 @@ void MBC1::WriteByte(int address, int value)
 			{
 				_selectedRomBank = 0x41;
 			}
-			else if (_selectedRomBank == 0x60) 
+			else if (_selectedRomBank == 0x60)
 			{
 				_selectedRomBank = 0x61;
 			}
-			
+
 			_selectedRomBank %= _header.romDimensions.banks;
 		}
 		else if (_romRamMode == 0x01)
@@ -99,7 +99,7 @@ void MBC1::WriteByte(int address, int value)
 	else if (address <= 0x7FFF)
 	{
 		_romRamMode = value & 0x01;
-		
+
 		if (_romRamMode == 0x00)
 		{
 			_selectedRamBank = 0x00;
@@ -121,6 +121,6 @@ void MBC1::WriteByte(int address, int value)
 	}
 	else
 	{
-		ERROR("MBC1: Address out of range!");
+		ERROR ("MBC1: Address out of range!");
 	}
 }

@@ -14,9 +14,9 @@ Frontend::~Frontend()
 void Frontend::Initialize()
 {
 	_gbc.Initialize();
-	
-	_gbc.SetLCD(*this);
-	_gbc.SetJoypad(*this);
+
+	_gbc.SetLCD (*this);
+	_gbc.SetJoypad (*this);
 }
 
 void Frontend::Finalize()
@@ -29,25 +29,25 @@ void Frontend::Reset()
 	_gbc.Reset();
 }
 
-void Frontend::LoadRom(std::string path)
+void Frontend::LoadRom (std::string path)
 {
 	std::vector<int> rom;
-	std::ifstream file(path, std::ios::in | std::ios::binary);
-	
+	std::ifstream file (path, std::ios::in | std::ios::binary);
+
 	if (file.is_open())
 	{
 		while (!file.eof())
 		{
 			char byte;
-			
-			file.get(byte);
-			rom.push_back(((int) byte) & 0xFF);
+
+			file.get (byte);
+			rom.push_back (((int) byte) & 0xFF);
 		}
-		
+
 		file.close();
 	}
-	
-	_gbc.SetRom(rom);
+
+	_gbc.SetRom (rom);
 }
 
 void Frontend::Start()
@@ -80,7 +80,7 @@ void Frontend::SignalSerialInterrupt()
 	_gbc.GetInterruptHandler().SignalSerialInterrupt();
 }
 
-GameboyColor &Frontend::GetDevice()
+GameboyColor& Frontend::GetDevice()
 {
 	return _gbc;
 }

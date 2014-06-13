@@ -12,28 +12,28 @@ namespace james
 		template<class T, int width, int height>
 		class Matrix
 		{
-		public:
+		  public:
 			Matrix()
-			:  _matrixElements()
+				:  _matrixElements()
 			{
 			}
-			
+
 			virtual ~Matrix()
 			{
 			}
-		
-		protected:
-			void Clear(T nullInstance)
+
+		  protected:
+			void Clear (T nullInstance)
 			{
 				for (int x = 0; x < width; x++)
 				{
 					for (int y = 0; y < height; y++)
 					{
-						std::memcpy(&_matrixElements[x][y], &nullInstance, sizeof(T));
+						std::memcpy (&_matrixElements[x][y], &nullInstance, sizeof (T));
 					}
 				}
 			}
-			
+
 			Array2<T, width, height> _matrixElements;
 		};
 	}

@@ -10,7 +10,7 @@ namespace james
 		template<class T>
 		class Color
 		{
-		public:
+		  public:
 			T red;
 			T green;
 			T blue;

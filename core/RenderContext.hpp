@@ -19,19 +19,19 @@ namespace james
 	{
 		class GameboyClassicSpecificRenderContext
 		{
-		public:
+		  public:
 			GameboyClassicSpecificRenderContext();
 			~GameboyClassicSpecificRenderContext();
 			ColorPalette monochromeBackgroundPalette;
 			ColorPalette monochromeSpritePalette0;
 			ColorPalette monochromeSpritePalette1;
-		private:
-			GameboyClassicSpecificRenderContext(GameboyClassicSpecificRenderContext &) = delete;
-			GameboyClassicSpecificRenderContext& operator=(GameboyClassicSpecificRenderContext &) = delete;
+		  private:
+			GameboyClassicSpecificRenderContext (GameboyClassicSpecificRenderContext&) = delete;
+			GameboyClassicSpecificRenderContext& operator= (GameboyClassicSpecificRenderContext&) = delete;
 		};
 		class GameboyColorSpecificRenderContext
 		{
-		public:
+		  public:
 			GameboyColorSpecificRenderContext();
 			~GameboyColorSpecificRenderContext();
 			TileMapAttribute tileMapAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
@@ -43,29 +43,29 @@ namespace james
 			int dmaTransferDestinationAddress;
 			int dmaTransferLength;
 			int currentDMATransferOffset;
-		private:
-                        GameboyColorSpecificRenderContext(GameboyColorSpecificRenderContext &) = delete;
-			GameboyColorSpecificRenderContext& operator=(GameboyColorSpecificRenderContext &) = delete;
+		  private:
+			GameboyColorSpecificRenderContext (GameboyColorSpecificRenderContext&) = delete;
+			GameboyColorSpecificRenderContext& operator= (GameboyColorSpecificRenderContext&) = delete;
 		};
 		class RenderContext
 		{
-		public:
+		  public:
 			RenderContext();
 			~RenderContext();
 			// memory dimensions
 			static const int VIDEO_RAM_BANKS = 2;
 			static const int VIDEO_RAM_BANK_SIZE = 0x2000;
-			
+
 			static const int WORK_RAM_BANKS = 8;
 			static const int WORK_RAM_BANK_SIZE = 0x1000;
-			
+
 			static const int OAM_SIZE = 0x80;
-			
+
 			static const int IO_PORTS_SIZE = 0x80;
-			
+
 			static const int HIGH_RAM_SIZE = 0x80;
-		
-		public:
+
+		  public:
 			// ram
 			Array2<int, VIDEO_RAM_BANKS, VIDEO_RAM_BANK_SIZE> videoRam;
 			Array2<int, WORK_RAM_BANKS, WORK_RAM_BANK_SIZE> workRam;
@@ -73,30 +73,30 @@ namespace james
 			Array<int, IO_PORTS_SIZE> ioPorts;
 			Array<int, HIGH_RAM_SIZE> highRam;
 			int interruptEnableRegister;
-			
+
 			// ram banks
 			int selectedWorkRamBank;
 			int selectedVideoRamBank;
-			
+
 			// memory bus
-			IMemoryBus *memoryBus;
-			
+			IMemoryBus* memoryBus;
+
 			// interrupt handler
-			IInterruptHandler *interruptHandler;
-			
+			IInterruptHandler* interruptHandler;
+
 			// current scanline
 			Color<int> rawFrame[Frame::WIDTH * Frame::HEIGHT];
-			
+
 			// interrupt requests
 			int verticalBlankInterruptAlreadyRequested;
-			
+
 			// interrupt enablers
 			int verticalBlankInterruptEnabled;
 			int lcdStatusInterruptEnabled;
 			int timerInterruptEnabled;
 			int serialInterruptEnabled;
 			int joypadInterruptEnabled;
-			
+
 			// lcd control
 			int lcdDisplayEnabled;
 			int windowTileMapDisplaySelect;
@@ -106,7 +106,7 @@ namespace james
 			int spriteSize;
 			int spriteDisplayEnabled;
 			int backgroundDisplayEnabled;
-			
+
 			// lcd status
 			LCDMode lcdMode;
 			int coincidenceFlag;
@@ -114,7 +114,7 @@ namespace james
 			int verticalBlankInterruptEnabledInLCD;
 			int oamInterruptEnabled;
 			int coincidenceInterruptEnabled;
-			
+
 			// lcd position and scrolling
 			int scrollX;
 			int scrollY;
@@ -122,25 +122,25 @@ namespace james
 			int lcdYCompare;
 			int windowX;
 			int windowY;
-			
+
 			// tile data
 			Tile tiles[2][384] = { { Tile(), }, }; // test
 			Queue<Pair<int, int>> changedTiles;
-			
+
 			// background map elements
 			TileMap tileMaps[2];
 			Queue<Pair<int, int>> changedTileMapElements;
-			
+
 			// sprite attributes
 			Array<SpriteAttribute, 40> spriteAttributes;
 			Queue<int> changedSpriteAttributes;
-			
+
 			GameboyClassicSpecificRenderContext gameboyClassicSpecific;
 			GameboyColorSpecificRenderContext gameboyColorSpecific;
 
-		private:
-			RenderContext(RenderContext &) = delete;
-			RenderContext& operator=(RenderContext &) = delete;
+		  private:
+			RenderContext (RenderContext&) = delete;
+			RenderContext& operator= (RenderContext&) = delete;
 
 		};
 	}

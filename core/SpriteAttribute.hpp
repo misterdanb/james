@@ -9,7 +9,7 @@ namespace james
 	{
 		class SpriteAttribute
 		{
-		public:
+		  public:
 			int y = 0;
 			int x = 0;
 			int tileNumber = 0;

@@ -11,11 +11,11 @@ namespace james
 		{
 			class LookUpTables
 			{
-			public:
+			  public:
 				static const int AMOUNT_OF_INSTUCTION_TABLES = 2;
 				static const int INSTRUCTION_TABLE_SIZE = 0x0100;
-			
-			public:
+
+			  public:
 				static const Array2<int, AMOUNT_OF_INSTUCTION_TABLES, INSTRUCTION_TABLE_SIZE> INSTRUCTION_CYCLES;
 				static const Array2<int, AMOUNT_OF_INSTUCTION_TABLES, INSTRUCTION_TABLE_SIZE> ADDITIONAL_INSTRUCTION_CYCLES;
 				static const Array2<int, AMOUNT_OF_INSTUCTION_TABLES, INSTRUCTION_TABLE_SIZE> INSTRUCTION_LENGTHS;

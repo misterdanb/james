@@ -11,17 +11,17 @@ namespace james
 	namespace sfml
 	{
 		using namespace core;
-		
+
 		class GameWindow : public sf::RenderWindow, public Frontend
 		{
-		public:
-			GameWindow(int, int, std::string);
+		  public:
+			GameWindow (int, int, std::string);
 			~GameWindow();
-			
+
 			void Render();
-			
-			void DrawFrame(Frame &);
-			
+
+			void DrawFrame (Frame&);
+
 			int GetRight();
 			int GetLeft();
 			int GetUp();
@@ -30,19 +30,19 @@ namespace james
 			int GetButtonB();
 			int GetSelect();
 			int GetStart();
-			
-			void ShowTileMap(int);
-			void HideTileMap(int);
-		
-		private:
+
+			void ShowTileMap (int);
+			void HideTileMap (int);
+
+		  private:
 			void ThrowTilemaps();
 			void ThrowMem();
 			void ThrowRegs();
 			void ThrowSprAttr();
-			
-			Array<sf::Uint8, Frame::WIDTH * Frame::HEIGHT * 4> _rawFrame;
+
+			Array<sf::Uint8, Frame::WIDTH* Frame::HEIGHT * 4> _rawFrame;
 			sf::Image _frame;
-			
+
 			int _rightPressed;
 			int _leftPressed;
 			int _upPressed;
@@ -51,13 +51,13 @@ namespace james
 			int _buttonBPressed;
 			int _selectPressed;
 			int _startPressed;
-#ifdef DEBUG			
+			#ifdef DEBUG
 			bool _tileMap0WindowVisible;
 			bool _tileMap1WindowVisible;
-			
+
 			TileMapWindow _tileMap0Window;
 			TileMapWindow _tileMap1Window;
-#endif
+			#endif
 		};
 	}
 }

@@ -32,85 +32,85 @@ namespace james
 	{
 		class GameboyColor : public IMemoryBus
 		{
-		public:
+		  public:
 			// clock speed over 256 will cause timer inaccuracies
 			static const int CLOCK_SPEED = 1;
-			
-		public:
+
+		  public:
 			GameboyColor();
 			~GameboyColor();
-			
-			void SetLCD(ILCD &);
-			void SetJoypad(IJoypad &);
-			void SetRom(DynamicArray<int> &);
-			
-			IInterruptHandler &GetInterruptHandler();
-			Processor &GetProcessor();
-			Renderer &GetRenderer();
-			
-			TileMap::TileMapArray2 &GetTileMap(int);
-			SpriteAttribute &GetSpriteAttribute(int);
-			
+
+			void SetLCD (ILCD&);
+			void SetJoypad (IJoypad&);
+			void SetRom (DynamicArray<int>&);
+
+			IInterruptHandler& GetInterruptHandler();
+			Processor& GetProcessor();
+			Renderer& GetRenderer();
+
+			TileMap::TileMapArray2& GetTileMap (int);
+			SpriteAttribute& GetSpriteAttribute (int);
+
 			void Initialize();
 			void Finalize();
-			
+
 			void Start();
 			void Pause();
-			
+
 			bool IsPaused();
-			
+
 			void Reset();
-			
+
 			void RenderScanline();
 			void RenderFrame();
-			
-			void ExecuteMachineClocks(int);
-			void UpdateTimer(int);
-			
-			int ReadByte(int);
-			void WriteByte(int, int);
-		
-		private:
-			GameboyColor(GameboyColor &);
-			GameboyColor & operator=(GameboyColor &);
+
+			void ExecuteMachineClocks (int);
+			void UpdateTimer (int);
+
+			int ReadByte (int);
+			void WriteByte (int, int);
+
+		  private:
+			GameboyColor (GameboyColor&);
+			GameboyColor& operator= (GameboyColor&);
 			// emulation state
 			bool _paused;
 			int _pendingClocks;
-			
+
 			// lcd
-			ILCD *_lcd;
-			
+			ILCD* _lcd;
+
 			// joypad
-			IJoypad *_joypad;
-			
+			IJoypad* _joypad;
+
 			int _directionKeysSelected;
 			int _buttonKeysSelected;
-			
+
 			// cartridge
-			Cartridge *_cartridge;
+			Cartridge* _cartridge;
 			int _forceClassicGameboy;
-			
+
 			// processor
 			Processor _hybr1s80;
 			int _speedFactor;
-			
+
 			// timer
 			int _timerClockFrequency;
 			int _timerStopped;
 			int _deviderCounter;
 			int _timerCounter;
-			
+
 			ColorPalette _monochromePalette;
-			
+
 			int _colorBackgroundPaletteIndexAutoIncrement;
 			int _colorSpritePaletteIndexAutoIncrement;
-			
-			Renderer *_renderer;
-			
+
+			Renderer* _renderer;
+
 			RenderContext _rc;
-			
-			GameboyClassicSpecificRenderContext &_rcClassic = _rc.gameboyClassicSpecific;
-			GameboyColorSpecificRenderContext &_rcColor = _rc.gameboyColorSpecific;
+
+			GameboyClassicSpecificRenderContext& _rcClassic = _rc.gameboyClassicSpecific;
+			GameboyColorSpecificRenderContext& _rcColor = _rc.gameboyColorSpecific;
 		};
 	}
 }

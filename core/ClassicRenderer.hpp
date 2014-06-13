@@ -13,25 +13,25 @@ namespace james
 	{
 		class ClassicRenderer : public Renderer
 		{
-		public:
-			ClassicRenderer(RenderContext &);
+		  public:
+			ClassicRenderer (RenderContext&);
 			~ClassicRenderer();
-			
+
 			void RenderOAMSearch();
 			void RenderTransferData();
 			void RenderHorizontalBlank();
 			void RenderVerticalBlank();
-			
-			Renderer::RenderedTileMap GetRenderedTileMap(int);
-		
-		private:
-			void DrawSprites(int, SpriteToBackgroundPriority);
-			void DrawSprites(int);
-			void DrawBackgroundMap(int);
-			void DrawWindowMap(int);
-			void DrawBackgroundMapTile(int, int);
-			void DrawWindowMapTile(int, int);
-			void DrawTile(Vector2<int>, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
+
+			Renderer::RenderedTileMap GetRenderedTileMap (int);
+
+		  private:
+			void DrawSprites (int, SpriteToBackgroundPriority);
+			void DrawSprites (int);
+			void DrawBackgroundMap (int);
+			void DrawWindowMap (int);
+			void DrawBackgroundMapTile (int, int);
+			void DrawWindowMapTile (int, int);
+			void DrawTile (Vector2<int>, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
 		};
 	}
 }
