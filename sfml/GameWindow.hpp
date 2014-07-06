@@ -51,13 +51,13 @@ namespace james
 			int _buttonBPressed;
 			int _selectPressed;
 			int _startPressed;
-			#ifdef DEBUG
+#ifdef DEBUG
 			bool _tileMap0WindowVisible;
 			bool _tileMap1WindowVisible;
 
 			TileMapWindow _tileMap0Window;
 			TileMapWindow _tileMap1Window;
-			#endif
+#endif
 		};
 	}
 }

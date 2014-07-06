@@ -40,23 +40,23 @@ int main (int argc, char* argv[])
 			gbc::ui::GameWindow window (160, 144, rom);
 
 			sf::Clock clock;
-			#ifdef DEBUG
+#ifdef DEBUG
 			window.ShowTileMap (0);
 			window.ShowTileMap (1);
 			float frames = 0;
-			#endif
+#endif
 
 			while (window.isOpen())
 			{
 				window.Render();
-				#ifdef DEBUG
+#ifdef DEBUG
 				float currentTime = clock.getElapsedTime().asSeconds();
 				float fps = frames / currentTime;
 
 				std::cout << fps << std::endl;
 
 				frames++;
-				#endif
+#endif
 			}
 		}
 	}

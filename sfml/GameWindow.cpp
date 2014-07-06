@@ -16,17 +16,17 @@ GameWindow::GameWindow (int width, int height, std::string rom)
 	  _buttonBPressed (GBC_FALSE),
 	  _selectPressed (GBC_FALSE),
 	  _startPressed (GBC_FALSE)
-	  #ifdef DEBUG
+#ifdef DEBUG
 	  ,_tileMap0WindowVisible (GBC_FALSE),
 	  _tileMap1WindowVisible (GBC_FALSE),
 	  _tileMap0Window (0, GetDevice()),
 	  _tileMap1Window (1, GetDevice())
-	  #endif
+#endif
 {
-	#ifdef DEBUG
+#ifdef DEBUG
 	_tileMap0Window.setVisible (GBC_FALSE);
 	_tileMap1Window.setVisible (GBC_FALSE);
-	#endif
+#endif
 	LoadRom (rom);
 
 	Initialize();
@@ -188,7 +188,7 @@ void GameWindow::Render()
 	draw (sprite);
 	display();
 
-	#ifdef DEBUG
+#ifdef DEBUG
 
 	if (_tileMap0WindowVisible)
 	{
@@ -200,7 +200,7 @@ void GameWindow::Render()
 		_tileMap1Window.Render();
 	}
 
-	#endif
+#endif
 }
 
 void GameWindow::DrawFrame (Frame& frame)
