@@ -326,13 +326,13 @@ void GameboyColor::UpdateTimer (int ticks)
 			counter++;
 		}
 
-		_rc.ioPorts[5] = counter % 0xFF;
-
 		if (counter > 0xFF)
 		{
 			_rc.ioPorts[5]   =_rc.ioPorts[6];
 			_rc.interruptHandler->SignalTimerInterrupt();
 			ticks_per_cycle = 0;
+		} else {
+			_rc.ioPorts[5] = counter;
 		}
 	}
 
