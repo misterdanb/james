@@ -2202,6 +2202,14 @@ void Processor::ExecuteInterrupt()
 		int interruptsToBePerformed = _bus->ReadByte (INTERRUPT_ENABLE_ADDRESS) &
 									  _bus->ReadByte (INTERRUPT_REQUEST_ADDRESS);
 
+		if (!_state.interruptsEnabled)
+		{
+			_state.stopped = false;
+			_state.halted = false;
+
+			return;
+		}
+
 		if (interruptsToBePerformed & (1 << VERTICAL_BLANK_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
