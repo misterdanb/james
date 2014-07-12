@@ -97,7 +97,7 @@ namespace james
 			// timer
 			int _timerClockFrequency;
 			int _timerStopped;
-			int _deviderCounter;
+			int _dividerCounter;
 			int _timerCounter;
 
 			ColorPalette _monochromePalette;

@@ -13,7 +13,7 @@ GameboyColor::GameboyColor()
 	  _speedFactor (1),
 	  _timerClockFrequency (1024), // or something...
 	  _timerStopped (GBC_TRUE),
-	  _deviderCounter (0),
+	  _dividerCounter (0),
 	  _timerCounter (0),
 	  _monochromePalette(),
 	  _colorBackgroundPaletteIndexAutoIncrement (0),
@@ -285,7 +285,6 @@ void GameboyColor::ExecuteMachineClocks (int clocks)
 
 void GameboyColor::UpdateTimer (int ticks)
 {
-	#if 1
 	static int ticks_per_cycle  = 0;
 	static int ticks_left_cycle = 0;
 	int counter = _rc.ioPorts[5];
@@ -327,19 +326,15 @@ void GameboyColor::UpdateTimer (int ticks)
 			counter++;
 		}
 
+		_rc.ioPorts[5] = counter % 0xFF;
+
 		if (counter > 0xFF)
 		{
 			_rc.ioPorts[5]   =_rc.ioPorts[6];
 			_rc.interruptHandler->SignalTimerInterrupt();
 			ticks_per_cycle = 0;
 		}
-		else
-		{
-			_rc.ioPorts[5] = counter;
-		}
 	}
-
-	#else
 
 	if (!_timerStopped)
 	{
@@ -360,17 +355,16 @@ void GameboyColor::UpdateTimer (int ticks)
 		}
 	}
 
-	_deviderCounter += ticks;
+	_dividerCounter += ticks;
 
-	if (_deviderCounter > 0xFF)
+	if (_dividerCounter > 0xFF)
 	{
-		_rc.ioPorts[0xFF04 - 0xFF00] += _deviderCounter / 256;
-		_rc.ioPorts[0xFF04 - 0xFF00] &= 0xFF;
-
-		_deviderCounter %= 256;
+		_rc.ioPorts[4]++;
+		if (_rc.ioPorts[4] > 0xFF)
+			_rc.ioPorts[4] = 0;
+		_dividerCounter = 0;
 	}
 
-	#endif
 }
 
 inline int GameboyColor::ReadByte (int address)
@@ -643,7 +637,7 @@ inline void GameboyColor::WriteByte (int address, int value)
 
 			case 0xFF04:
 				// write to devider register
-				_rc.ioPorts[address - 0xFF00] = value;
+				_rc.ioPorts[address - 0xFF00] = 0;
 
 				break;
 
