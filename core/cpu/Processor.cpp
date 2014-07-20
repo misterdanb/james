@@ -100,14 +100,14 @@ void Processor::Execute (int ticks)
 	{
 		tickCountdown -= _state.ticks;
 
+		_state.ticks = 0;
+
 		ExecuteInterrupt();
 
 		if (_state.halted) { break; }
 
 		ExecuteInstruction();
 	}
-
-	_state.ticks = 0;
 }
 
 void Processor::ExecuteInstruction()
