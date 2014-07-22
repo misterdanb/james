@@ -98,6 +98,9 @@ InterruptHandler.o: InterruptHandler.cpp
 MemoryBus.o: MemoryBus.cpp
 	$(CC) $(FLAGS) $(CFLAGS) MemoryBus.cpp -o MemoryBus.o
 
+cpu/Timer.o: cpu/Timer.cpp
+	$(CC) $(FLAGS) $(CFLAGS) cpu/Timer.cpp -o cpu/Timer.o
+
 James.o: James.cpp
 	$(CC) $(FLAGS) $(CFLAGS) James.cpp -o James.o
 

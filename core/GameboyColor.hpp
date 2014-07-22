@@ -94,12 +94,6 @@ namespace james
 			Processor _hybr1s80;
 			int _speedFactor;
 
-			// timer
-			int _timerClockFrequency;
-			int _timerStopped;
-			int _dividerCounter;
-			int _timerCounter;
-
 			ColorPalette _monochromePalette;
 
 			int _colorBackgroundPaletteIndexAutoIncrement;

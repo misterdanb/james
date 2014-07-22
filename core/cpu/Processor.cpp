@@ -12,7 +12,8 @@ Processor::Processor()
 	  _state(),
 	  _bus (NULL),
 	  _recording (false),
-	  _recordingPath ("")
+	  _recordingPath (""),
+	  _timer()
 {
 }
 
@@ -77,6 +78,11 @@ void Processor::SetMemoryBus (IMemoryBus* bus)
 	_bus = bus;
 }
 
+Timer* Processor::GetTimer()
+{
+	return &_timer;
+}
+
 void Processor::Step()
 {
 	if (_state.ticks) // <=> > 0
@@ -99,14 +105,17 @@ void Processor::Execute (int ticks)
 	while (tickCountdown >= _state.ticks)
 	{
 		tickCountdown -= _state.ticks;
-
+		_timer.Advance (_state.ticks);
 		_state.ticks = 0;
-
 		ExecuteInterrupt();
 
 		if (_state.halted) { break; }
 
+		tickCountdown -= _state.ticks;
+		_timer.Advance (_state.ticks);
+		_state.ticks = 0;
 		ExecuteInstruction();
+
 	}
 }
 

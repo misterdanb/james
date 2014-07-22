@@ -11,10 +11,6 @@ GameboyColor::GameboyColor()
 	  _forceClassicGameboy (GBC_TRUE),
 	  _hybr1s80(),
 	  _speedFactor (1),
-	  _timerClockFrequency (1024), // or something...
-	  _timerStopped (GBC_TRUE),
-	  _dividerCounter (0),
-	  _timerCounter (0),
 	  _monochromePalette(),
 	  _colorBackgroundPaletteIndexAutoIncrement (0),
 	  _colorSpritePaletteIndexAutoIncrement (0),
@@ -133,7 +129,11 @@ void GameboyColor::Initialize()
 {
 	LOG ("Initializing Gameboy Color emulation");
 
+	Timer* timer = _hybr1s80.GetTimer();
+
 	_hybr1s80.SetMemoryBus (this);
+
+	timer->SetRenderContext (&_rc);
 
 	Reset();
 
@@ -279,92 +279,7 @@ void GameboyColor::ExecuteMachineClocks (int clocks)
 		_pendingClocks -= CLOCK_SPEED;
 
 		_hybr1s80.Execute (CLOCK_SPEED * 4);
-		UpdateTimer (CLOCK_SPEED * 4);
 	}
-}
-
-void GameboyColor::UpdateTimer (int ticks)
-{
-	static int ticks_per_cycle  = 0;
-	static int ticks_left_cycle = 0;
-	int counter = _rc.ioPorts[5];
-
-	if (! (_timerStopped))
-	{
-		if (! (ticks_per_cycle))
-		{
-			switch (_rc.ioPorts[7] & 0x03)
-			{
-				case 0:
-					ticks_per_cycle = 1024;
-					break;
-
-				case 1:
-					ticks_per_cycle = 16;
-					break;
-
-				case 2:
-					ticks_per_cycle = 64;
-					break;
-
-				case 3:
-					ticks_per_cycle = 256;
-					break;
-
-				default:
-					break;
-			}
-
-			ticks_left_cycle = ticks_per_cycle;
-		}
-
-		ticks_left_cycle -= ticks;
-
-		if (ticks_left_cycle <= 0)
-		{
-			ticks_left_cycle = 0;
-			counter++;
-		}
-
-		if (counter > 0xFF)
-		{
-			_rc.ioPorts[5]   =_rc.ioPorts[6];
-			_rc.interruptHandler->SignalTimerInterrupt();
-			ticks_per_cycle = 0;
-		} else {
-			_rc.ioPorts[5] = counter;
-		}
-	}
-
-	if (!_timerStopped)
-	{
-		_timerCounter += ticks;
-
-		if (_timerCounter >= _timerClockFrequency)
-		{
-			_rc.ioPorts[0xFF05 - 0xFF00] += _timerCounter / _timerClockFrequency;
-
-			if (_rc.ioPorts[0xFF05 - 0xFF00] > 0xFF)
-			{
-				_rc.ioPorts[0xFF05 - 0xFF00] = _rc.ioPorts[0xFF06  - 0xFF00];
-
-				_rc.interruptHandler->SignalTimerInterrupt();
-			}
-
-			_timerCounter %= _timerClockFrequency;
-		}
-	}
-
-	_dividerCounter += ticks;
-
-	if (_dividerCounter > 0xFF)
-	{
-		_rc.ioPorts[4]++;
-		if (_rc.ioPorts[4] > 0xFF)
-			_rc.ioPorts[4] = 0;
-		_dividerCounter = 0;
-	}
-
 }
 
 inline int GameboyColor::ReadByte (int address)
@@ -656,30 +571,6 @@ inline void GameboyColor::WriteByte (int address, int value)
 			case 0xFF07:
 				// timer control
 				_rc.ioPorts[address - 0xFF00] = value;
-
-				switch (value & 0x03)
-				{
-					case 0x00:
-						_timerClockFrequency = 1024;
-						break;
-
-					case 0x01:
-						_timerClockFrequency = 16;
-						break;
-
-					case 0x02:
-						_timerClockFrequency = 64;
-						break;
-
-					case 0x03:
-						_timerClockFrequency = 256;
-						break;
-
-					default:
-						break;
-				}
-
-				_timerStopped = !GetBit (value, 2);
 
 				break;
 

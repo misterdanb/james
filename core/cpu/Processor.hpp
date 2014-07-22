@@ -8,6 +8,7 @@
 #include "State.hpp"
 #include "InstructionTable.hpp"
 #include "LookUpTables.hpp"
+#include "Timer.hpp"
 
 namespace james
 {
@@ -31,6 +32,7 @@ namespace james
 				void Deserialize (std::istream&);
 
 				void SetMemoryBus (IMemoryBus*);
+				Timer* GetTimer();
 
 				void Step();
 				void Execute (int);
@@ -198,6 +200,7 @@ namespace james
 
 				State _state;
 				IMemoryBus* _bus;
+				Timer _timer;
 
 			  private:
 				bool _recording;
