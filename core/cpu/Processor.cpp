@@ -2211,14 +2211,6 @@ void Processor::ExecuteInterrupt()
 		int interruptsToBePerformed = _bus->ReadByte (INTERRUPT_ENABLE_ADDRESS) &
 									  _bus->ReadByte (INTERRUPT_REQUEST_ADDRESS);
 
-		if (!_state.interruptsEnabled)
-		{
-			_state.stopped = false;
-			_state.halted = false;
-
-			return;
-		}
-
 		if (interruptsToBePerformed & (1 << VERTICAL_BLANK_INTERRUPT_BIT_NUMBER))
 		{
 			_state.sp -= 2;
@@ -2329,6 +2321,10 @@ void Processor::ExecuteInterrupt()
 			_state.halted = false;
 
 			_state.ticks += 16;
+		}
+		else if (_state.halted)
+		{
+			_state.ticks += 4;
 		}
 	}
 }
@@ -3556,6 +3552,7 @@ void Processor::LD_SP_HL()
 void Processor::DI()
 {
 	_state.interruptsEnabled = false;
+	_state.halted = false;
 
 	UpdatePC (InstructionTable::DEFAULT);
 	UpdateTicks (InstructionTable::DEFAULT);
@@ -3564,6 +3561,7 @@ void Processor::DI()
 void Processor::EI()
 {
 	_state.interruptsEnabled = true;
+	_state.halted = false;
 
 	UpdatePC (InstructionTable::DEFAULT);
 	UpdateTicks (InstructionTable::DEFAULT);
