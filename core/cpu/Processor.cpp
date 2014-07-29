@@ -2211,9 +2211,8 @@ void Processor::ExecuteInterrupt()
 		int interruptsToBePerformed = _bus->ReadByte (INTERRUPT_ENABLE_ADDRESS) &
 									  _bus->ReadByte (INTERRUPT_REQUEST_ADDRESS);
 
-		if (!_state.interruptsEnabled)
+		if (!_state.interruptsEnabled && interruptsToBePerformed)
 		{
-			_state.stopped = false;
 			_state.halted = false;
 
 			return;
@@ -2234,8 +2233,6 @@ void Processor::ExecuteInterrupt()
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
-			_state.interruptsEnabled = false;
-			_state.stopped = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
@@ -2257,8 +2254,6 @@ void Processor::ExecuteInterrupt()
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
-			_state.interruptsEnabled = false;
-			_state.stopped = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
@@ -2280,8 +2275,6 @@ void Processor::ExecuteInterrupt()
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
-			_state.interruptsEnabled = false;
-			_state.stopped = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
@@ -2303,8 +2296,6 @@ void Processor::ExecuteInterrupt()
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
-			_state.interruptsEnabled = false;
-			_state.stopped = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
@@ -2324,7 +2315,6 @@ void Processor::ExecuteInterrupt()
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
-			_state.interruptsEnabled = false;
 			_state.stopped = false;
 			_state.halted = false;
 
