@@ -102,17 +102,17 @@ void Processor::Execute (int ticks)
 
 	tickCountdown += ticks;
 
+	_timer.Advance (ticks);
+
 	while (tickCountdown >= _state.ticks)
 	{
 		tickCountdown -= _state.ticks;
-		_timer.Advance (_state.ticks);
 		_state.ticks = 0;
 		ExecuteInterrupt();
 
 		if (_state.halted) { break; }
 
 		tickCountdown -= _state.ticks;
-		_timer.Advance (_state.ticks);
 		_state.ticks = 0;
 		ExecuteInstruction();
 
@@ -2321,10 +2321,6 @@ void Processor::ExecuteInterrupt()
 			_state.halted = false;
 
 			_state.ticks += 16;
-		}
-		else if (_state.halted)
-		{
-			_state.ticks += 4;
 		}
 	}
 }
