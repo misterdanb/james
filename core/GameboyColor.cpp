@@ -25,10 +25,10 @@ GameboyColor::GameboyColor()
 	_rc.selectedVideoRamBank = 0;
 	_rc.verticalBlankInterruptAlreadyRequested = GBC_FALSE;
 	_rc.lcdDisplayEnabled = GBC_FALSE;
-	_rc.windowTileMapDisplaySelect = 0;
+	_rc.windowMapDisplaySelect = 0;
 	_rc.windowDisplayEnabled = GBC_FALSE;
 	_rc.backgroundAndWindowTileDataSelect = 0;
-	_rc.backgroundTileMapDisplaySelect = 0;
+	_rc.backgroundMapDisplaySelect = 0;
 	_rc.spriteSize = 0; // missing enum for sprite size (and implementation of this)
 	_rc.spriteDisplayEnabled = GBC_FALSE;
 	_rc.backgroundDisplayEnabled = GBC_FALSE;
@@ -117,7 +117,7 @@ Renderer& GameboyColor::GetRenderer()
 
 TileMap::TileMapArray2& GameboyColor::GetTileMap (int tileMapNumber)
 {
-	return _rc.tileMaps[tileMapNumber].data;
+	return _rc.backgroundMaps[tileMapNumber].data;
 }
 
 SpriteAttribute& GameboyColor::GetSpriteAttribute (int spriteAttributeNumber)
@@ -436,28 +436,22 @@ inline void GameboyColor::WriteByte (int address, int value)
 					int mapElementX = mapElementNumber % TileMap::WIDTH;
 					int mapElementY = mapElementNumber / TileMap::WIDTH;
 
-					TileMap& tileMap = _rc.tileMaps[mapNumber];
+					TileMap& backgroundMap = _rc.backgroundMaps[mapNumber];
 
-					tileMap.data[mapElementX][mapElementY] = _rc.videoRam[0][ (mapNumber == 0) ?
-							(0x9800 - 0x8000 + mapElementNumber) :
-							(0x9C00 - 0x8000 + mapElementNumber)];
+					backgroundMap.data[mapElementX][mapElementY] = _rc.videoRam[0][(mapNumber == 0) ?
+					                                               (0x9800 - 0x8000 + mapElementNumber) :
+				                                                 (0x9C00 - 0x8000 + mapElementNumber)];
 				}
 				else
 				{
 					int mapNumber = (address <= 0x9BFF) ? 0 : 1;
 					int mapElementNumber = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
 
-					int tileMapAttribute = _rc.videoRam[1][ (mapNumber == 0) ?
-															(0x9800 + mapElementNumber) :
-															(0x9C00 + mapElementNumber)];
+					int backgroundAttribute = _rc.videoRam[1][ (mapNumber == 0) ?
+					                          (0x9800 + mapElementNumber) :
+					                          (0x9C00 + mapElementNumber)];
 
-					TileMapAttribute& tileMapAttributeToChange = _rcColor.tileMapAttributes[mapNumber][mapElementNumber];
-
-					tileMapAttributeToChange.backgroundColorPaletteNumber = tileMapAttribute & 0x07;
-					tileMapAttributeToChange.tileVideoRamBankNumber = (tileMapAttribute >> 3) & 0x01;
-					tileMapAttributeToChange.horizontalFlip = HorizontalFlip ((tileMapAttribute >> 5) & 0x01);
-					tileMapAttributeToChange.verticalFlip = VerticalFlip ((tileMapAttribute >> 6) & 0x01);
-					tileMapAttributeToChange.backgroundToOAMPriority = BackgroundToOAMPriority ((tileMapAttribute >> 7) & 0x01);
+					 _rcColor.backgroundAttributes[mapNumber][mapElementNumber] = BackgroundAttribute(backgroundAttribute);
 				}
 			}
 		}
@@ -587,10 +581,10 @@ inline void GameboyColor::WriteByte (int address, int value)
 				_rc.backgroundDisplayEnabled = GetBit (value, 0);
 				_rc.spriteDisplayEnabled = GetBit (value, 1);
 				_rc.spriteSize = GetBit (value, 2);
-				_rc.backgroundTileMapDisplaySelect = GetBit (value, 3);
+				_rc.backgroundMapDisplaySelect = GetBit (value, 3);
 				_rc.backgroundAndWindowTileDataSelect = GetBit (value, 4);
 				_rc.windowDisplayEnabled = GetBit (value, 5);
-				_rc.windowTileMapDisplaySelect = GetBit (value, 6);
+				_rc.windowMapDisplaySelect = GetBit (value, 6);
 				_rc.lcdDisplayEnabled = GetBit (value, 7);
 
 				break;
