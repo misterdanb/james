@@ -10,23 +10,24 @@ namespace james
 {
 	namespace core
 	{
-		class Tile : public ByteMap<8, 8>
+		class Tile : public Array2<int, 8, 8>
 		{
-		  public:
+		public:
 			static const int WIDTH = 8;
 			static const int HEIGHT = 8;
-
+			
+			static const int DATA_SIZE = 16;
+			
 			typedef Array2<int, WIDTH, HEIGHT> TileArray2;
-
-		  public:
+		
+		public:
 			Tile();
+			Tile(Array<int, DATA_SIZE>);
 			~Tile();
-
-		  public:
-			TileArray2& data;
-
-		  protected:
-			using ByteMap<WIDTH, HEIGHT>::_matrixElements;
+			
+			void SetData(Array<int, DATA_SIZE>);
+			
+			Array<int, DATA_SIZE> GetData();
 		};
 	}
 }
