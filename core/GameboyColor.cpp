@@ -407,8 +407,8 @@ inline void GameboyColor::WriteByte (int address, int value)
 					case 0:
 						for (int x = 0; x < Tile::WIDTH; x++)
 						{
-							tileToChange.data[x][y] &= 2;
-							tileToChange.data[x][y] |= (colorNumbersLow >> (7 - x)) & 1;
+							tileToChange[x][y] &= 2;
+							tileToChange[x][y] |= (colorNumbersLow >> (7 - x)) & 1;
 						}
 
 						break;
@@ -416,8 +416,8 @@ inline void GameboyColor::WriteByte (int address, int value)
 					case 1:
 						for (int x = 0; x < Tile::WIDTH; x++)
 						{
-							tileToChange.data[x][y] &= 1;
-							tileToChange.data[x][y] |= ((colorNumbersHigh << 1) >> (7 - x)) & 2;
+							tileToChange[x][y] &= 1;
+							tileToChange[x][y] |= ((colorNumbersHigh << 1) >> (7 - x)) & 2;
 						}
 
 						break;

@@ -116,11 +116,11 @@ Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap (int tileMapNumber
 				{
 					Color<int>& pixel = renderedTileMap.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
 
-					pixel = _rcClassic.monochromeBackgroundPalette.colors[_rc.tiles[0][tileNumber].data[tileX][tileY]];
+					pixel = _rcClassic.monochromeBackgroundPalette.colors[_rc.tiles[0][tileNumber][tileX][tileY]];
 
 					pixel.red = ((pixel.red << 3) | (pixel.red >> 2)) & 0xFF,
-						  pixel.green = ((pixel.green << 3) | (pixel.green >> 2)) & 0xFF,
-								pixel.blue = ((pixel.blue << 3) | (pixel.blue >> 2)) & 0xFF;
+				  pixel.green = ((pixel.green << 3) | (pixel.green >> 2)) & 0xFF,
+					pixel.blue = ((pixel.blue << 3) | (pixel.blue >> 2)) & 0xFF;
 				}
 			}
 		}
@@ -379,7 +379,7 @@ void ClassicRenderer::DrawTile (Vector2<int> position,
 					realTileY = 7 - tileY;
 				}
 
-				int colorNumber = tile.data[realTileX][realTileY];
+				int colorNumber = tile[realTileX][realTileY];
 
 				if (((colorNumber == 0) && (enabledColors & COLOR_0)) ||
 						((colorNumber == 1) && (enabledColors & COLOR_1)) ||
