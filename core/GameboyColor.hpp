@@ -13,7 +13,7 @@
 #include "cpu/Processor.hpp"
 #include "MemoryBus.hpp"
 #include "LCDMode.hpp"
-#include "TileMapAttribute.hpp"
+#include "BackgroundAttribute.hpp"
 #include "SpriteAttribute.hpp"
 #include "Tile.hpp"
 #include "TileMap.hpp"

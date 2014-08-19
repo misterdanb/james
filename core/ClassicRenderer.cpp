@@ -102,7 +102,7 @@ Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap (int tileMapNumber
 	{
 		for (int mapY = 0; mapY < TileMap::HEIGHT; mapY++)
 		{
-			int backgroundMapElement = _rc.tileMaps
+			int backgroundMapElement = _rc.backgroundMaps
 									   [tileMapNumber].data
 									   [mapX][mapY];
 
@@ -286,8 +286,8 @@ void ClassicRenderer::DrawBackgroundMapTile (int mapX, int enabledColors)
 		mapElementY %= TileMap::HEIGHT;
 	}
 
-	int backgroundMapElement = _rc.tileMaps
-							   [_rc.backgroundTileMapDisplaySelect].data
+	int backgroundMapElement = _rc.backgroundMaps
+							   [_rc.backgroundMapDisplaySelect].data
 							   [mapElementX][mapElementY];
 
 	int tileVideoRamBankNumber = 0;
@@ -325,8 +325,8 @@ void ClassicRenderer::DrawWindowMapTile (int mapX, int enabledColors)
 
 	if (mapElementX < Frame::WIDTH / Tile::WIDTH && mapElementY < Frame::HEIGHT / Tile::HEIGHT)
 	{
-		int windowMapElement = _rc.tileMaps
-							   [_rc.windowTileMapDisplaySelect].data
+		int windowMapElement = _rc.backgroundMaps
+							   [_rc.windowMapDisplaySelect].data
 							   [mapElementX][mapElementY];
 
 		int tileVideoRamBankNumber = 0;

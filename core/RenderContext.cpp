@@ -18,10 +18,10 @@ RenderContext::RenderContext()
 	   serialInterruptEnabled(),
 	   joypadInterruptEnabled(),
 	   lcdDisplayEnabled(),
-	   windowTileMapDisplaySelect(),
+	   windowMapDisplaySelect(),
 	   windowDisplayEnabled(),
 	   backgroundAndWindowTileDataSelect(),
-	   backgroundTileMapDisplaySelect(),
+	   backgroundMapDisplaySelect(),
 	   spriteSize(),
 	   spriteDisplayEnabled(),
 	   backgroundDisplayEnabled(),
@@ -38,7 +38,7 @@ RenderContext::RenderContext()
 	   windowX(),
 	   windowY(),
 	   changedTiles(),
-	   changedTileMapElements(),
+	   changedBackgroundMapElements(),
 	   spriteAttributes(),
 	   changedSpriteAttributes(),
 	   gameboyClassicSpecific(),
@@ -62,8 +62,8 @@ GameboyClassicSpecificRenderContext::~GameboyClassicSpecificRenderContext()
 }
 
 GameboyColorSpecificRenderContext::GameboyColorSpecificRenderContext()
-	:  tileMapAttributes(),
-	   changedTileMapAttributes(),
+	:  backgroundAttributes(),
+	   changedBackgroundAttributes(),
 	   colorBackgroundPalettes(),
 	   colorSpritePalettes(),
 	   dmaTransferActive(),

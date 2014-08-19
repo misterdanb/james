@@ -6,7 +6,7 @@
 #include "InterruptHandler.hpp"
 #include "Tile.hpp"
 #include "TileMap.hpp"
-#include "TileMapAttribute.hpp"
+#include "BackgroundAttribute.hpp"
 #include "InterruptHandler.hpp"
 #include "LCDMode.hpp"
 #include "Frame.hpp"
@@ -34,8 +34,8 @@ namespace james
 		  public:
 			GameboyColorSpecificRenderContext();
 			~GameboyColorSpecificRenderContext();
-			TileMapAttribute tileMapAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
-			Queue<Pair<int, int>>changedTileMapAttributes;
+			BackgroundAttribute backgroundAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
+			Queue<Pair<int, int>> changedBackgroundAttributes;
 			ColorPalette colorBackgroundPalettes[8];
 			ColorPalette colorSpritePalettes[8];
 			int dmaTransferActive;
@@ -99,10 +99,10 @@ namespace james
 
 			// lcd control
 			int lcdDisplayEnabled;
-			int windowTileMapDisplaySelect;
+			int windowMapDisplaySelect;
 			int windowDisplayEnabled;
 			int backgroundAndWindowTileDataSelect;
-			int backgroundTileMapDisplaySelect;
+			int backgroundMapDisplaySelect;
 			int spriteSize;
 			int spriteDisplayEnabled;
 			int backgroundDisplayEnabled;
@@ -128,8 +128,8 @@ namespace james
 			Queue<Pair<int, int>> changedTiles;
 
 			// background map elements
-			TileMap tileMaps[2];
-			Queue<Pair<int, int>> changedTileMapElements;
+			TileMap backgroundMaps[2];
+			Queue<Pair<int, int>> changedBackgroundMapElements;
 
 			// sprite attributes
 			Array<SpriteAttribute, 40> spriteAttributes;
