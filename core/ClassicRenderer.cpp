@@ -116,11 +116,11 @@ Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap (int tileMapNumber
 				{
 					Color<int>& pixel = renderedTileMap.map[mapX * Tile::WIDTH + tileX][mapY * Tile::HEIGHT + tileY];
 
-					pixel = _rcClassic.monochromeBackgroundPalette.colors[_rc.tiles[0][tileNumber][tileX][tileY]];
+					pixel = _rcClassic.monochromeBackgroundPalette[_rc.tiles[0][tileNumber][tileX][tileY]];
 
-					pixel.red = ((pixel.red << 3) | (pixel.red >> 2)) & 0xFF,
-				  pixel.green = ((pixel.green << 3) | (pixel.green >> 2)) & 0xFF,
-					pixel.blue = ((pixel.blue << 3) | (pixel.blue >> 2)) & 0xFF;
+					pixel.SetRed(((pixel.GetRed() << 3) | (pixel.GetRed() >> 2)) & 0xFF);
+				  pixel.SetGreen(((pixel.GetGreen() << 3) | (pixel.GetGreen() >> 2)) & 0xFF);
+					pixel.SetBlue(((pixel.GetBlue() << 3) | (pixel.GetBlue() >> 2)) & 0xFF);
 				}
 			}
 		}
@@ -267,12 +267,12 @@ void ClassicRenderer::DrawBackgroundMapTile (int mapX, int enabledColors)
 	Vector2<int> position ((mapX * Tile::WIDTH) - _rc.scrollX,
 						   _rc.lcdY - ((_rc.lcdY + _rc.scrollY) % Tile::HEIGHT));
 
-	if (position.x < -8)
+	if (position.GetX() < -8)
 	{
-		position.x += TileMap::WIDTH * Tile::WIDTH; // IAW: 256, eeyup
+		position.SetX(position.GetX() + TileMap::WIDTH * Tile::WIDTH); // IAW: 256, eeyup
 	}
 
-	position.x %= TileMap::WIDTH * Tile::WIDTH;
+	position.SetX(position.GetX() % (TileMap::WIDTH * Tile::WIDTH));
 
 	int mapElementX = mapX;
 	int mapElementY = (_rc.lcdY + _rc.scrollY) / Tile::HEIGHT;
@@ -355,13 +355,13 @@ void ClassicRenderer::DrawTile (Vector2<int> position,
 								ColorPalette colorPalette,
 								int enabledColors)
 {
-	int tileY = _rc.lcdY - position.y;
+	int tileY = _rc.lcdY - position.GetY();
 
 	if (tileY >= 0 && tileY < Tile::HEIGHT)
 	{
 		for (int tileX = 0; tileX < Tile::WIDTH; tileX++)
 		{
-			int scanlinePosition = position.x + tileX;
+			int scanlinePosition = position.GetX() + tileX;
 
 			if (scanlinePosition >= 0 && scanlinePosition < Frame::WIDTH &&
 					_rc.lcdY >= 0 && _rc.lcdY < Frame::HEIGHT)
@@ -386,7 +386,7 @@ void ClassicRenderer::DrawTile (Vector2<int> position,
 						((colorNumber == 2) && (enabledColors & COLOR_2)) ||
 						((colorNumber == 3) && (enabledColors & COLOR_3)))
 				{
-					_rc.rawFrame[_rc.lcdY * Frame::WIDTH + scanlinePosition] = colorPalette.colors[colorNumber];
+					_rc.rawFrame[_rc.lcdY * Frame::WIDTH + scanlinePosition] = colorPalette[colorNumber];
 				}
 			}
 		}

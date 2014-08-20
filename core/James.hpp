@@ -15,12 +15,12 @@
 #include <algorithm>
 
 #include "BaseTypes.hpp"
-#include "Color.template"
+
+#include "Color.tpp"
 #include "PixelMap.template"
 #include "ByteMap.template"
 #include "Matrix.template"
-#include "Vector.template"
-#include "Vector2.template"
+#include "Vector2.tpp"
 
 #define LOG_LEVEL_2
 
