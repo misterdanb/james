@@ -14,9 +14,12 @@ Frame::Frame (Color<int> gameboyColors[])
 		{
 			int pixelIndex = y * WIDTH + x;
 
-			data[x][y].red = ((gameboyColors[pixelIndex].red << 3) | (gameboyColors[pixelIndex].red >> 2)) & 0xFF,
-					   data[x][y].green = ((gameboyColors[pixelIndex].green << 3) | (gameboyColors[pixelIndex].green >> 2)) & 0xFF,
-								  data[x][y].blue = ((gameboyColors[pixelIndex].blue << 3) | (gameboyColors[pixelIndex].blue >> 2)) & 0xFF;
+			data[x][y].SetRed(((gameboyColors[pixelIndex].GetRed() << 3) |
+			                   (gameboyColors[pixelIndex].GetRed() >> 2)) & 0xFF);
+			data[x][y].SetGreen(((gameboyColors[pixelIndex].GetGreen() << 3) |
+			                     (gameboyColors[pixelIndex].GetGreen() >> 2)) & 0xFF);
+			data[x][y].SetBlue(((gameboyColors[pixelIndex].GetBlue() << 3) |
+			                    (gameboyColors[pixelIndex].GetBlue() >> 2)) & 0xFF);
 		}
 	}
 }

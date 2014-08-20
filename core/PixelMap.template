@@ -4,7 +4,7 @@
 #include <cstring>
 
 #include "Matrix.template"
-#include "Color.template"
+#include "Color.tpp"
 
 namespace james
 {
@@ -17,13 +17,6 @@ namespace james
 			PixelMap()
 				: Matrix<Color<int>, width, height>(), map (_matrixElements)
 			{
-				Color<int> nullColor;
-
-				nullColor.red = 0;
-				nullColor.green = 0;
-				nullColor.blue = 0;
-
-				Clear (nullColor);
 			}
 
 			virtual ~PixelMap()

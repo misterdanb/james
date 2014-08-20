@@ -7,7 +7,7 @@ namespace james
 {
 	namespace core
 	{
-		class ColorPalette : public Vector<Color<int>, 4>
+		class ColorPalette : public Array<Color<int>, 4>
 		{
 		  public:
 			static const int COLOR_PALETTE_SIZE = 4;
@@ -16,19 +16,12 @@ namespace james
 
 		  public:
 			ColorPalette()
-				: Vector<Color<int>, COLOR_PALETTE_SIZE>(), colors (_vectorElements)
 			{
 			}
 
 			~ColorPalette()
 			{
 			}
-
-		  public:
-			ColorPaletteArray& colors;
-
-		  protected:
-			using Vector<Color<int>, COLOR_PALETTE_SIZE>::_vectorElements;
 		};
 	}
 }
