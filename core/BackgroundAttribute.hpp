@@ -18,7 +18,7 @@ namespace james
 		 * a game boy color:
 		 *
 		 * <code>
-		 * Bit 0-2: background color palette numper<br />
+		 * Bit 0-2: background color palette number<br />
 		 * Bit 3: tile video ram bank number (0 = bank 0, 1 = bank 1)<br />
 		 * Bit 4: not used<br />
 		 * Bit 5: horizontal flip (0 = normal, 1 = horizontally flipped)<br />
