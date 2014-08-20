@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../core/GameboyColor.hpp"
-#include "../core/Color.template"
+#include "../core/Color.tpp"
 
 namespace james
 {

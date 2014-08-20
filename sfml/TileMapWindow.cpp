@@ -34,9 +34,9 @@ void TileMapWindow::Render()
 		{
 			int pixelIndex = y * tileMapPixelWidth + x;
 
-			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rendererTileMap.map[x][y].red);
-			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rendererTileMap.map[x][y].green);
-			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rendererTileMap.map[x][y].blue);
+			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rendererTileMap.map[x][y].GetRed());
+			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rendererTileMap.map[x][y].GetGreen());
+			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rendererTileMap.map[x][y].GetBlue());
 			_rawFrame[pixelIndex * 4 + 3] = (sf::Uint8) (0xFF);
 		}
 	}
