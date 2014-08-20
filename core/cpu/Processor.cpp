@@ -73,7 +73,7 @@ void Processor::Deserialize (std::istream& is)
 	_state.halted = bool (inState[13]);
 }
 
-void Processor::SetMemoryBus (IMemoryBus* bus)
+void Processor::SetMemoryBus (MemoryBus* bus)
 {
 	_bus = bus;
 }

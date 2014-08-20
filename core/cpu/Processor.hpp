@@ -31,7 +31,7 @@ namespace james
 				void Serialize (std::ostream&);
 				void Deserialize (std::istream&);
 
-				void SetMemoryBus (IMemoryBus*);
+				void SetMemoryBus (MemoryBus*);
 				Timer* GetTimer();
 
 				void Step();
@@ -199,7 +199,7 @@ namespace james
 				Array<int, LookUpTables::AMOUNT_OF_INSTUCTION_TABLES> _currentOpHighs;
 
 				State _state;
-				IMemoryBus* _bus;
+				MemoryBus* _bus;
 				Timer _timer;
 
 			  private:

@@ -30,7 +30,7 @@ namespace james
 {
 	namespace core
 	{
-		class GameboyColor : public IMemoryBus
+		class GameboyColor : public MemoryBus
 		{
 		  public:
 			// clock speed over 256 will cause timer inaccuracies
