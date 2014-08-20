@@ -79,7 +79,7 @@ namespace james
 			int selectedVideoRamBank;
 
 			// memory bus
-			IMemoryBus* memoryBus;
+			MemoryBus* memoryBus;
 
 			// interrupt handler
 			IInterruptHandler* interruptHandler;
