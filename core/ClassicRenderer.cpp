@@ -148,7 +148,7 @@ void ClassicRenderer::DrawSprites (int enabledColors,
 		{
 			if (spriteAttribute.GetSpriteToBackgroundPriority() == spriteToBackgroundPriority)
 			{
-				ColorPalette colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
+				Array<Color<int>, 4> colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
 											_rcClassic.monochromeSpritePalette0 :
 											_rcClassic.monochromeSpritePalette1;
 
@@ -201,7 +201,7 @@ void ClassicRenderer::DrawSprites (int enabledColors)
 				(_rc.lcdY < (spriteAttribute.GetY() + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
 				(drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
 		{
-			ColorPalette colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
+			Array<Color<int>, 4> colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
 										_rcClassic.monochromeSpritePalette0 :
 										_rcClassic.monochromeSpritePalette1;
 
@@ -298,7 +298,7 @@ void ClassicRenderer::DrawBackgroundMapTile (int mapX, int enabledColors)
 
 	Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
 
-	ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
+	Array<Color<int>, 4> colorPalette = _rcClassic.monochromeBackgroundPalette;
 
 	DrawTile (position,
 			  tile,
@@ -337,7 +337,7 @@ void ClassicRenderer::DrawWindowMapTile (int mapX, int enabledColors)
 
 		Tile tile = _rc.tiles[tileVideoRamBankNumber][tileNumber];
 
-		ColorPalette colorPalette = _rcClassic.monochromeBackgroundPalette;
+		Array<Color<int>, 4> colorPalette = _rcClassic.monochromeBackgroundPalette;
 
 		DrawTile (position,
 				  tile,
@@ -352,7 +352,7 @@ void ClassicRenderer::DrawTile (Vector2<int> position,
 								Tile tile,
 								HorizontalFlip horizontalFlip,
 								VerticalFlip verticalFlip,
-								ColorPalette colorPalette,
+								Array<Color<int>, 4> colorPalette,
 								int enabledColors)
 {
 	int tileY = _rc.lcdY - position.GetY();
