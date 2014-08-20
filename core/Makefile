@@ -50,6 +50,9 @@ Frame.o: Frame.cpp
 Tile.o: Tile.cpp
 	$(CC) $(FLAGS) $(CFLAGS) Tile.cpp -o Tile.o
 
+SpriteAttribute.o: SpriteAttribute.cpp
+	$(CC) $(FLAGS) $(CFLAGS) SpriteAttribute.cpp -o SpriteAttribute.o
+
 BackgroundAttribute.o: BackgroundAttribute.cpp
 	$(CC) $(FLAGS) $(CFLAGS) BackgroundAttribute.cpp -o BackgroundAttribute.o
 

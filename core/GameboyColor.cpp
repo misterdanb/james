@@ -484,36 +484,16 @@ inline void GameboyColor::WriteByte (int address, int value)
 			_rc.oam[address - 0xFE00] = value;
 
 			int oamAddress = (address - 0xFE00) & 0xFC;
-			int spriteAttributeFlags = _rc.oam[oamAddress + 3];
 
-			SpriteAttribute& spriteAttributeToChange = _rc.spriteAttributes[oamAddress >> 2];
-
-			switch (address % 4)
+			Array<int, 4> rawSpriteAttribute =
 			{
-				case 0:
-					spriteAttributeToChange.y = _rc.oam[oamAddress] - 16;
-					break;
+				_rc.oam[oamAddress],
+				_rc.oam[oamAddress + 1],
+				_rc.oam[oamAddress + 2],
+				_rc.oam[oamAddress + 3]
+			};
 
-				case 1:
-					spriteAttributeToChange.x = _rc.oam[oamAddress + 1] - 8;
-					break;
-
-				case 2:
-					spriteAttributeToChange.tileNumber = _rc.oam[oamAddress + 2];
-					break;
-
-				case 3:
-					spriteAttributeToChange.colorPaletteNumber = spriteAttributeFlags & 0x07;
-					spriteAttributeToChange.tileVideoRamBankNumber = (spriteAttributeFlags >> 3) & 0x01;
-					spriteAttributeToChange.monochromePaletteNumber = (spriteAttributeFlags >> 4) & 0x01;
-					spriteAttributeToChange.horizontalFlip = HorizontalFlip ((spriteAttributeFlags >> 5) & 0x01);
-					spriteAttributeToChange.verticalFlip = VerticalFlip ((spriteAttributeFlags >> 6) & 0x01);
-					spriteAttributeToChange.spriteToBackgroundPriority = SpriteToBackgroundPriority ((spriteAttributeFlags >> 7) & 0x01);
-					break;
-
-				default:
-					break;
-			}
+			_rc.spriteAttributes[oamAddress >> 2] = SpriteAttribute(rawSpriteAttribute);
 		}
 	}
 	else if (address <= 0xFEFF)

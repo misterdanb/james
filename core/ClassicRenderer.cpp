@@ -138,42 +138,42 @@ void ClassicRenderer::DrawSprites (int enabledColors,
 	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
 		// only draw visible sprites
-		if ((spriteAttribute.x != -8) &&
-				(spriteAttribute.y != -16) &&
-				(spriteAttribute.x < 168) &&
-				(spriteAttribute.y < 160) &&
-				(_rc.lcdY >= spriteAttribute.y) &&
-				(_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
+		if ((spriteAttribute.GetX() != -8) &&
+				(spriteAttribute.GetY() != -16) &&
+				(spriteAttribute.GetX() < 168) &&
+				(spriteAttribute.GetY() < 160) &&
+				(_rc.lcdY >= spriteAttribute.GetY()) &&
+				(_rc.lcdY < (spriteAttribute.GetY() + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
 				(drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
 		{
-			if (spriteAttribute.spriteToBackgroundPriority == spriteToBackgroundPriority)
+			if (spriteAttribute.GetSpriteToBackgroundPriority() == spriteToBackgroundPriority)
 			{
-				ColorPalette colorPalette = spriteAttribute.monochromePaletteNumber == 0 ?
+				ColorPalette colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
 											_rcClassic.monochromeSpritePalette0 :
 											_rcClassic.monochromeSpritePalette1;
 
 				if (_rc.spriteSize == 0)
 				{
-					DrawTile (Vector2<int> (spriteAttribute.x, spriteAttribute.y),
-							  _rc.tiles[0][ (0x8000 - 0x8000) + spriteAttribute.tileNumber],
-							  spriteAttribute.horizontalFlip,
-							  spriteAttribute.verticalFlip,
+					DrawTile (Vector2<int> (spriteAttribute.GetX(), spriteAttribute.GetY()),
+							  _rc.tiles[0][ (0x8000 - 0x8000) + spriteAttribute.GetTileNumber()],
+							  spriteAttribute.GetHorizontalFlip(),
+							  spriteAttribute.GetVerticalFlip(),
 							  colorPalette,
 							  enabledColors);
 				}
 				else if (_rc.spriteSize == 1)
 				{
-					DrawTile (Vector2<int> (spriteAttribute.x, spriteAttribute.y),
-							  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.tileNumber & 0xFE)],
-							  spriteAttribute.horizontalFlip,
-							  spriteAttribute.verticalFlip,
+					DrawTile (Vector2<int> (spriteAttribute.GetX(), spriteAttribute.GetY()),
+							  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.GetTileNumber() & 0xFE)],
+							  spriteAttribute.GetHorizontalFlip(),
+							  spriteAttribute.GetVerticalFlip(),
 							  colorPalette,
 							  enabledColors);
 
-					DrawTile (Vector2<int> (spriteAttribute.x, spriteAttribute.y + 8),
-							  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.tileNumber | 0x01)],
-							  spriteAttribute.horizontalFlip,
-							  spriteAttribute.verticalFlip,
+					DrawTile (Vector2<int> (spriteAttribute.GetX(), spriteAttribute.GetY() + 8),
+							  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.GetTileNumber() | 0x01)],
+							  spriteAttribute.GetHorizontalFlip(),
+							  spriteAttribute.GetVerticalFlip(),
 							  colorPalette,
 							  enabledColors);
 				}
@@ -193,40 +193,40 @@ void ClassicRenderer::DrawSprites (int enabledColors)
 	for (SpriteAttribute spriteAttribute : _rc.spriteAttributes)
 	{
 		// only draw visible sprites
-		if ((spriteAttribute.x != -8) &&
-				(spriteAttribute.y != -16) &&
-				(spriteAttribute.x < 168) &&
-				(spriteAttribute.y < 160) &&
-				(_rc.lcdY >= spriteAttribute.y) &&
-				(_rc.lcdY < (spriteAttribute.y + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
+		if ((spriteAttribute.GetX() != -8) &&
+				(spriteAttribute.GetY() != -16) &&
+				(spriteAttribute.GetX() < 168) &&
+				(spriteAttribute.GetY() < 160) &&
+				(_rc.lcdY >= spriteAttribute.GetY()) &&
+				(_rc.lcdY < (spriteAttribute.GetY() + 2 * Tile::HEIGHT)) && // double tile height for 8x16 sprites
 				(drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
 		{
-			ColorPalette colorPalette = spriteAttribute.monochromePaletteNumber == 0 ?
+			ColorPalette colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
 										_rcClassic.monochromeSpritePalette0 :
 										_rcClassic.monochromeSpritePalette1;
 
 			if (_rc.spriteSize == 0)
 			{
-				DrawTile (Vector2<int> (spriteAttribute.x, spriteAttribute.y),
-						  _rc.tiles[0][ (0x8000 - 0x8000) + spriteAttribute.tileNumber],
-						  spriteAttribute.horizontalFlip,
-						  spriteAttribute.verticalFlip,
+				DrawTile (Vector2<int> (spriteAttribute.GetX(), spriteAttribute.GetY()),
+						  _rc.tiles[0][ (0x8000 - 0x8000) + spriteAttribute.GetTileNumber()],
+						  spriteAttribute.GetHorizontalFlip(),
+						  spriteAttribute.GetVerticalFlip(),
 						  colorPalette,
 						  enabledColors);
 			}
 			else if (_rc.spriteSize == 1)
 			{
-				DrawTile (Vector2<int> (spriteAttribute.x, spriteAttribute.y),
-						  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.tileNumber & 0xFE)],
-						  spriteAttribute.horizontalFlip,
-						  spriteAttribute.verticalFlip,
+				DrawTile (Vector2<int> (spriteAttribute.GetX(), spriteAttribute.GetY()),
+						  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.GetTileNumber() & 0xFE)],
+						  spriteAttribute.GetHorizontalFlip(),
+						  spriteAttribute.GetVerticalFlip(),
 						  colorPalette,
 						  enabledColors);
 
-				DrawTile (Vector2<int> (spriteAttribute.x, spriteAttribute.y + 8),
-						  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.tileNumber | 0x01)],
-						  spriteAttribute.horizontalFlip,
-						  spriteAttribute.verticalFlip,
+				DrawTile (Vector2<int> (spriteAttribute.GetX(), spriteAttribute.GetY() + 8),
+						  _rc.tiles[0][ (0x8000 - 0x8000) + (spriteAttribute.GetTileNumber() | 0x01)],
+						  spriteAttribute.GetHorizontalFlip(),
+						  spriteAttribute.GetVerticalFlip(),
 						  colorPalette,
 						  enabledColors);
 			}
