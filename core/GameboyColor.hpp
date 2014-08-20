@@ -17,7 +17,6 @@
 #include "SpriteAttribute.hpp"
 #include "Tile.hpp"
 #include "TileMap.hpp"
-#include "ColorPalette.hpp"
 #include "RenderContext.hpp"
 #include "ClassicRenderer.hpp"
 
@@ -94,7 +93,7 @@ namespace james
 			Processor _hybr1s80;
 			int _speedFactor;
 
-			ColorPalette _monochromePalette;
+			Array<Color<int>, 4> _monochromePalette;
 
 			int _colorBackgroundPaletteIndexAutoIncrement;
 			int _colorSpritePaletteIndexAutoIncrement;

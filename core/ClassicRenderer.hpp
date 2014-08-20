@@ -31,7 +31,7 @@ namespace james
 			void DrawWindowMap (int);
 			void DrawBackgroundMapTile (int, int);
 			void DrawWindowMapTile (int, int);
-			void DrawTile (Vector2<int>, Tile, HorizontalFlip, VerticalFlip, ColorPalette, int);
+			void DrawTile (Vector2<int>, Tile, HorizontalFlip, VerticalFlip, Array<Color<int>, 4> , int);
 		};
 	}
 }

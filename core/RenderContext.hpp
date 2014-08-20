@@ -11,7 +11,6 @@
 #include "LCDMode.hpp"
 #include "Frame.hpp"
 #include "SpriteAttribute.hpp"
-#include "ColorPalette.hpp"
 
 namespace james
 {
@@ -22,9 +21,9 @@ namespace james
 		  public:
 			GameboyClassicSpecificRenderContext();
 			~GameboyClassicSpecificRenderContext();
-			ColorPalette monochromeBackgroundPalette;
-			ColorPalette monochromeSpritePalette0;
-			ColorPalette monochromeSpritePalette1;
+			Array<Color<int>, 4> monochromeBackgroundPalette;
+			Array<Color<int>, 4> monochromeSpritePalette0;
+			Array<Color<int>, 4> monochromeSpritePalette1;
 		  private:
 			GameboyClassicSpecificRenderContext (GameboyClassicSpecificRenderContext&) = delete;
 			GameboyClassicSpecificRenderContext& operator= (GameboyClassicSpecificRenderContext&) = delete;
@@ -36,8 +35,8 @@ namespace james
 			~GameboyColorSpecificRenderContext();
 			BackgroundAttribute backgroundAttributes[2][TileMap::WIDTH * TileMap::HEIGHT];
 			Queue<Pair<int, int>> changedBackgroundAttributes;
-			ColorPalette colorBackgroundPalettes[8];
-			ColorPalette colorSpritePalettes[8];
+			Array<Color<int>, 4> colorBackgroundPalettes[8];
+			Array<Color<int>, 4> colorSpritePalettes[8];
 			int dmaTransferActive;
 			int dmaTransferSourceAddress;
 			int dmaTransferDestinationAddress;
