@@ -205,7 +205,7 @@ void GameWindow::Render()
 
 void GameWindow::DrawFrame (Frame& frame)
 {
-	core::Frame::FrameArray2& rawMap = frame.data;
+	auto& rawMap = frame.data;
 
 	for (int y = 0; y < Frame::HEIGHT; y++)
 	{
@@ -213,9 +213,9 @@ void GameWindow::DrawFrame (Frame& frame)
 		{
 			int pixelIndex = y * Frame::WIDTH + x;
 
-			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[x][y].red);
-			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[x][y].green);
-			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rawMap[x][y].blue);
+			_rawFrame[pixelIndex * 4] = (sf::Uint8) (rawMap[x][y].GetRed());
+			_rawFrame[pixelIndex * 4 + 1] = (sf::Uint8) (rawMap[x][y].GetGreen());
+			_rawFrame[pixelIndex * 4 + 2] = (sf::Uint8) (rawMap[x][y].GetBlue());
 			_rawFrame[pixelIndex * 4 + 3] = (sf::Uint8) (0xFF);
 		}
 	}
@@ -405,15 +405,15 @@ void GameWindow::ThrowSprAttr()
 	{
 		core::SpriteAttribute spriteAttribute = GetDevice().GetSpriteAttribute (i);
 
-		std::cout << "\t Y = " << spriteAttribute.y << std::endl;
-		std::cout << "\t X = " << spriteAttribute.x << std::endl;
-		std::cout << "\t Tile number = " << spriteAttribute.tileNumber << std::endl;
-		std::cout << "\t Color palette number = " << spriteAttribute.colorPaletteNumber << std::endl;
-		std::cout << "\t Tile video ram bank number = " << spriteAttribute.tileVideoRamBankNumber << std::endl;
-		std::cout << "\t Monochrome palette number = " << spriteAttribute.monochromePaletteNumber << std::endl;
-		std::cout << "\t Horizontal flip = " << GetEnumValue (spriteAttribute.horizontalFlip) << std::endl;
-		std::cout << "\t Vertical flip = " << GetEnumValue (spriteAttribute.verticalFlip) << std::endl;
-		std::cout << "\t Sprite to background priority = " << GetEnumValue (spriteAttribute.spriteToBackgroundPriority) << std::endl;
+		std::cout << "\t Y = " << spriteAttribute.GetY() << std::endl;
+		std::cout << "\t X = " << spriteAttribute.GetX() << std::endl;
+		std::cout << "\t Tile number = " << spriteAttribute.GetTileNumber() << std::endl;
+		std::cout << "\t Color palette number = " << spriteAttribute.GetColorPaletteNumber() << std::endl;
+		std::cout << "\t Tile video ram bank number = " << spriteAttribute.GetTileVideoRamBankNumber() << std::endl;
+		std::cout << "\t Monochrome palette number = " << spriteAttribute.GetMonochromePaletteNumber() << std::endl;
+		std::cout << "\t Horizontal flip = " << GetEnumValue (spriteAttribute.GetHorizontalFlip()) << std::endl;
+		std::cout << "\t Vertical flip = " << GetEnumValue (spriteAttribute.GetVerticalFlip()) << std::endl;
+		std::cout << "\t Sprite to background priority = " << GetEnumValue (spriteAttribute.GetSpriteToBackgroundPriority()) << std::endl;
 
 		std::cout << std::endl;
 	}

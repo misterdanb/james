@@ -57,12 +57,12 @@ GameboyColor::~GameboyColor()
 	delete _cartridge;
 }
 
-void GameboyColor::SetLCD (ILCD& lcd)
+void GameboyColor::SetLCD (LCD& lcd)
 {
 	_lcd = &lcd;
 }
 
-void GameboyColor::SetJoypad (IJoypad& joypad)
+void GameboyColor::SetJoypad (Joypad& joypad)
 {
 	_joypad = &joypad;
 }

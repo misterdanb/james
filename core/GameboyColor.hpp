@@ -39,8 +39,8 @@ namespace james
 			GameboyColor();
 			~GameboyColor();
 
-			void SetLCD (ILCD&);
-			void SetJoypad (IJoypad&);
+			void SetLCD (LCD&);
+			void SetJoypad (Joypad&);
 			void SetRom (DynamicArray<int>&);
 
 			IInterruptHandler& GetInterruptHandler();
@@ -77,10 +77,10 @@ namespace james
 			int _pendingClocks;
 
 			// lcd
-			ILCD* _lcd;
+			LCD* _lcd;
 
 			// joypad
-			IJoypad* _joypad;
+			Joypad* _joypad;
 
 			int _directionKeysSelected;
 			int _buttonKeysSelected;
