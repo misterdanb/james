@@ -9,18 +9,23 @@ namespace james
 	{
 		class Serializable
 		{
-		  public:
-			friend std::ostream& operator<< (std::ostream& os, const Serializable& s)
+		public:
+			friend std::ostream &operator<<(std::ostream &os, Serializable &serializable)
 			{
+				serializable.Serialize(os);
+
+				return os;
 			}
 
-			friend std::istream& operator>> (std::istream& is, const Serializable& s)
+			friend std::istream &operator>>(std::istream &is, Serializable &serializable)
 			{
-			}
+				serializable.Deserialize(is);
 
-		  protected:
-			virtual void Serialize (std::ostream&) = GBC_NULL;
-			virtual void Deserialize (std::istream&) = GBC_NULL;
+				return is;
+			}
+			
+			virtual void Serialize(std::ostream &) = 0;
+			virtual void Deserialize(std::istream &) = 0;
 		};
 	}
 }
