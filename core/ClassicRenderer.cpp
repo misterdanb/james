@@ -118,9 +118,9 @@ Renderer::RenderedTileMap ClassicRenderer::GetRenderedTileMap (int tileMapNumber
 
 					pixel = _rcClassic.monochromeBackgroundPalette[_rc.tiles[0][tileNumber][tileX][tileY]];
 
-					pixel.SetRed(((pixel.GetRed() << 3) | (pixel.GetRed() >> 2)) & 0xFF);
-				  pixel.SetGreen(((pixel.GetGreen() << 3) | (pixel.GetGreen() >> 2)) & 0xFF);
-					pixel.SetBlue(((pixel.GetBlue() << 3) | (pixel.GetBlue() >> 2)) & 0xFF);
+					pixel.SetRed (((pixel.GetRed() << 3) | (pixel.GetRed() >> 2)) & 0xFF);
+					pixel.SetGreen (((pixel.GetGreen() << 3) | (pixel.GetGreen() >> 2)) & 0xFF);
+					pixel.SetBlue (((pixel.GetBlue() << 3) | (pixel.GetBlue() >> 2)) & 0xFF);
 				}
 			}
 		}
@@ -149,8 +149,8 @@ void ClassicRenderer::DrawSprites (int enabledColors,
 			if (spriteAttribute.GetSpriteToBackgroundPriority() == spriteToBackgroundPriority)
 			{
 				Array<Color<int>, 4> colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
-											_rcClassic.monochromeSpritePalette0 :
-											_rcClassic.monochromeSpritePalette1;
+													_rcClassic.monochromeSpritePalette0 :
+													_rcClassic.monochromeSpritePalette1;
 
 				if (_rc.spriteSize == 0)
 				{
@@ -202,8 +202,8 @@ void ClassicRenderer::DrawSprites (int enabledColors)
 				(drawnSprites < hardCodedSpriteLimit)) // max 10 sprites per scanline
 		{
 			Array<Color<int>, 4> colorPalette = spriteAttribute.GetMonochromePaletteNumber() == 0 ?
-										_rcClassic.monochromeSpritePalette0 :
-										_rcClassic.monochromeSpritePalette1;
+												_rcClassic.monochromeSpritePalette0 :
+												_rcClassic.monochromeSpritePalette1;
 
 			if (_rc.spriteSize == 0)
 			{
@@ -269,10 +269,10 @@ void ClassicRenderer::DrawBackgroundMapTile (int mapX, int enabledColors)
 
 	if (position.GetX() < -8)
 	{
-		position.SetX(position.GetX() + TileMap::WIDTH * Tile::WIDTH); // IAW: 256, eeyup
+		position.SetX (position.GetX() + TileMap::WIDTH * Tile::WIDTH); // IAW: 256, eeyup
 	}
 
-	position.SetX(position.GetX() % (TileMap::WIDTH * Tile::WIDTH));
+	position.SetX (position.GetX() % (TileMap::WIDTH * Tile::WIDTH));
 
 	int mapElementX = mapX;
 	int mapElementY = (_rc.lcdY + _rc.scrollY) / Tile::HEIGHT;

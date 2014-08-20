@@ -101,6 +101,9 @@ cpu/LookUpTables.o: cpu/LookUpTables.cpp
 InterruptHandler.o: InterruptHandler.cpp
 	$(CC) $(FLAGS) $(CFLAGS) InterruptHandler.cpp -o InterruptHandler.o
 
+MemoryBlock.o: MemoryBlock.cpp
+	$(CC) $(FLAGS) $(CFLAGS) MemoryBlock.cpp -o MemoryBlock.o
+
 MemoryBus.o: MemoryBus.cpp
 	$(CC) $(FLAGS) $(CFLAGS) MemoryBus.cpp -o MemoryBus.o
 

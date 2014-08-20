@@ -7,23 +7,23 @@ Tile::Tile()
 {
 }
 
-Tile::Tile(Array<int, DATA_SIZE> tileData)
+Tile::Tile (Array<int, DATA_SIZE> tileData)
 {
-	SetData(tileData);
+	SetData (tileData);
 }
 
 Tile::~Tile()
 {
 }
 
-void Tile::SetData(Array<int, DATA_SIZE> tileData)
+void Tile::SetData (Array<int, DATA_SIZE> tileData)
 {
 	for (int y = 0; y < HEIGHT; y++)
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
 			(*this)[x][y] = (((tileData[y * 2] >> (7 - x)) & 0x01) << 1) |
-			                ((tileData[y * 2 + 1] >> (7 - x)) & 0x01);
+							((tileData[y * 2 + 1] >> (7 - x)) & 0x01);
 		}
 	}
 }
@@ -31,7 +31,7 @@ void Tile::SetData(Array<int, DATA_SIZE> tileData)
 Array<int, Tile::DATA_SIZE> Tile::GetData()
 {
 	Array<int, DATA_SIZE> tileData;
-	
+
 	for (int y = 0; y < HEIGHT; y++)
 	{
 		for (int x = 0; x < WIDTH; x++)
@@ -40,6 +40,6 @@ Array<int, Tile::DATA_SIZE> Tile::GetData()
 			tileData[y * 2 + 1] |= ((*this)[x][y] & 0x01) << (7 - x);
 		}
 	}
-	
+
 	return tileData;
 }
