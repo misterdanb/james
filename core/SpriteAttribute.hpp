@@ -12,25 +12,26 @@ namespace james
 	{
 		class SpriteAttribute
 		{
-		public:
+		  public:
 			SpriteAttribute();
-			SpriteAttribute(Array<int, 4>);
+			SpriteAttribute (const SpriteAttribute&);
+			SpriteAttribute (Array<int, 4>);
 			~SpriteAttribute();
-			
-			void SetData(Array<int, 4>);
-			
-			void SetX(int);
-			void SetY(int);
-			void SetTileNumber(int);
-			void SetColorPaletteNumber(int);
-			void SetTileVideoRamBankNumber(int);
-			void SetMonochromePaletteNumber(int);
-			void SetHorizontalFlip(HorizontalFlip);
-			void SetVerticalFlip(VerticalFlip);
-			void SetSpriteToBackgroundPriority(SpriteToBackgroundPriority);
-			
+
+			void SetData (Array<int, 4>);
+
+			void SetX (int);
+			void SetY (int);
+			void SetTileNumber (int);
+			void SetColorPaletteNumber (int);
+			void SetTileVideoRamBankNumber (int);
+			void SetMonochromePaletteNumber (int);
+			void SetHorizontalFlip (HorizontalFlip);
+			void SetVerticalFlip (VerticalFlip);
+			void SetSpriteToBackgroundPriority (SpriteToBackgroundPriority);
+
 			Array<int, 4> GetData() const;
-			
+
 			int GetX() const;
 			int GetY() const;
 			int GetTileNumber() const;
@@ -40,8 +41,8 @@ namespace james
 			HorizontalFlip GetHorizontalFlip() const;
 			VerticalFlip GetVerticalFlip() const;
 			SpriteToBackgroundPriority GetSpriteToBackgroundPriority() const;
-			
-		private:
+
+		  private:
 			int _y;
 			int _x;
 			int _tileNumber;

@@ -137,18 +137,18 @@ void GameboyColor::Initialize()
 
 	Reset();
 
-	_monochromePalette[3].SetRed(0x00);
-	_monochromePalette[3].SetGreen(0x00);
-	_monochromePalette[3].SetBlue(0x00);
-	_monochromePalette[2].SetRed(0x08);
-	_monochromePalette[2].SetGreen(0x08);
-	_monochromePalette[2].SetBlue(0x08);
-	_monochromePalette[1].SetRed(0x10);
-	_monochromePalette[1].SetGreen(0x10);
-	_monochromePalette[1].SetBlue(0x10);
-	_monochromePalette[0].SetRed(0x1F);
-	_monochromePalette[0].SetGreen(0x1F);
-	_monochromePalette[0].SetBlue(0x1F);
+	_monochromePalette[3].SetRed (0x00);
+	_monochromePalette[3].SetGreen (0x00);
+	_monochromePalette[3].SetBlue (0x00);
+	_monochromePalette[2].SetRed (0x08);
+	_monochromePalette[2].SetGreen (0x08);
+	_monochromePalette[2].SetBlue (0x08);
+	_monochromePalette[1].SetRed (0x10);
+	_monochromePalette[1].SetGreen (0x10);
+	_monochromePalette[1].SetBlue (0x10);
+	_monochromePalette[0].SetRed (0x1F);
+	_monochromePalette[0].SetGreen (0x1F);
+	_monochromePalette[0].SetBlue (0x1F);
 
 	std::copy (_monochromePalette.begin(),
 			   _monochromePalette.end(),
@@ -438,9 +438,9 @@ inline void GameboyColor::WriteByte (int address, int value)
 
 					TileMap& backgroundMap = _rc.backgroundMaps[mapNumber];
 
-					backgroundMap.data[mapElementX][mapElementY] = _rc.videoRam[0][(mapNumber == 0) ?
-					                                               (0x9800 - 0x8000 + mapElementNumber) :
-				                                                 (0x9C00 - 0x8000 + mapElementNumber)];
+					backgroundMap.data[mapElementX][mapElementY] = _rc.videoRam[0][ (mapNumber == 0) ?
+							(0x9800 - 0x8000 + mapElementNumber) :
+							(0x9C00 - 0x8000 + mapElementNumber)];
 				}
 				else
 				{
@@ -448,10 +448,10 @@ inline void GameboyColor::WriteByte (int address, int value)
 					int mapElementNumber = (address <= 0x9BFF) ? (address - 0x9800) : (address - 0x9C00);
 
 					int backgroundAttribute = _rc.videoRam[1][ (mapNumber == 0) ?
-					                          (0x9800 + mapElementNumber) :
-					                          (0x9C00 + mapElementNumber)];
+											  (0x9800 + mapElementNumber) :
+											  (0x9C00 + mapElementNumber)];
 
-					 _rcColor.backgroundAttributes[mapNumber][mapElementNumber] = BackgroundAttribute(backgroundAttribute);
+					_rcColor.backgroundAttributes[mapNumber][mapElementNumber] = BackgroundAttribute (backgroundAttribute);
 				}
 			}
 		}
@@ -485,7 +485,7 @@ inline void GameboyColor::WriteByte (int address, int value)
 
 			int oamAddress = (address - 0xFE00) & 0xFC;
 
-			Array<int, 4> rawSpriteAttribute =
+			Array<int, 4> spriteAttributeData =
 			{
 				_rc.oam[oamAddress],
 				_rc.oam[oamAddress + 1],
@@ -493,7 +493,7 @@ inline void GameboyColor::WriteByte (int address, int value)
 				_rc.oam[oamAddress + 3]
 			};
 
-			_rc.spriteAttributes[oamAddress >> 2] = SpriteAttribute(rawSpriteAttribute);
+			_rc.spriteAttributes[oamAddress >> 2] = SpriteAttribute (spriteAttributeData);
 		}
 	}
 	else if (address <= 0xFEFF)
@@ -631,9 +631,9 @@ inline void GameboyColor::WriteByte (int address, int value)
 
 				// TODO: CONVERT ALL THESE DECIMALS TO HEX
 				_rcClassic.monochromeBackgroundPalette[0] = _monochromePalette[value & 3];
-				_rcClassic.monochromeBackgroundPalette[1] = _monochromePalette[(value & 12) >> 2];
-				_rcClassic.monochromeBackgroundPalette[2] = _monochromePalette[(value & 48) >> 4];
-				_rcClassic.monochromeBackgroundPalette[3] = _monochromePalette[(value & 192) >> 6];
+				_rcClassic.monochromeBackgroundPalette[1] = _monochromePalette[ (value & 12) >> 2];
+				_rcClassic.monochromeBackgroundPalette[2] = _monochromePalette[ (value & 48) >> 4];
+				_rcClassic.monochromeBackgroundPalette[3] = _monochromePalette[ (value & 192) >> 6];
 
 				break;
 
@@ -642,9 +642,9 @@ inline void GameboyColor::WriteByte (int address, int value)
 				_rc.ioPorts[address - 0xFF00] = value;
 
 				_rcClassic.monochromeSpritePalette0[0] = _monochromePalette[value & 3];
-				_rcClassic.monochromeSpritePalette0[1] = _monochromePalette[(value & 12) >> 2];
-				_rcClassic.monochromeSpritePalette0[2] = _monochromePalette[(value & 48) >> 4];
-				_rcClassic.monochromeSpritePalette0[3] = _monochromePalette[(value & 192) >> 6];
+				_rcClassic.monochromeSpritePalette0[1] = _monochromePalette[ (value & 12) >> 2];
+				_rcClassic.monochromeSpritePalette0[2] = _monochromePalette[ (value & 48) >> 4];
+				_rcClassic.monochromeSpritePalette0[3] = _monochromePalette[ (value & 192) >> 6];
 
 				break;
 
@@ -653,9 +653,9 @@ inline void GameboyColor::WriteByte (int address, int value)
 				_rc.ioPorts[address - 0xFF00] = value;
 
 				_rcClassic.monochromeSpritePalette1[0] = _monochromePalette[value & 3];
-				_rcClassic.monochromeSpritePalette1[1] = _monochromePalette[(value & 12) >> 2];
-				_rcClassic.monochromeSpritePalette1[2] = _monochromePalette[(value & 48) >> 4];
-				_rcClassic.monochromeSpritePalette1[3] = _monochromePalette[(value & 192) >> 6];
+				_rcClassic.monochromeSpritePalette1[1] = _monochromePalette[ (value & 12) >> 2];
+				_rcClassic.monochromeSpritePalette1[2] = _monochromePalette[ (value & 48) >> 4];
+				_rcClassic.monochromeSpritePalette1[3] = _monochromePalette[ (value & 192) >> 6];
 
 				break;
 
@@ -785,8 +785,8 @@ inline void GameboyColor::WriteByte (int address, int value)
 					int newRed = value & 31;
 					int newGreen = (_rcColor.colorBackgroundPalettes[palette][color].GetGreen() & 24) | ((value >> 5) & 7);
 
-					_rcColor.colorBackgroundPalettes[palette][color].SetRed(newRed);
-					_rcColor.colorBackgroundPalettes[palette][color].SetGreen(newGreen);
+					_rcColor.colorBackgroundPalettes[palette][color].SetRed (newRed);
+					_rcColor.colorBackgroundPalettes[palette][color].SetGreen (newGreen);
 				}
 				else
 				{
@@ -796,8 +796,8 @@ inline void GameboyColor::WriteByte (int address, int value)
 					int newGreen = (_rcColor.colorBackgroundPalettes[palette][color].GetGreen() & 7) | ((value << 3) & 24);
 					int newBlue = (value >> 2) & 31;
 
-					_rcColor.colorBackgroundPalettes[palette][color].SetGreen(newGreen);
-					_rcColor.colorBackgroundPalettes[palette][color].SetBlue(newBlue);
+					_rcColor.colorBackgroundPalettes[palette][color].SetGreen (newGreen);
+					_rcColor.colorBackgroundPalettes[palette][color].SetBlue (newBlue);
 				}
 
 				if (_colorBackgroundPaletteIndexAutoIncrement) { _rc.ioPorts[0xFF68 - 0xFF00]++; } // take care because of bti 7
@@ -826,8 +826,8 @@ inline void GameboyColor::WriteByte (int address, int value)
 					int newRed = value & 31;
 					int newGreen = (_rcColor.colorSpritePalettes[palette][color].GetGreen() & 24) | ((value >> 5) & 7);
 
-					_rcColor.colorSpritePalettes[palette][color].SetRed(newRed);
-					_rcColor.colorSpritePalettes[palette][color].SetGreen(newGreen);
+					_rcColor.colorSpritePalettes[palette][color].SetRed (newRed);
+					_rcColor.colorSpritePalettes[palette][color].SetGreen (newGreen);
 				}
 				else
 				{
@@ -837,8 +837,8 @@ inline void GameboyColor::WriteByte (int address, int value)
 					int newGreen = (_rcColor.colorSpritePalettes[palette][color].GetGreen() & 7) | ((value << 3) & 24);
 					int newBlue = (value >> 2) & 31;
 
-					_rcColor.colorSpritePalettes[palette][color].SetGreen(newGreen);
-					_rcColor.colorSpritePalettes[palette][color].SetBlue(newBlue);
+					_rcColor.colorSpritePalettes[palette][color].SetGreen (newGreen);
+					_rcColor.colorSpritePalettes[palette][color].SetBlue (newBlue);
 				}
 
 

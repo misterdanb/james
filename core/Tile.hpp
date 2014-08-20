@@ -12,21 +12,21 @@ namespace james
 	{
 		class Tile : public Array2<int, 8, 8>
 		{
-		public:
+		  public:
 			static const int WIDTH = 8;
 			static const int HEIGHT = 8;
-			
+
 			static const int DATA_SIZE = 16;
-			
+
 			typedef Array2<int, WIDTH, HEIGHT> TileArray2;
-		
-		public:
+
+		  public:
 			Tile();
-			Tile(Array<int, DATA_SIZE>);
+			Tile (Array<int, DATA_SIZE>);
 			~Tile();
-			
-			void SetData(Array<int, DATA_SIZE>);
-			
+
+			void SetData (Array<int, DATA_SIZE>);
+
 			Array<int, DATA_SIZE> GetData();
 		};
 	}
