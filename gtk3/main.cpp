@@ -14,6 +14,16 @@ guchar image[GAMEBOY_WIDTH * GAMEBOY_HEIGHT * 3] = { 0, };
 
 class GtkJames : public james::core::Frontend
 {
+	public:
+	int rightPressed;
+	int leftPressed;
+	int upPressed;
+	int downPressed;
+	int buttonAPressed;
+	int buttonBPressed;
+	int selectPressed;
+	int startPressed;
+
 	void DrawFrame (Frame& frame)
 	{
 		for (int y = 0; y < Frame::HEIGHT; y++)
@@ -29,45 +39,44 @@ class GtkJames : public james::core::Frontend
 
 	int GetRight()
 	{
-		return 0;
+		return rightPressed;
 	}
 
 	int GetLeft()
 	{
-		return 0;
+		return leftPressed;
 	}
 
 	int GetUp()
 	{
-		return 0;
+		return upPressed;
 	}
 
 	int GetDown()
 	{
-		return 0;
+		return downPressed;
 	}
 
 	int GetButtonA()
 	{
-		return 0;
+		return buttonAPressed;
 	}
 
 	int GetButtonB()
 	{
-		return 0;
+		return buttonBPressed;
 	}
 
 	int GetSelect()
 	{
-		return 0;
+		return selectPressed;
 	}
 
 	int GetStart()
 	{
-		return 0;
+		return startPressed;
 	}
 };
-
 
 /* VARIABLES */
 // james
@@ -98,7 +107,7 @@ GtkWidget *info_bar;
 GtkWidget *info_label;
 
 /* JAMES BINDINGS */
-static void *
+	static void *
 james_loop(gpointer data)
 {
 	while (!gtk_james->IsPaused())
@@ -170,6 +179,114 @@ james_pause()
 }
 
 /* UI */
+static gboolean
+on_key_press(GtkWidget *widget,
+             GdkEventKey *event)
+{
+    g_print(gdk_keyval_name(event->keyval));
+		char *key_name = gdk_keyval_name(event->keyval);
+
+		if (strcmp(key_name, "Right") == 0)
+		{
+			gtk_james->rightPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		
+		if (strcmp(key_name, "Left") == 0)
+		{
+			gtk_james->leftPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+		
+		if (strcmp(key_name, "Up") == 0)
+		{
+			gtk_james->upPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+
+		if (strcmp(key_name, "Down") == 0)
+		{
+			gtk_james->downPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+
+		if (strcmp(key_name, "period") == 0)
+		{
+			gtk_james->buttonAPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+
+		if (strcmp(key_name, "comma") == 0)
+		{
+			gtk_james->buttonBPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+
+		if (strcmp(key_name, "minus") == 0)
+		{
+			gtk_james->selectPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+
+		if (strcmp(key_name, "Shift_R") == 0)
+		{
+			gtk_james->startPressed = TRUE;
+			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
+		}
+
+    return FALSE;
+}
+
+static gboolean
+on_key_release(GtkWidget *widget,
+               GdkEventKey *event)
+{
+    g_print(gdk_keyval_name(event->keyval));
+		char *key_name = gdk_keyval_name(event->keyval);
+
+		if (strcmp(key_name, "Right") == 0)
+		{
+			gtk_james->rightPressed = FALSE;
+		}
+		
+		if (strcmp(key_name, "Left") == 0)
+		{
+			gtk_james->leftPressed = FALSE;
+		}
+		
+		if (strcmp(key_name, "Up") == 0)
+		{
+			gtk_james->upPressed = FALSE;
+		}
+
+		if (strcmp(key_name, "Down") == 0)
+		{
+			gtk_james->downPressed = FALSE;
+		}
+
+		if (strcmp(key_name, "period") == 0)
+		{
+			gtk_james->buttonAPressed = FALSE;
+		}
+
+		if (strcmp(key_name, "comma") == 0)
+		{
+			gtk_james->buttonBPressed = FALSE;
+		}
+
+		if (strcmp(key_name, "minus") == 0)
+		{
+			gtk_james->selectPressed = FALSE;
+		}
+
+		if (strcmp(key_name, "Shift_R") == 0)
+		{
+			gtk_james->startPressed = FALSE;
+		}
+
+    return FALSE;
+}
+
 char *
 show_open_dialog(gchar *title)
 {
@@ -401,6 +518,8 @@ on_activate(GApplication *app,
   gtk_window_set_titlebar(GTK_WINDOW(window), header_bar);
 	gtk_window_set_wmclass(GTK_WINDOW(window), "James", "James");
 	gtk_window_set_title(GTK_WINDOW(window), "James");
+	g_signal_connect(window, "key-press-event", G_CALLBACK(on_key_press), NULL);
+	g_signal_connect(window, "key-release-event", G_CALLBACK(on_key_release), NULL);
 
 	// set up box
 	box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
