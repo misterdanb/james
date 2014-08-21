@@ -36,6 +36,15 @@ void Cartridge::Serialize (std::ostream& os)
 	DynamicArray<char> outRam (_ram.begin(), _ram.end());
 
 	os.write (&outRam[0], _header.ramDimensions.size + 1);
+
+	// saving and ...
+	Array<char, 2> outRegisters =
+	{
+		_selectedRomBank,
+		_selectedRamBank
+	};
+
+	os.write (&outRegisters[0], 2);
 }
 
 void Cartridge::Deserialize (std::istream& is)
@@ -47,6 +56,14 @@ void Cartridge::Deserialize (std::istream& is)
 	is.read (&inRam[0], _header.ramDimensions.size + 1);
 
 	_ram = DynamicArray<int> (inRam.begin(), inRam.end());
+
+	// ... loading this might be wrong
+	Array<char, 2> inRegisters;
+
+	is.read(&inRegisters[0], 2);
+
+	_selectedRomBank = inRegisters[0];
+	_selectedRamBank = inRegisters[1];
 }
 
 Header Cartridge::GetHeader()

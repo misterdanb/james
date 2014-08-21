@@ -13,6 +13,38 @@ MBC3::~MBC3()
 {
 }
 
+void MBC3::Serialize(std::ostream& os)
+{
+	Cartridge::Serialize(os);
+
+	Array<char, 7> outRegisters =
+	{
+		char(_ramRtcEnabled),
+		char(_ramRtcMode),
+		char(_rtc[0]),
+		char(_rtc[1]),
+		char(_rtc[2]),
+		char(_rtc[3]),
+		char(_rtc[4])
+	};
+
+	os.write(&outRegisters[0], 7);
+}
+
+void MBC3::Deserialize(std::istream& is)
+{
+	Cartridge::Deserialize(is);
+
+	Array<char, 7> inRegisters;
+
+	is.read(&inRegisters[0], 7);
+
+	_ramRtcEnabled = inRegisters[0];
+	_ramRtcMode = inRegisters[1];
+
+	std::copy(inRegisters.begin() + 2, inRegisters.end(), _rtc.begin());
+}
+
 int MBC3::ReadByte (int address)
 {
 	if (address >= 0x0000 && address <= 0x3FFF)

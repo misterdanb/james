@@ -21,13 +21,13 @@ namespace james
 				Cartridge (DynamicArray<int>&);
 				virtual ~Cartridge();
 
-				void Serialize (std::ostream&);
-				void Deserialize (std::istream&);
+				virtual void Serialize (std::ostream&);
+				virtual void Deserialize (std::istream&);
 
 				Header GetHeader();
 
-				virtual int ReadByte (int) = GBC_NULL;
-				virtual void WriteByte (int, int) = GBC_NULL;
+				virtual int ReadByte (int) = 0;
+				virtual void WriteByte (int, int) = 0;
 
 				static Cartridge* Create (DynamicArray<int>);
 

@@ -74,7 +74,7 @@ void GameboyColor::SetRom (DynamicArray<int>& rom)
 
 	std::string path = ToHex (_cartridge->GetHeader().globalChecksum[0]) +
 					   ToHex (_cartridge->GetHeader().globalChecksum[1]) +
-					   std::string (".battery\0");
+					   std::string (".battery");
 
 	std::ifstream file (path, std::ios::binary);
 
@@ -168,7 +168,7 @@ void GameboyColor::Finalize()
 
 	std::string path = ToHex (_cartridge->GetHeader().globalChecksum[0]) +
 					   ToHex (_cartridge->GetHeader().globalChecksum[1]) +
-					   std::string (".battery\0");
+					   std::string (".battery");
 
 	std::ofstream file (path, std::ios::binary);
 

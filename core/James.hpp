@@ -22,6 +22,7 @@
 #include "Matrix.template"
 #include "Vector2.tpp"
 
+#define DEBUG
 #define LOG_LEVEL_2
 
 #ifdef DEBUG
