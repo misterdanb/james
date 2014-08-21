@@ -23,7 +23,7 @@
 #include "Vector2.tpp"
 
 #define DEBUG
-#define LOG_LEVEL_2
+#define LOG_LEVEL_3
 
 #ifdef DEBUG
 #define LOG(str) Log(std::string("L1> ") + (str))
