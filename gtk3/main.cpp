@@ -183,7 +183,6 @@ static gboolean
 on_key_press(GtkWidget *widget,
              GdkEventKey *event)
 {
-    g_print(gdk_keyval_name(event->keyval));
 		char *key_name = gdk_keyval_name(event->keyval);
 
 		if (strcmp(key_name, "Right") == 0)
@@ -228,7 +227,7 @@ on_key_press(GtkWidget *widget,
 			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
 		}
 
-		if (strcmp(key_name, "Shift_R") == 0)
+		if (strcmp(key_name, "a") == 0)
 		{
 			gtk_james->startPressed = TRUE;
 			gtk_james->GetDevice().GetInterruptHandler().SignalJoypadInterrupt();
@@ -241,7 +240,6 @@ static gboolean
 on_key_release(GtkWidget *widget,
                GdkEventKey *event)
 {
-    g_print(gdk_keyval_name(event->keyval));
 		char *key_name = gdk_keyval_name(event->keyval);
 
 		if (strcmp(key_name, "Right") == 0)
@@ -279,7 +277,7 @@ on_key_release(GtkWidget *widget,
 			gtk_james->selectPressed = FALSE;
 		}
 
-		if (strcmp(key_name, "Shift_R") == 0)
+		if (strcmp(key_name, "a") == 0)
 		{
 			gtk_james->startPressed = FALSE;
 		}
@@ -534,7 +532,8 @@ on_activate(GApplication *app,
 	                 "draw",
 	                 G_CALLBACK(on_screen_draw),
 	                 NULL);
-	gtk_widget_set_size_request(screen, GAMEBOY_WIDTH, GAMEBOY_HEIGHT);
+	gtk_widget_set_size_request(screen, GAMEBOY_WIDTH * 2, GAMEBOY_HEIGHT * 2);
+	gtk_widget_set_can_focus(screen, TRUE);
 	
 	gtk_box_pack_start(GTK_BOX(box), screen, TRUE, TRUE, 0);
 
