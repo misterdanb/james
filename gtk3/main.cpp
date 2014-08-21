@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include "../core/Frontend.hpp"
 
+#include <sys/time.h>
 #include <string>
 
 #define GAMEBOY_WIDTH  160
@@ -83,6 +84,8 @@ class GtkJames : public james::core::Frontend
 GtkJames *gtk_james;
 GThread *thread_james;
 
+char title[32] = { 0, };
+
 // gtk3
 GtkApplication *app;
 
@@ -107,15 +110,47 @@ GtkWidget *info_bar;
 GtkWidget *info_label;
 
 /* JAMES BINDINGS */
-	static void *
+static void *
 james_loop(gpointer data)
 {
+	static int fps_update_counter = 0;
+	static struct timeval tm1;
+	gettimeofday(&tm1, NULL);
+
 	while (!gtk_james->IsPaused())
 	{
 		gtk_james->RenderFrame();
 		gtk_widget_queue_draw_area(screen, 0, 0, screen_width, screen_height);
 
 		g_thread_yield();
+
+		struct timeval tm2;
+		gettimeofday(&tm2, NULL);
+
+		// gtk gets fucked up about this, if it gets the new subtitle more often
+		if (fps_update_counter == 180)
+		{
+			unsigned long long dt = (tm2.tv_sec - tm2.tv_sec) * 1000000 + (tm2.tv_usec - tm1.tv_usec);
+
+			double fps = 1000000.0 / ((double) (dt));
+
+			char fps_str[32] = { '\0', };
+			sprintf(fps_str, "%d", (int) fps);
+
+			char header_subtitle[128] = { '\0', };
+			strcpy(header_subtitle, title);
+			strcat(header_subtitle, " - ");
+			strcat(header_subtitle, fps_str);
+			strcat(header_subtitle, " fps");
+
+			gtk_header_bar_set_subtitle(GTK_HEADER_BAR(header_bar), header_subtitle);
+
+			fps_update_counter = 0;
+		}
+
+		tm1 = tm2;
+
+		fps_update_counter++;
 	}
 }
 
@@ -130,14 +165,14 @@ james_open(const char *file_path)
 	Array<int, Header::NEW_TITLE_LENGTH> newTitle;
 	newTitle = gtk_james->GetDevice().GetCartridge().GetHeader().newTitle;
 
-	char newTitleString[Header::NEW_TITLE_LENGTH];
-
 	for (int i = 0; i < Header::NEW_TITLE_LENGTH; i++)
 	{
-		newTitleString[i] = (char) newTitle[i];
+		title[i] = (char) newTitle[i];
 	}
 
-	gtk_header_bar_set_subtitle(GTK_HEADER_BAR(header_bar), newTitleString);
+	title[Header::NEW_TITLE_LENGTH + 1] = '\0';
+
+	gtk_header_bar_set_subtitle(GTK_HEADER_BAR(header_bar), title);
 }
 
 void
