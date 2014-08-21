@@ -44,6 +44,7 @@ namespace james
 			void SetRom (DynamicArray<int>&);
 
 			IInterruptHandler& GetInterruptHandler();
+			Cartridge& GetCartridge();
 			Processor& GetProcessor();
 			Renderer& GetRenderer();
 

@@ -49,7 +49,7 @@ namespace james
 			GameboyColor& GetDevice();
 
 			/* callback method to draw the rendered frame */
-			virtual void DrawFrame (Frame&) = GBC_NULL;
+			virtual void DrawFrame (Frame&) = 0;
 
 			/* Methods to read the current state of the joypad.
 			 * State should be holded for more than just one

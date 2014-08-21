@@ -105,6 +105,11 @@ IInterruptHandler& GameboyColor::GetInterruptHandler()
 	return _hybr1s80;
 }
 
+Cartridge& GameboyColor::GetCartridge()
+{
+	return *_cartridge;
+}
+
 Processor& GameboyColor::GetProcessor()
 {
 	return _hybr1s80;
