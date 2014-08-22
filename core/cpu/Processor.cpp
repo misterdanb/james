@@ -2211,110 +2211,153 @@ void Processor::ExecuteInterrupt()
 		int interruptsToBePerformed = _bus->ReadByte (INTERRUPT_ENABLE_ADDRESS) &
 									  _bus->ReadByte (INTERRUPT_REQUEST_ADDRESS);
 
-		if (!_state.interruptsEnabled && interruptsToBePerformed)
+		// Because of the surrounding if statement, the following one will only
+		// be executed if halted is true.
+		//
+		// If IME (interruptsEnabled) is false and there are interrupts
+		// to be performed (the interrupt enable flag and its corresponding
+		// request flag in the io ports are true), the halted state is canceled,
+		// but NO INTERRUPT ROUTINE is executed; the operation just continues.
+		if (!_state.interruptsEnabled && (interruptsToBePerformed & 0x1F) != 0)
 		{
 			_state.halted = false;
-
-			return;
 		}
-
-		if (interruptsToBePerformed & (1 << VERTICAL_BLANK_INTERRUPT_BIT_NUMBER))
+		// Because of the surrounding if statement, it is safe to say, that the
+		// following ones will only be executed if IME (interruptsEnabled) or
+		// halted is true.
+		else if (interruptsToBePerformed & (1 << VERTICAL_BLANK_INTERRUPT_BIT_NUMBER))
 		{
+			// Decrement the stack pointer and push the current program counter.
 			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
 
+			// Set the program counter to the address of the vertical blank interrupt
+			// routine.
 			_state.pc = VERTICAL_BLANK_INTERRUPT_VECTOR;
 
+			// Reset the interrupt request flag of the vertical blank interrupt, as
+			// the interrupt request has been handled.
 			int newInterruptRequestRegister = SetBit (_bus->ReadByte (INTERRUPT_REQUEST_ADDRESS),
 											  VERTICAL_BLANK_INTERRUPT_BIT_NUMBER,
 											  false);
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
+			// Disable interrupts globally, because an interrupt routine MUST NOT
+			// be interrupted.
+			_state.interruptsEnabled = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
-
-			return;
 		}
 		else if (interruptsToBePerformed & (1 << LCD_STATUS_INTERRUPT_BIT_NUMBER))
 		{
+			// Decrement the stack pointer and push the current program counter.
+			_state.sp -= 2;
 			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
 
+			// Set the program counter to the address of the lcd status interrupt
+			// routine.
 			_state.pc = LCD_STATUS_INTERRUPT_VECTOR;
 
+			// Reset the interrupt request flag of the lcd status interrupt, as the
+			// interrupt request has been handled.
 			int newInterruptRequestRegister = SetBit (_bus->ReadByte (INTERRUPT_REQUEST_ADDRESS),
 											  LCD_STATUS_INTERRUPT_BIT_NUMBER,
 											  false);
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
+			// Disable interrupts globally, because an interrupt routine MUST NOT
+			// be interrupted.
+			_state.interruptsEnabled = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
-
-			return;
 		}
 		else if (interruptsToBePerformed & (1 << TIMER_INTERRUPT_BIT_NUMBER))
 		{
+			// Decrement the stack pointer and push the current program counter.
+			_state.sp -= 2;
 			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
 
+			// Set the program counter to the address of the timer interrupt routine.
 			_state.pc = TIMER_INTERRUPT_VECTOR;
 
+			// Reset the interrupt request flag of the timer interrupt, as the
+			// interrupt request has been handled.
 			int newInterruptRequestRegister = SetBit (_bus->ReadByte (INTERRUPT_REQUEST_ADDRESS),
 											  TIMER_INTERRUPT_BIT_NUMBER,
 											  false);
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
+			// Disable interrupts globally, because an interrupt routine MUST NOT
+			// be interrupted.
+			_state.interruptsEnabled = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
-
-			return;
 		}
 		else if (interruptsToBePerformed & (1 << SERIAL_INTERRUPT_BIT_NUMBER))
 		{
+			// Decrement the stack pointer and push the current program counter.
+			_state.sp -= 2;
 			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
 
+			// Set the program counter to the address of the serial interrupt routine.
 			_state.pc = SERIAL_INTERRUPT_VECTOR;
 
+			// Reset the interrupt request flag of the serial interrupt, as the
+			// interrupt request has been handled.
 			int newInterruptRequestRegister = SetBit (_bus->ReadByte (INTERRUPT_REQUEST_ADDRESS),
 											  SERIAL_INTERRUPT_BIT_NUMBER,
 											  false);
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
+			// Disable interrupts globally, because an interrupt routine MUST NOT
+			// be interrupted.
+			_state.interruptsEnabled = false;
 			_state.halted = false;
 
 			_state.ticks += 16;
 		}
 		else if (interruptsToBePerformed & (1 << JOYPAD_INTERRUPT_BIT_NUMBER))
 		{
+			// Decrement the stack pointer and push the current program counter.
+			_state.sp -= 2;
 			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
 
+			// Set the program counter to the address of the joypad interrupt routine.
 			_state.pc = JOYPAD_INTERRUPT_VECTOR;
 
+			// Reset the interrupt request flag of the joypad interrupt, as the
+			// interrupt request has been handled.
 			int newInterruptRequestRegister = SetBit (_bus->ReadByte (INTERRUPT_REQUEST_ADDRESS),
 											  JOYPAD_INTERRUPT_BIT_NUMBER,
 											  false);
 
 			_bus->WriteByte (INTERRUPT_REQUEST_ADDRESS, newInterruptRequestRegister);
 
+			// Disable interrupts globally, because an interrupt routine MUST NOT
+			// be interrupted.
+			_state.interruptsEnabled = false;
+			// Disable stopped flag, because a button has been pressed
 			_state.stopped = false;
 			_state.halted = false;
 
