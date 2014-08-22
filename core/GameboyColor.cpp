@@ -9,6 +9,7 @@ GameboyColor::GameboyColor()
 	  _buttonKeysSelected (1),
 	  _cartridge (NULL),
 	  _forceClassicGameboy (GBC_TRUE),
+		_timer(),
 	  _hybr1s80(),
 	  _speedFactor (1),
 	  _monochromePalette(),
@@ -129,11 +130,9 @@ void GameboyColor::Initialize()
 {
 	LOG ("Initializing Gameboy Color emulation");
 
-	Timer* timer = _hybr1s80.GetTimer();
+	_timer.SetRenderContext (_rc);
 
 	_hybr1s80.SetMemoryBus (this);
-
-	timer->SetRenderContext (&_rc);
 
 	Reset();
 
@@ -278,7 +277,8 @@ void GameboyColor::ExecuteMachineClocks (int clocks)
 	{
 		_pendingClocks -= CLOCK_SPEED;
 
-		_hybr1s80.Execute (CLOCK_SPEED * 4);
+		_timer.ExecuteTicks (CLOCK_SPEED * 4);
+		_hybr1s80.ExecuteTicks (CLOCK_SPEED * 4);
 	}
 }
 

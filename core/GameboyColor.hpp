@@ -10,6 +10,7 @@
 #include "LCD.hpp"
 #include "Joypad.hpp"
 #include "cartridges/Cartridge.hpp"
+#include "Timer.hpp"
 #include "cpu/Processor.hpp"
 #include "MemoryBus.hpp"
 #include "LCDMode.hpp"
@@ -89,8 +90,13 @@ namespace james
 			Cartridge* _cartridge;
 			int _forceClassicGameboy;
 
+			// timer
+			Timer _timer;
+
 			// processor
 			Processor _hybr1s80;
+
+			// dmg/cgb mode
 			int _speedFactor;
 
 			Array<Color<int>, 4> _monochromePalette;

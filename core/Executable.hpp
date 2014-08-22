@@ -7,8 +7,8 @@ namespace james
 	{
 		class Executable
 		{
-			virtual void ExecuteTicks(int) = 0;
-		}
+			virtual void ExecuteTicks (int) = 0;
+		};
 	}
 }
 
