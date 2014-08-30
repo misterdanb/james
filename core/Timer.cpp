@@ -25,7 +25,7 @@ void Timer::ExecuteTicks (int ticks)
 {
 	_timerCounter = _rc->ioPorts[5];
 
-	if (GetBit (_rc->ioPorts[TIMER_CONTROL_ADDRESS - 0xFF00], 3))
+	if (GetBit (_rc->ioPorts[TIMER_CONTROL_ADDRESS - 0xFF00], 2))
 	{
 		if (_ticksPerCycle == 0)
 		{
@@ -64,7 +64,7 @@ void Timer::ExecuteTicks (int ticks)
 
 		if (_timerCounter > 0xFF)
 		{
-			_rc->ioPorts[TIMER_MODULO_ADDRESS - 0xFF00] =_rc->ioPorts[TIMER_MODULO_ADDRESS - 0xFF00];
+			_rc->ioPorts[TIMER_COUNTER_ADDRESS - 0xFF00] =_rc->ioPorts[TIMER_MODULO_ADDRESS - 0xFF00];
 			_rc->interruptHandler->SignalTimerInterrupt();
 			_ticksPerCycle = 0;
 		}
