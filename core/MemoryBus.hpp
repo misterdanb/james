@@ -28,7 +28,7 @@ namespace james
 			 * Destructor of MemoryBus.
 			 */
 			~MemoryBus() = default;
-			
+
 			/**
 			 * Reads a byte from this part of the memory bus.
 			 *
@@ -57,7 +57,7 @@ namespace james
 			 *
 			 * @see WriteByte
 			 */
-			j16 ReadWord(j16 address);
+			j16 ReadWord (j16 address);
 
 			/**
 			 * Writes a word to this part of the memory bus.
@@ -67,7 +67,7 @@ namespace james
 			 *
 			 * @see ReadByte
 			 */
-			void WriteWord(j16 address, j16 value);
+			void WriteWord (j16 address, j16 value);
 		};
 	}
 }

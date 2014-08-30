@@ -9,7 +9,7 @@ GameboyColor::GameboyColor()
 	  _buttonKeysSelected (1),
 	  _cartridge (NULL),
 	  _forceClassicGameboy (GBC_TRUE),
-		_timer(),
+	  _timer(),
 	  _hybr1s80(),
 	  _speedFactor (1),
 	  _monochromePalette(),

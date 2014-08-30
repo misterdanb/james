@@ -19,8 +19,8 @@ namespace james
 				MBC1 (DynamicArray<int>);
 				~MBC1();
 
-				void Serialize(std::ostream&);
-				void Deserialize(std::istream&);
+				void Serialize (std::ostream&);
+				void Deserialize (std::istream&);
 
 				int ReadByte (int);
 				void WriteByte (int, int);

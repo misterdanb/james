@@ -13,26 +13,26 @@ MBC1::~MBC1()
 {
 }
 
-void MBC1::Serialize(std::ostream& os)
+void MBC1::Serialize (std::ostream& os)
 {
-	Cartridge::Serialize(os);
+	Cartridge::Serialize (os);
 
 	Array<char, 2> outRegisters =
 	{
-		char(_ramEnabled),
-		char(_romRamMode)
+		char (_ramEnabled),
+		char (_romRamMode)
 	};
 
-	os.write(&outRegisters[0], 2);
+	os.write (&outRegisters[0], 2);
 }
 
-void MBC1::Deserialize(std::istream& is)
+void MBC1::Deserialize (std::istream& is)
 {
-	Cartridge::Deserialize(is);
+	Cartridge::Deserialize (is);
 
 	Array<char, 2> inRegisters;
 
-	is.read(&inRegisters[0], 2);
+	is.read (&inRegisters[0], 2);
 
 	_ramEnabled = inRegisters[0];
 	_romRamMode = inRegisters[1];

@@ -60,7 +60,7 @@ void Cartridge::Deserialize (std::istream& is)
 	// ... loading this might be wrong
 	Array<char, 2> inRegisters;
 
-	is.read(&inRegisters[0], 2);
+	is.read (&inRegisters[0], 2);
 
 	_selectedRomBank = inRegisters[0];
 	_selectedRamBank = inRegisters[1];

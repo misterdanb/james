@@ -11,20 +11,20 @@ namespace james
 	{
 		class Timer : public Executable
 		{
-		public:
+		  public:
 			static const int DEVIDER_REGISTER_ADDRESS = 0xFF04;
 			static const int TIMER_COUNTER_ADDRESS = 0xFF05;
 			static const int TIMER_MODULO_ADDRESS = 0xFF06;
 			static const int TIMER_CONTROL_ADDRESS = 0xFF07;
 
-		public:
+		  public:
 			Timer();
 			~Timer();
 
 			void SetRenderContext (RenderContext& rc);
 			void ExecuteTicks (int);
 
-		private:
+		  private:
 			RenderContext* _rc;
 
 			int _ticksPerCycle;

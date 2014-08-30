@@ -2247,7 +2247,6 @@ void Processor::ExecuteInterrupt()
 		{
 			// Decrement the stack pointer and push the current program counter.
 			_state.sp -= 2;
-			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
@@ -2275,7 +2274,6 @@ void Processor::ExecuteInterrupt()
 		{
 			// Decrement the stack pointer and push the current program counter.
 			_state.sp -= 2;
-			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
@@ -2302,7 +2300,6 @@ void Processor::ExecuteInterrupt()
 		{
 			// Decrement the stack pointer and push the current program counter.
 			_state.sp -= 2;
-			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
 			_bus->WriteByte (_state.sp + 1, GetHigh (_state.pc));
@@ -2328,7 +2325,6 @@ void Processor::ExecuteInterrupt()
 		else if (interruptsToBePerformed & (1 << JOYPAD_INTERRUPT_BIT_NUMBER))
 		{
 			// Decrement the stack pointer and push the current program counter.
-			_state.sp -= 2;
 			_state.sp -= 2;
 
 			_bus->WriteByte (_state.sp, GetLow (_state.pc));
