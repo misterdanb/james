@@ -63,6 +63,8 @@ namespace james
 				// helper methods
 				void FetchInstruction (InstructionTable instructionTable);
 
+				void TakeInterrupt (int bitNumber);
+
 				void UpdatePC (InstructionTable instructionTable);
 				void UpdateTicks (InstructionTable instructionTable);
 				void UpdateAdditionalTicks (InstructionTable instructionTable);
