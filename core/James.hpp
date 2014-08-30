@@ -77,37 +77,37 @@ namespace james
 	const int GBC_TRUE = 1;
 
 	// const expressions
-	constexpr int GetBit (int x, int n)
+	constexpr int GetBit (j8 x, int n)
 	{
 		return (x >> n) & 0x01;
 	}
 
-	constexpr int SetBit (int x, int n, int value)
+	constexpr int SetBit (j8 x, int n, bool value)
 	{
 		return (x & (~ (0x01 << n))) | (value ? (0x01 << n) : 0x00);
 	}
 
-	constexpr int GetHigh (int x)
+	constexpr int GetHigh (j8 x)
 	{
 		return (x >> 8) & 0xFF;
 	}
 
-	constexpr int GetLow (int x)
+	constexpr int GetLow (j8 x)
 	{
 		return x & 0xFF;
 	}
 
-	constexpr int JoinBytes (int high, int low)
+	constexpr int JoinBytes (j8 high, j8 low)
 	{
 		return ((high & 0xFF) << 8) | (low & 0xFF);
 	}
 
-	constexpr int GetSignedValue (int x)
+	constexpr int GetSignedValue (j8 x)
 	{
 		return (x & 0x7F) - (x & 0x80);
 	}
 
-	constexpr int GetAbsoluteValue (int x)
+	constexpr int GetAbsoluteValue (j8 x)
 	{
 		return (x < 0) ? (x * (-1)) : x;
 	}

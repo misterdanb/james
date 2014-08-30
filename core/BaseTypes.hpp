@@ -33,7 +33,11 @@ namespace james
 		template<class T, class U>
 		using Pair = std::pair<T, U>;
 
-		typedef unsigned char byte;
+		//typedef unsigned char byte;
+		typedef int j8;
+		typedef int j16;
+		typedef unsigned int ju8;
+		typedef unsigned int ju16;
 	}
 }
 
