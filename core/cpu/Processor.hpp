@@ -3,12 +3,12 @@
 
 #include "../James.hpp"
 #include "../MemoryBus.hpp"
+#include "../Executable.hpp"
 #include "../InterruptHandler.hpp"
 #include "../Serializable.hpp"
 #include "State.hpp"
 #include "InstructionTable.hpp"
 #include "LookUpTables.hpp"
-#include "Timer.hpp"
 
 namespace james
 {
@@ -16,7 +16,7 @@ namespace james
 	{
 		namespace cpu
 		{
-			class Processor : public IInterruptHandler, public Serializable
+			class Processor : public Executable, public IInterruptHandler, public Serializable
 			{
 			  public:
 				static const int CFLAG_BIT = 4;
@@ -32,10 +32,9 @@ namespace james
 				void Deserialize (std::istream&);
 
 				void SetMemoryBus (MemoryBus*);
-				Timer* GetTimer();
 
 				void Step();
-				void Execute (int);
+				void ExecuteTicks (int);
 
 				void ExecuteInstruction();
 				void ExecuteInterrupt();
@@ -63,6 +62,8 @@ namespace james
 				Processor& operator= (Processor&) = delete;
 				// helper methods
 				void FetchInstruction (InstructionTable instructionTable);
+
+				void TakeInterrupt (int bitNumber);
 
 				void UpdatePC (InstructionTable instructionTable);
 				void UpdateTicks (InstructionTable instructionTable);
@@ -200,7 +201,6 @@ namespace james
 
 				State _state;
 				MemoryBus* _bus;
-				Timer _timer;
 
 			  private:
 				bool _recording;

@@ -16,20 +16,20 @@ Timer::~Timer()
 {
 }
 
-void Timer::SetRenderContext (RenderContext* rc)
+void Timer::SetRenderContext (RenderContext& rc)
 {
-	_rc = rc;
+	_rc = &rc;
 }
 
-void Timer::Advance (int ticks)
+void Timer::ExecuteTicks (int ticks)
 {
 	_timerCounter = _rc->ioPorts[5];
 
-	if (_rc->ioPorts[7] & 0x04)
+	if (GetBit (_rc->ioPorts[TIMER_CONTROL_ADDRESS - 0xFF00], 2))
 	{
-		if (! (_ticksPerCycle))
+		if (_ticksPerCycle == 0)
 		{
-			switch (_rc->ioPorts[7] & 0x03)
+			switch (_rc->ioPorts[TIMER_CONTROL_ADDRESS - 0xFF00] & 0x03)
 			{
 				case 0:
 					_ticksPerCycle = 1024;
@@ -64,7 +64,7 @@ void Timer::Advance (int ticks)
 
 		if (_timerCounter > 0xFF)
 		{
-			_rc->ioPorts[5]   =_rc->ioPorts[6];
+			_rc->ioPorts[TIMER_COUNTER_ADDRESS - 0xFF00] =_rc->ioPorts[TIMER_MODULO_ADDRESS - 0xFF00];
 			_rc->interruptHandler->SignalTimerInterrupt();
 			_ticksPerCycle = 0;
 		}
@@ -78,10 +78,12 @@ void Timer::Advance (int ticks)
 
 	if (_dividerCounter > 0xFF)
 	{
-		_rc->ioPorts[4]++;
+		_rc->ioPorts[DEVIDER_REGISTER_ADDRESS - 0xFF00]++;
 
-		if (_rc->ioPorts[4] > 0xFF)
-		{ _rc->ioPorts[4] = 0; }
+		if (_rc->ioPorts[DEVIDER_REGISTER_ADDRESS - 0xFF00] > 0xFF)
+		{
+			_rc->ioPorts[DEVIDER_REGISTER_ADDRESS - 0xFF00] = 0;
+		}
 
 		_dividerCounter = 0;
 	}

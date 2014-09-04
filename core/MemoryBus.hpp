@@ -20,6 +20,16 @@ namespace james
 		{
 		  public:
 			/**
+			 * Contructor of MemoryBus.
+			 */
+			MemoryBus() = default;
+
+			/**
+			 * Destructor of MemoryBus.
+			 */
+			~MemoryBus() = default;
+
+			/**
 			 * Reads a byte from this part of the memory bus.
 			 *
 			 * @param address The address from which the byte is read.
@@ -27,7 +37,7 @@ namespace james
 			 *
 			 * @see WriteByte
 			 */
-			virtual int ReadByte (int address) = 0;
+			virtual j8 ReadByte (j16 address) = 0;
 
 			/**
 			 * Writes a byte to this part of the memory bus.
@@ -37,7 +47,27 @@ namespace james
 			 *
 			 * @see ReadByte
 			 */
-			virtual void WriteByte (int address, int value) = 0;
+			virtual void WriteByte (j16 address, j8 value) = 0;
+
+			/**
+			 * Reads a word from this part of the memory bus.
+			 *
+			 * @param address The address from which the word is read.
+			 * @return The word which has been read.
+			 *
+			 * @see WriteByte
+			 */
+			j16 ReadWord (j16 address);
+
+			/**
+			 * Writes a word to this part of the memory bus.
+			 *
+			 * @param address The address to which the word is written.
+			 * @param value The word which is written.
+			 *
+			 * @see ReadByte
+			 */
+			void WriteWord (j16 address, j16 value);
 		};
 	}
 }

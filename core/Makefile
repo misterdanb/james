@@ -107,8 +107,8 @@ MemoryBlock.o: MemoryBlock.cpp
 MemoryBus.o: MemoryBus.cpp
 	$(CC) $(FLAGS) $(CFLAGS) MemoryBus.cpp -o MemoryBus.o
 
-cpu/Timer.o: cpu/Timer.cpp
-	$(CC) $(FLAGS) $(CFLAGS) cpu/Timer.cpp -o cpu/Timer.o
+Timer.o: Timer.cpp
+	$(CC) $(FLAGS) $(CFLAGS) Timer.cpp -o Timer.o
 
 James.o: James.cpp
 	$(CC) $(FLAGS) $(CFLAGS) James.cpp -o James.o
