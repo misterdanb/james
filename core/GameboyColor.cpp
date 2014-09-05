@@ -166,6 +166,9 @@ void GameboyColor::Finalize()
 {
 	LOG ("Finalizing Gameboy Color emulation");
 
+	if (_cartridge == NULL)
+		return;
+
 	std::string path = ToHex (_cartridge->GetHeader().globalChecksum[0]) +
 					   ToHex (_cartridge->GetHeader().globalChecksum[1]) +
 					   std::string (".battery");
