@@ -81,8 +81,10 @@ class GtkJames : public james::core::Frontend
 
 /* VARIABLES */
 // james
-GtkJames *gtk_james;
-GThread *thread_james;
+GtkJames *gtk_james = NULL;
+GThread *thread_james = NULL;
+
+gchar *init_file_path = NULL;
 
 char title[32] = { 0, };
 
@@ -321,7 +323,7 @@ on_key_release(GtkWidget *widget,
 }
 
 char *
-show_open_dialog(gchar *title)
+show_open_dialog(const char *title)
 {
 	GtkWidget *dialog = gtk_file_chooser_dialog_new (title,
 	                                                 GTK_WINDOW(window),
@@ -352,7 +354,7 @@ show_open_dialog(gchar *title)
 }
 
 char *
-show_save_dialog(gchar *title)
+show_save_dialog(const char *title)
 {
 	GtkWidget *dialog = gtk_file_chooser_dialog_new (title,
 	                                                 GTK_WINDOW(window),
@@ -415,7 +417,6 @@ on_menu_open_clicked(GSimpleAction *action,
 	if (file_path != NULL)
 	{
 		james_open(file_path);
-
 		james_pause();
 	}
 }
@@ -487,8 +488,8 @@ on_screen_draw(GtkWidget *self,
 	gdk_cairo_set_source_pixbuf(cr, pixbuf_scaled, 0, 0);
 	cairo_paint(cr);
 
-	gdk_pixbuf_unref(pixbuf);
-	gdk_pixbuf_unref(pixbuf_scaled);
+	g_object_unref(pixbuf);
+	g_object_unref(pixbuf_scaled);
 
 	return FALSE;
 }
@@ -586,17 +587,38 @@ on_activate(GApplication *app,
 	gtk_james->Initialize();
 
 	thread_james = NULL;
+g_print("iaencfglxsolvcqfosclvohfgsclvoqclvso\n");
 
-	james_pause();
+	if (init_file_path != NULL)
+	{
+		james_open(init_file_path);
+		james_pause();
+	}
 }
 
 static void
 on_shutdown(GApplication *app,
             gpointer      data)
 {
-	gtk_james->Finalize();
+	if (gtk_james != NULL)
+	{
+		gtk_james->Finalize();
 
-	delete gtk_james;
+		delete gtk_james;
+	}
+}
+
+static void
+on_open(GApplication *app,
+        GFile       **files,
+        gint          n_files,
+        gchar        *hint,
+        gpointer      data)
+{
+	if (n_files != 0)
+	{
+		init_file_path = g_file_get_path(files[0]);
+	}
 }
 
 int
@@ -605,8 +627,12 @@ main(int   argc,
 {
 	int status;
 
-	app = gtk_application_new("james.gtkapp", G_APPLICATION_FLAGS_NONE);
+	app = gtk_application_new("org.gnome.james", G_APPLICATION_HANDLES_OPEN);
+
+	//g_application_add_main_option_entries(G_APPLICATION(app), options);
+
 	g_signal_connect(app, "activate", G_CALLBACK(on_activate), NULL);
+	g_signal_connect(app, "open", G_CALLBACK(on_open), NULL);
 	g_signal_connect(app, "shutdown", G_CALLBACK(on_shutdown), NULL);
 	//g_signal_connect(app, "quit", G_CALLBACK(on_quit), NULL);
 	
